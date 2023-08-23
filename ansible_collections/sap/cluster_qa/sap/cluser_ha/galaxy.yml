@@ -1,0 +1,36 @@
+---
+
+namespace: sap
+
+name: cluster_ha
+
+version: 1.0.0
+
+readme: README.md
+
+authors:
+  - Amir Memon (@amemon-redhat)
+  - Kirill Satarin (@kksat)
+
+description: SAP HA Cluster quality assurance content
+
+license:
+- GPL-3.0-only
+
+license_file: 'LICENSE'
+
+tags: []
+
+dependencies: {
+  sap.sap_operations: '==1.1.0'
+  }
+
+repository: https://github.com/redhat-sap/ha-cluster-qa
+
+documentation: https://github.com/redhat-sap/ha-cluster-qa
+
+homepage: https://github.com/redhat-sap/ha-cluster-qa
+
+issues: https://github.com/redhat-sap/ha-cluster-qa
+
+build_ignore: []
