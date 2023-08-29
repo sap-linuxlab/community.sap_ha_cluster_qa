@@ -1,0 +1,67 @@
+---
+- name: Playbook to test Network Failures by blocking firewall on the Primary side
+  hosts: all
+  tasks:
+    - name: Dropping corosync network connection on primary
+      shell: "firewall-cmd --direct --add-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
+      delegate_to: "{{ sap_hana_master_node }}"
+      run_once: true
+
+    - name: Waiting for slave node cluster to go offline
+      shell: "pcs status | grep 'Node List' -A2 | xargs"
+      register: slave_node_cluster_state
+      delegate_to: "{{ sap_hana_master_node }}"
+      run_once: true
+      until: "'OFFLINE:' in slave_node_cluster_state.stdout"
+      retries: 400
+      delay: 1
+        
+    - name: Acquiring the state of slave node
+      shell: "pcs status | grep 'Node List' -A2 | xargs"
+      register: slave_node_cluster_state
+      delegate_to: "{{ sap_hana_master_node }}"
+      run_once: true
+
+    - name: Verifying Slave node in offline state
+      debug:
+        msg: "Current state of slave node is {{ slave_node_cluster_state.stdout }}"
+      failed_when: "'OFFLINE' not in slave_node_cluster_state.stdout"
+    
+    - name: Restoring Network connection on the Primary side
+      shell: "firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
+      delegate_to: "{{ sap_hana_master_node }}"
+      run_once: true
+
+    - name: Wait 900 seconds, but only start checking after 10 seconds
+      ansible.builtin.wait_for_connection:
+        delay: 10
+        timeout: 900
+
+    - name: Acquiring the state of slave node from master
+      shell: pcs status | grep "Node List" -A2 | grep "{{ sap_hana_slave_node }}"
+      register: slave_node_cluster_state
+      delegate_to: "{{ sap_hana_master_node }}"
+      run_once: true
+
+    - name: Waiting for slave node cluster to come back online
+      shell: "pcs status | grep 'Node List' -A2 | xargs"
+      register: slave_node_cluster_state
+      delegate_to: "{{ sap_hana_master_node }}"
+      run_once: true
+      until: "'OFFLINE:' not in slave_node_cluster_state.stdout"
+      retries: 400
+      delay: 1
+
+    - name: Verifying Slave node back to Online state
+      debug:
+        msg: "Current state of slave node is {{ slave_node_cluster_state.stdout }}"
+      failed_when: "'Online:' not in slave_node_cluster_state.stdout"
+
+    - name: Waiting for SOK Replication sync state after restoring Network
+      shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      register: sap_hana_sync_state
+      delegate_to: "{{ sap_hana_slave_node }}"
+      run_once: true
+      until: "'SOK' in sap_hana_sync_state.stdout"
+      retries: 480
+      delay: 2
