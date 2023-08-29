@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  author:
+    - Kirill Satarin (@kksat)
+    - Amir Memon (@amemon-redhat)
+
+  description: Ensure that HANA cluster is initialized for QA testing
+
+  min_ansible_version: "2.9"
+
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+
+  license: GPL-3.0-only
+  galaxy_tags: []
+
+dependencies: []
