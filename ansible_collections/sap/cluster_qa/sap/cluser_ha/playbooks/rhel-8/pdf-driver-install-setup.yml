@@ -1,0 +1,41 @@
+---
+- name: Playbook to install and configure cups-pdf printer driver
+  hosts: localhost
+  become: true
+  gather_facts: true
+  vars:
+    callback_plugins:
+      - "{{ playbook_dir }}/callback_plugins"
+  tasks:
+    - name: Install cups-pdf package
+      yum:
+        name: cups-pdf
+        state: present
+
+    - name: Configure cups-pdf printer
+      lineinfile:
+        path: /etc/cups/cups-pdf.conf
+        regexp: '{{ item.regexp }}'
+        line: '{{ item.line }}'
+      with_items:
+        - { regexp: '^Out .*', line: 'Out ${HOME}/PDF' }
+        - { regexp: '^Annots .*', line: 'Annots yes' }
+        - { regexp: '^DefaultPrinter .*', line: 'DefaultPrinter PDF' }
+
+    - name: Create PDF output directory
+      file:
+        path: /root/rhel-8-hsr-cluster-test/test-runs
+        state: directory
+
+    - name: Create callback_plugins directory
+      file:
+        path: "{{ playbook_dir }}/callback_plugins"
+        state: directory
+
+    - name: Copy PDF callback plugin to callback_plugins directory
+      copy:
+        src: pdf.py
+        dest: "{{ playbook_dir }}/callback_plugins"
+
+
+

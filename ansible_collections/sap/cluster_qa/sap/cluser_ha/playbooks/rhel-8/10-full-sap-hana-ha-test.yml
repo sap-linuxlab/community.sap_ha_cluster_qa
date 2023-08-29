@@ -1,0 +1,6 @@
+---
+- name: Playbook to test the working state of the Pacemaker HANA cluster Nodes
+  hosts: all 
+- import_playbook: 01-acquire-and-set-facts.yml
+- import_playbook: 08-cluster-network-down-tests.yml
+- import_playbook: 01-acquire-and-set-facts.yml
