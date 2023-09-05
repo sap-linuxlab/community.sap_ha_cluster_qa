@@ -11,7 +11,7 @@ venv/bin/activate:  ## Create virtual environment
 	. venv/bin/activate && pip install -r requirements-dev.txt
 
 .PHONY: requirements.yml
-requirements.yml:  ## Install ansible collections requirements
+requirements.yml: venv/bin/activate  ## Install ansible collections requirements
 	. venv/bin/activate && \
 	ANSIBLE_COLLECTIONS_PATH=${ANSIBLE_COLLECTIONS_PATH_VENV} ansible-galaxy collection install -r requirements.yml --collections-path ${ANSIBLE_COLLECTIONS_PATH_VENV}
 
