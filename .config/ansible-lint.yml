@@ -1,0 +1,14 @@
+warn_list:
+    - no-handler
+    - command-instead-of-module
+exclude_paths:
+    - ansible_collection/sap/sap_operations/
+    - ansible_collection/ansible/
+    - ansible_collection/community/
+    - venv/
+    - .venv/
+    - .github/
+    - .config/
+    - .idea/
+    - tests
+    - ansible_collection/sap/sap_operations/changelogs/changelog.yaml
