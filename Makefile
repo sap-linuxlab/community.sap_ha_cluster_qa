@@ -1,3 +1,9 @@
+ANSIBLE_COLLECTIONS_PATH_VENV=venv
+export ANSIBLE_COLLECTIONS_PATH_VENV
+
+COLLECTION_PATH=.
+export COLLECTION_PATH
+
 .ONESHELL:
 venv/bin/activate:  ## Create virtual environment
 	python3 -m venv venv
@@ -6,11 +12,12 @@ venv/bin/activate:  ## Create virtual environment
 
 .PHONY: requirements.yml
 requirements.yml:  ## Install ansible collections requirements
-	ansible-galaxy collection install -r requirements.yml
+	. venv/bin/activate && \
+	ANSIBLE_COLLECTIONS_PATH=${ANSIBLE_COLLECTIONS_PATH_VENV} ansible-galaxy collection install -r requirements.yml --collections-path ${ANSIBLE_COLLECTIONS_PATH_VENV}
 
 .PHONY: ansible-lint
 ansible-lint: venv/bin/activate  ## Run ansible-lint
-	. venv/bin/activate && ANSIBLE_COLLECTIONS_PATH=. ansible-lint --offline --config .config/ansible-lint.yml
+	. venv/bin/activate && ANSIBLE_COLLECTIONS_PATH=${COLLECTION_PATH}:${ANSIBLE_COLLECTIONS_PATH_VENV} ansible-lint --offline --config .config/ansible-lint.yml
 
 .PHONY: yamllint
 yamllint: venv/bin/activate ## Run yamllint
@@ -25,3 +32,9 @@ clean-venv:  ## Clean virtual environment
 
 .PHONY: clean
 clean: clean-venv  ## Clean
+
+.PHONY: collection-list
+collection-list:  ## List ansible installed collections
+	. venv/bin/activate && \
+	ANSIBLE_COLLECTIONS_PATH=${COLLECTION_PATH}:${ANSIBLE_COLLECTIONS_PATH_VENV} \
+	ansible-galaxy collection list
