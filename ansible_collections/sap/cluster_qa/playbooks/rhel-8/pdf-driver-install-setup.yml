@@ -18,9 +18,9 @@
         regexp: '{{ item.regexp }}'
         line: '{{ item.line }}'
       with_items:
-        - { regexp: '^Out .*', line: 'Out ${HOME}/PDF' }
-        - { regexp: '^Annots .*', line: 'Annots yes' }
-        - { regexp: '^DefaultPrinter .*', line: 'DefaultPrinter PDF' }
+        - {regexp: '^Out .*', line: 'Out ${HOME}/PDF'}
+        - {regexp: '^Annots .*', line: 'Annots yes'}
+        - {regexp: '^DefaultPrinter .*', line: 'DefaultPrinter PDF'}
 
     - name: Create PDF output directory
       file:
@@ -36,6 +36,3 @@
       copy:
         src: pdf.py
         dest: "{{ playbook_dir }}/callback_plugins"
-
-
-
