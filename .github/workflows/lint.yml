@@ -1,0 +1,20 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request_target:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Run lint
+        run: |
+          make lint
