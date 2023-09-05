@@ -4,6 +4,10 @@ venv/bin/activate:  ## Create virtual environment
 	. venv/bin/activate && pip install -r requirements.txt
 	. venv/bin/activate && pip install -r requirements-dev.txt
 
+.PHONY: requirements.yml
+requirements.yml:  ## Install ansible collections requirements
+	ANSIBLE_COLLECTIONS_PATH=./ ansible-galaxy collection install -r requirements.yml
+
 .PHONY: ansible-lint
 ansible-lint: venv/bin/activate  ## Run ansible-lint
 	. venv/bin/activate && ANSIBLE_COLLECTIONS_PATH=./ ansible-lint --offline --config .config/ansible-lint.yml
