@@ -6,11 +6,11 @@ venv/bin/activate:  ## Create virtual environment
 
 .PHONY: requirements.yml
 requirements.yml:  ## Install ansible collections requirements
-	ANSIBLE_COLLECTIONS_PATH=./ ansible-galaxy collection install -r requirements.yml
+	ansible-galaxy collection install -r requirements.yml
 
 .PHONY: ansible-lint
 ansible-lint: venv/bin/activate  ## Run ansible-lint
-	. venv/bin/activate && ANSIBLE_COLLECTIONS_PATH=./ ansible-lint --offline --config .config/ansible-lint.yml
+	. venv/bin/activate && ANSIBLE_COLLECTIONS_PATH=. ansible-lint --offline --config .config/ansible-lint.yml
 
 .PHONY: yamllint
 yamllint: venv/bin/activate ## Run yamllint
