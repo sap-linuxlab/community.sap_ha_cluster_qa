@@ -2,15 +2,15 @@
 - name: Playbook to test the working and state of the Pacemaker HANA cluster Nodes
   hosts: all
   vars:
-    - sap_preconfigure_reboot_ok: yes
-    - sap_hana_preconfigure_enable_sap_hana_repos: yes
-    - sap_hana_preconfigure_set_minor_release: yes
-    - sap_hana_preconfigure_modify_grub_cmdline_linux: yes
-    - sap_hana_preconfigure_reboot_ok: yes
+    - sap_preconfigure_reboot_ok: true
+    - sap_hana_preconfigure_enable_sap_hana_repos: true
+    - sap_hana_preconfigure_set_minor_release: true
+    - sap_hana_preconfigure_modify_grub_cmdline_linux: true
+    - sap_hana_preconfigure_reboot_ok: true
     - sap_domain: example.com
-    - sap_netweaver_preconfigure_fail_if_not_enough_swap_space_configured: no
-    - sap_hana_preconfigure_fail_if_not_enough_swap_space_configured: no
-    - sap_preconfigure_modify_etc_hosts: no
+    - sap_netweaver_preconfigure_fail_if_not_enough_swap_space_configured: false
+    - sap_hana_preconfigure_fail_if_not_enough_swap_space_configured: false
+    - sap_preconfigure_modify_etc_hosts: false
   tasks:
     - name: Verify or make the cluster online
       pacemaker_cluster:

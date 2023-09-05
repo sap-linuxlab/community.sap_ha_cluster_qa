@@ -15,7 +15,7 @@ authors:
 description: SAP HA Cluster quality assurance content
 
 license:
-- GPL-3.0-only
+  - GPL-3.0-only
 
 license_file: 'LICENSE'
 
@@ -23,7 +23,7 @@ tags: []
 
 dependencies: {
   sap.sap_operations: '==1.1.0'
-  }
+}
 
 repository: https://github.com/redhat-sap/ha-cluster-qa
 

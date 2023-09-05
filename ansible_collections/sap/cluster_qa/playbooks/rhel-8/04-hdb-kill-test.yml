@@ -12,7 +12,7 @@
       failed_when: "'SOK' not in sap_hana_sync_state_t4.stdout"
 
     - name: PERFORMING HDB kill on MASTER node
-      become: yes
+      become: true
       become_user: "{{ sap_hana_sid|lower }}adm"
       shell: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB kill"
       delegate_to: "{{ sap_hana_master_node }}"
@@ -52,7 +52,7 @@
       debug:
         msg: "Current state of resource recovery is {{ sap_hana_resource_recovery_state.stdout }}"
       when: "'PREFER_SITE_TAKEOVER=false' in prefer_site_takeover"
-      failed_when: "'Masters:' and sap_hana_master_node not in sap_hana_resource_recovery_state.stdout"   
+      failed_when: "'Masters:' and sap_hana_master_node not in sap_hana_resource_recovery_state.stdout"
 
     - name: Cleaning up cluster for next test
       shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
@@ -81,4 +81,3 @@
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"
       when: "'PREFER_SITE_TAKEOVER=true' in prefer_site_takeover"
-

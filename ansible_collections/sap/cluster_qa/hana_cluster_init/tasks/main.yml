@@ -62,8 +62,8 @@
 - name: Acquiring Firewalld state
   shell: "systemctl is-active firewalld"
   register: firewalld_state
-  failed_when: False
-  changed_when: False
+  failed_when: false
+  changed_when: false
 
 - name: Verifying Firewalld state
   debug:

@@ -5,8 +5,8 @@
     - name: Acquiring Firewalld state
       shell: "systemctl is-active firewalld"
       register: firewalld_state
-      failed_when: False
-      changed_when: False
+      failed_when: false
+      changed_when: false
 
     - name: Verifying Firewalld state
       debug:
@@ -63,7 +63,7 @@
     - name: Closing Acquired ports of master on both nodes
       firewalld:
         port: "{{ item }}/tcp"
-        permanent: yes
+        permanent: true
         state: disabled
       loop: "{{ sr_master_ports.stdout_lines}}"
 
@@ -76,7 +76,7 @@
     - name: Closing Acquired ports of slave node on both nodes
       firewalld:
         port: "{{ item }}/tcp"
-        permanent: yes
+        permanent: true
         state: disabled
       loop: "{{ sr_slave_ports.stdout_lines}}"
 
@@ -85,4 +85,3 @@
         port: "4{{ sap_hana_instance_number }}00/tcp"
         permanent: true
         state: disabled
-

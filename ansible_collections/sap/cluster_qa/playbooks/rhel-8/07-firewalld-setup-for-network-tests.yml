@@ -22,20 +22,20 @@
     - name: Opening Acquired ports of master on both nodes
       firewalld:
         port: "{{ item }}/tcp"
-        permanent: yes
+        permanent: true
         state: enabled
-      loop: "{{ sr_master_ports.stdout_lines}}"   
+      loop: "{{ sr_master_ports.stdout_lines}}"
 
     - name: Acquiring SAP HANA System Replication slave ports
       shell: netstat -tulpn | egrep -e "hdb|saps|saph" | awk '{print $4}' | cut -d ":" -f2
       register: sr_slave_ports
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"
-    
+
     - name: Opening Acquired ports of slave node on both nodes
       firewalld:
         port: "{{ item }}/tcp"
-        permanent: yes
+        permanent: true
         state: enabled
       loop: "{{ sr_slave_ports.stdout_lines}}"
 

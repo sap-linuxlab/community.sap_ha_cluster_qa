@@ -15,7 +15,7 @@
       until: "'OFFLINE:' in slave_node_cluster_state.stdout"
       retries: 400
       delay: 1
-        
+
     - name: Acquiring the state of slave node
       shell: "pcs status | grep 'Node List' -A2 | xargs"
       register: slave_node_cluster_state
@@ -26,7 +26,7 @@
       debug:
         msg: "Current state of slave node is {{ slave_node_cluster_state.stdout }}"
       failed_when: "'OFFLINE' not in slave_node_cluster_state.stdout"
-    
+
     - name: Restoring Network connection on the Primary side
       shell: "firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
       delegate_to: "{{ sap_hana_master_node }}"
