@@ -1,0 +1,15 @@
+---
+
+extends: default
+
+ignore:
+  - changelogs
+  - venv
+  - .config
+  - .github
+  - changelogs/changelog.yaml
+
+rules:
+  line-length:
+    ignore: |
+      *
