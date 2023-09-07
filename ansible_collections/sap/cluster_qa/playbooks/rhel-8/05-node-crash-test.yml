@@ -7,7 +7,7 @@
       register: sap_hana_sync_state_t5
 
     - name: Verifying SOK state before performing test
-      debug:
+      ansible.builtin.debug:
         msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state_t5.stdout }}"
       failed_when: "'SOK' not in sap_hana_sync_state_t5.stdout"
 
@@ -36,7 +36,7 @@
       delay: 5
 
     - name: VERIFYING the promotion of the slave node
-      debug:
+      ansible.builtin.debug:
         msg: "Current state of resource recovery is {{ sap_hana_resource_recovery_state.stdout }}"
       failed_when: "'Masters:' and sap_hana_slave_node not in sap_hana_resource_recovery_state.stdout"
 
