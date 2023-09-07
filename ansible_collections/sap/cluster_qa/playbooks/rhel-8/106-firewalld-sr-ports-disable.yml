@@ -9,7 +9,7 @@
       changed_when: false
 
     - name: Verifying Firewalld state
-      debug:
+      ansible.builtin.debug:
         msg: "firewalld is {{ firewalld_state.stdout }}"
 
     - name: Setting Firewalld state as fact

@@ -7,7 +7,7 @@
       register: sap_hana_sync_state_t2
 
     - name: Verifying SOK state before performing test
-      debug:
+      ansible.builtin.debug:
         msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state_t2.stdout }}"
       failed_when: "'SOK' not in sap_hana_sync_state_t2.stdout"
 
@@ -18,7 +18,7 @@
       register: sap_hana_master_node_fenced
 
     - name: VERIFYING FENCE command successful
-      debug:
+      ansible.builtin.debug:
         msg: "Success message \"{{ sap_hana_master_node_fenced.stdout }}\" observed"
       failed_when: "'Node:' and 'fenced' not in sap_hana_master_node_fenced.stdout"
       delegate_to: "{{ sap_hana_slave_node }}"
@@ -43,7 +43,7 @@
       delay: 10
 
     - name: VERIFYING the failover process is completed
-      debug:
+      ansible.builtin.debug:
         msg: "Secondary instance is now promoted to master"
       failed_when: "'Masters:' not in sap_hana_promoted.stdout"
       delegate_to: "{{ sap_hana_slave_node }}"
