@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Acquiring Replication sync state
-      shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
       register: sap_hana_sync_state_t2
 
     - name: Verifying SOK state before performing test
@@ -12,7 +12,7 @@
       failed_when: "'SOK' not in sap_hana_sync_state_t2.stdout"
 
     - name: PERFORMING FENCE action of MASTER node from the slave node
-      shell: "pcs stonith fence {{ sap_hana_master_node }}"
+      ansible.builtin.shell: "pcs stonith fence {{ sap_hana_master_node }}"
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"
       register: sap_hana_master_node_fenced
@@ -24,7 +24,7 @@
       delegate_to: "{{ sap_hana_slave_node }}"
 
     - name: Waiting for commencement of the failover process
-      shell: "pcs resource status | grep {{ sap_hana_resource_name }} -A1 | tail -n1"
+      ansible.builtin.shell: "pcs resource status | grep {{ sap_hana_resource_name }} -A1 | tail -n1"
       register: sap_hana_promote_operation
       delegate_to: "{{ sap_hana_slave_node }}"
       run_once: true
@@ -34,7 +34,7 @@
       ignore_errors: true
 
     - name: Waiting for failover process to be completed
-      shell: "pcs resource status | grep {{ sap_hana_resource_name }} -A1 | tail -n1"
+      ansible.builtin.shell: "pcs resource status | grep {{ sap_hana_resource_name }} -A1 | tail -n1"
       register: sap_hana_promoted
       delegate_to: "{{ sap_hana_slave_node }}"
       run_once: true
