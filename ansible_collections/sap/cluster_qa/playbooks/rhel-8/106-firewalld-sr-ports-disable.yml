@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Acquiring Firewalld state
-      shell: "systemctl is-active firewalld"
+      ansible.builtin.shell: "systemctl is-active firewalld"
       register: firewalld_state
       failed_when: false
       changed_when: false
@@ -48,14 +48,14 @@
       ignore_errors: true
 
     - name: Waiting for cluster to start SAP HANA resource.
-      shell: pcs resource status | grep {{ sap_hana_resource_name }} -A2 | egrep -e "Masters|Slaves" | awk '{print $0}'
+      ansible.builtin.shell: pcs resource status | grep {{ sap_hana_resource_name }} -A2 | egrep -e "Masters|Slaves" | awk '{print $0}'
       register: sap_hana_resource_state
       until: "'Masters:' and 'Slaves:' in sap_hana_resource_state.stdout"
       retries: 120
       delay: 10
 
     - name: Acquiring SAP HANA System Replication master ports
-      shell: netstat -tulpn | egrep -e "hdb|saps|saph" | awk '{print $4}' | cut -d ":" -f2
+      ansible.builtin.shell: netstat -tulpn | egrep -e "hdb|saps|saph" | awk '{print $4}' | cut -d ":" -f2
       register: sr_master_ports
       run_once: true
       delegate_to: "{{ sap_hana_master_node }}"
@@ -68,7 +68,7 @@
       loop: "{{ sr_master_ports.stdout_lines}}"
 
     - name: Acquiring SAP HANA System Replication slave ports
-      shell: netstat -tulpn | egrep -e "hdb|saps|saph" | awk '{print $4}' | cut -d ":" -f2
+      ansible.builtin.shell: netstat -tulpn | egrep -e "hdb|saps|saph" | awk '{print $4}' | cut -d ":" -f2
       register: sr_slave_ports
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"

@@ -3,12 +3,12 @@
   hosts: all
   tasks:
     - name: Dropping corosync network connection on primary
-      shell: "firewall-cmd --direct --add-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
+      ansible.builtin.shell: "firewall-cmd --direct --add-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
 
     - name: Waiting for slave node cluster to go offline
-      shell: "pcs status | grep 'Node List' -A2 | xargs"
+      ansible.builtin.shell: "pcs status | grep 'Node List' -A2 | xargs"
       register: slave_node_cluster_state
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
@@ -17,7 +17,7 @@
       delay: 1
 
     - name: Acquiring the state of slave node
-      shell: "pcs status | grep 'Node List' -A2 | xargs"
+      ansible.builtin.shell: "pcs status | grep 'Node List' -A2 | xargs"
       register: slave_node_cluster_state
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
@@ -28,7 +28,7 @@
       failed_when: "'OFFLINE' not in slave_node_cluster_state.stdout"
 
     - name: Restoring Network connection on the Primary side
-      shell: "firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
+      ansible.builtin.shell: "firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
 
@@ -38,13 +38,13 @@
         timeout: 900
 
     - name: Acquiring the state of slave node from master
-      shell: pcs status | grep "Node List" -A2 | grep "{{ sap_hana_slave_node }}"
+      ansible.builtin.shell: pcs status | grep "Node List" -A2 | grep "{{ sap_hana_slave_node }}"
       register: slave_node_cluster_state
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
 
     - name: Waiting for slave node cluster to come back online
-      shell: "pcs status | grep 'Node List' -A2 | xargs"
+      ansible.builtin.shell: "pcs status | grep 'Node List' -A2 | xargs"
       register: slave_node_cluster_state
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
@@ -58,7 +58,7 @@
       failed_when: "'Online:' not in slave_node_cluster_state.stdout"
 
     - name: Waiting for SOK Replication sync state after restoring Network
-      shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
       register: sap_hana_sync_state
       delegate_to: "{{ sap_hana_slave_node }}"
       run_once: true

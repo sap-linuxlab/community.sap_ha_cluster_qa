@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Acquiring Replication sync state
-      shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
       register: sap_hana_sync_state_t3
 
     - name: Verifying SOK state before performing test
@@ -14,7 +14,7 @@
     - name: PERFORMING HDB stop on MASTER node
       become: true
       become_user: "{{ sap_hana_sid|lower }}adm"
-      shell: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB stop"
+      ansible.builtin.shell: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB stop"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
       register: sap_hana_master_node_hdb_stopped
@@ -30,7 +30,7 @@
       delay: 5
 
     - name: Waiting for Cluster to declare failure and start recovery
-      shell: pcs status | grep "Failed Resource Actions" -A1
+      ansible.builtin.shell: pcs status | grep "Failed Resource Actions" -A1
       register: sap_hana_master_monitor_operation_failed
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
@@ -39,7 +39,7 @@
       delay: 1
 
     - name: WAITING for recovery to complete on the same node
-      shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
+      ansible.builtin.shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
       register: sap_hana_resource_recovery_state
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
@@ -55,13 +55,13 @@
       failed_when: "'Masters:' and sap_hana_master_node not in sap_hana_resource_recovery_state.stdout"
 
     - name: Cleaning up cluster for next test
-      shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
+      ansible.builtin.shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
       run_once: true
       delegate_to: "{{ sap_hana_master_node }}"
       when: "'PREFER_SITE_TAKEOVER=false' in prefer_site_takeover"
 
     - name: WAITING promotion to complete on the other node
-      shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
+      ansible.builtin.shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
       register: sap_hana_resource_recovery_state
       delegate_to: "{{ sap_hana_slave_node }}"
       run_once: true
@@ -77,7 +77,7 @@
       failed_when: "'Masters:' and sap_hana_slave_node not in sap_hana_resource_recovery_state.stdout"
 
     - name: Cleaning up cluster for next test
-      shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
+      ansible.builtin.shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"
       when: "'PREFER_SITE_TAKEOVER=true' in prefer_site_takeover"

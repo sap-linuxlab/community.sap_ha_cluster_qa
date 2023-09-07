@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Acquiring Replication sync state
-      shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
       register: sap_hana_sync_state_t5
 
     - name: Verifying SOK state before performing test
@@ -12,13 +12,13 @@
       failed_when: "'SOK' not in sap_hana_sync_state_t5.stdout"
 
     - name: PERFORMING node crash on MASTER node
-      shell: "ssh root@{{ sap_hana_master_node }} 'echo c > /proc/sysrq-trigger' &"
+      ansible.builtin.shell: "ssh root@{{ sap_hana_master_node }} 'echo c > /proc/sysrq-trigger' &"
       delegate_to: localhost
       run_once: true
       ignore_errors: true
 
     - name: Verifying promotion process started on the other node
-      shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1
+      ansible.builtin.shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1
       register: sap_hana_resource_promotion_state
       delegate_to: "{{ sap_hana_slave_node }}"
       run_once: true
@@ -27,7 +27,7 @@
       delay: 2
 
     - name: WAITING for promotion to complete on the other node
-      shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
+      ansible.builtin.shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
       register: sap_hana_resource_recovery_state
       delegate_to: "{{ sap_hana_slave_node }}"
       run_once: true
