@@ -22,11 +22,11 @@
     sap_hana_instance_number: "{{ sap_hana_instance_number.stdout }}"
 
 - name: Checking Hardware CPU Architecture
-  debug:
+  ansible.builtin.debug:
     msg: "Hardware Archirecture of {{ ansible_hostname }} is {{ ansible_architecture }}"
 
 - name: Checking RHEL Version
-  debug:
+  ansible.builtin.debug:
     msg: "Red Hat Release Version is {{ ansible_distribution_version }}"
 
 - name: Acquiring SAP HANA resource agent version
@@ -34,7 +34,7 @@
   register: sap_hana_resource_agent
 
 - name: Checking Installed  SAP HANA Resource agent
-  debug:
+  ansible.builtin.debug:
     msg: "Installed SAP HANA Resource agent is {{ sap_hana_resource_agent.stdout }}"
 
 - name: Acquiring HANA release version
@@ -44,7 +44,7 @@
   register: sap_hana_release_version
 
 - name: Checking HANA Release Version
-  debug:
+  ansible.builtin.debug:
     msg: "HANA {{ sap_hana_release_version.stdout }}"
 
 - name: Acquiring Control Node's Ansible Version
@@ -54,7 +54,7 @@
   register: control_node_ansible_version
 
 - name: Checking Control Node's Ansible Version
-  debug:
+  ansible.builtin.debug:
     msg: "{{ control_node_ansible_version.stdout}}"
   delegate_to: localhost
   run_once: true
@@ -66,7 +66,7 @@
   changed_when: false
 
 - name: Verifying Firewalld state
-  debug:
+  ansible.builtin.debug:
     msg: "firewalld is {{ firewalld_state.stdout }}"
 
 - name: Setting Firewalld state as fact
@@ -115,7 +115,7 @@
   delay: 10
 
 - name: VERIFYING the running state of SAPHanaTopology resource
-  debug:
+  ansible.builtin.debug:
     msg: "Current state of SAP HANA Topology resource is {{ sap_hana_topology_resource_state.stdout }}"
   failed_when: "'Started:' not in sap_hana_topology_resource_state.stdout"
 
@@ -160,7 +160,7 @@
   when: "'AUTOMATED_REGISTER=true' in automated_register"
 
 - name: VERIFYING the running state of the SAP HANA Resource
-  debug:
+  ansible.builtin.debug:
     msg: "Current node and state of SAP HANA master is {{ sap_hana_resource_state.stdout }}"
   failed_when: "'Masters:' and 'Slaves:' not in sap_hana_resource_state.stdout"
   when: "'AUTOMATED_REGISTER=true' in automated_register"
@@ -174,7 +174,7 @@
   when: "'AUTOMATED_REGISTER=false' in automated_register"
 
 - name: VERIFYING the running state of the SAP HANA Resource
-  debug:
+  ansible.builtin.debug:
     msg: "Current node and state of SAP HANA master is {{ sap_hana_resource_state.stdout }}"
   failed_when: "'Masters:' not in sap_hana_resource_state.stdout"
   when: "'AUTOMATED_REGISTER=false' in automated_register"
@@ -216,7 +216,7 @@
   delay: 2
 
 - name: VERIFYING the running/started state of the SAP HANA VIP
-  debug:
+  ansible.builtin.debug:
     msg: "Current state of SAP HANA VIP is {{ sap_hana_vip_state.stdout }}"
   failed_when: "'Started' not in sap_hana_vip_state.stdout"
 
@@ -231,7 +231,7 @@
   when: "'AUTOMATED_REGISTER=true' in automated_register"
 
 - name: Verifying SOK state as {{ automated_register }}
-  debug:
+  ansible.builtin.debug:
     msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state.stdout }}"
   failed_when: "'SOK' not in sap_hana_sync_state.stdout"
   when: "'AUTOMATED_REGISTER=true' in automated_register"
@@ -346,7 +346,7 @@
   when: "'AUTOMATED_REGISTER=false' in automated_register"
 
 - name: Verifying SOK state as {{ automated_register }}
-  debug:
+  ansible.builtin.debug:
     msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state.stdout }}"
   failed_when: "'SOK' not in sap_hana_sync_state.stdout"
   when: "'AUTOMATED_REGISTER=false' in automated_register"

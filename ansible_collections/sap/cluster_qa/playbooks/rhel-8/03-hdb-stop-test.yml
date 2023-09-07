@@ -7,7 +7,7 @@
       register: sap_hana_sync_state_t3
 
     - name: Verifying SOK state before performing test
-      debug:
+      ansible.builtin.debug:
         msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state_t3.stdout }}"
       failed_when: "'SOK' not in sap_hana_sync_state_t3.stdout"
 
@@ -23,7 +23,7 @@
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
       until: "'hdbdaemon is stopped' in sap_hana_master_node_hdb_stopped.stdout"
-      debug:
+      ansible.builtin.debug:
         msg: "Success message \"hdbdaemon is stopped\" observed"
       failed_when: "'hdbdaemon is stopped' not in sap_hana_master_node_hdb_stopped.stdout"
       retries: 10
@@ -49,7 +49,7 @@
       delay: 5
 
     - name: VERIFYING the recovery on the same node
-      debug:
+      ansible.builtin.debug:
         msg: "Current state of resource recovery is {{ sap_hana_resource_recovery_state.stdout }}"
       when: "'PREFER_SITE_TAKEOVER=false' in prefer_site_takeover"
       failed_when: "'Masters:' and sap_hana_master_node not in sap_hana_resource_recovery_state.stdout"
@@ -71,7 +71,7 @@
       delay: 5
 
     - name: VERIFYING the promotion of the slave node
-      debug:
+      ansible.builtin.debug:
         msg: "Current state of resource recovery is {{ sap_hana_resource_recovery_state.stdout }}"
       when: "'PREFER_SITE_TAKEOVER=true' in prefer_site_takeover"
       failed_when: "'Masters:' and sap_hana_slave_node not in sap_hana_resource_recovery_state.stdout"
