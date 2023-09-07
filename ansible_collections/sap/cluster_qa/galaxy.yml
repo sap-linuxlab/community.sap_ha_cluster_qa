@@ -19,7 +19,13 @@ license:
 
 license_file: 'LICENSE'
 
-tags: []
+tags:
+  - linux
+  - sap
+  - cluster
+  - hana
+  - database
+  - tools
 
 dependencies:
   sap.sap_operations: '==1.1.0'
