@@ -80,7 +80,7 @@
   ignore_errors: true
 
 - name: Cleaning failed resource actions up if necessary
-  ansible.builtin.shell: pcs resource cleanup
+  ansible.builtin.command: pcs resource cleanup
   when: "'Failed Resource Actions' in failed_resource_actions.stdout"
   run_once: true
 
@@ -132,7 +132,7 @@
   register: sap_hana_resource_disabled
 
 - name: Enabling the SAP HANA resource to start
-  ansible.builtin.shell: pcs resource enable {{ sap_hana_resource_name }}
+  ansible.builtin.command: pcs resource enable {{ sap_hana_resource_name }}
   when: "'Stopped' and '(disabled)' in sap_hana_resource_disabled.stdout"
 
 - name: Acquiring AUTOMATED_REGISTER value
@@ -262,11 +262,16 @@
 
 - name: Setting Slave Node System Replication Mode as Fact
   set_fact:
-    sap_hana_slave_node_srmode: "{{ sap_hana_slave_node_srmode.stdout}}"
+    sap_hana_slave_node_srmode: "{{ sap_hana_slave_node_srmode.stdout }}"
   when: "'AUTOMATED_REGISTER=false' in automated_register"
 
 - name: Acquiring Slave Node Operation Mode
-  ansible.builtin.shell: "pcs node attribute | grep {{ sap_hana_slave_node }}: | awk '{print $2}' | cut -d '=' -f2 | xargs"
+  ansible.builtin.shell: |
+    set -o pipefail
+    pcs node attribute |
+    grep {{ sap_hana_slave_node }}:
+    | awk '{print $2}'
+    | cut -d '=' -f2 | xargs
   delegate_to: "{{ sap_hana_slave_node }}"
   run_once: true
   register: sap_hana_slave_node_opmode
@@ -274,11 +279,15 @@
 
 - name: Setting Slave Node Operation Mode as Fact
   set_fact:
-    sap_hana_slave_node_mode: "{{ sap_hana_slave_node_opmode.stdout}}"
+    sap_hana_slave_node_mode: "{{ sap_hana_slave_node_opmode.stdout }}"
   when: "'AUTOMATED_REGISTER=false' in automated_register"
 
 - name: Acquiring current System Replication sync state
-  ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | egrep -e 'Node:|hana_{{ sap_hana_sid|lower }}_clone_state|hana_{{ sap_hana_sid|lower }}_sync_state'"
+  ansible.builtin.shell: |
+    set -o pipefail
+    crm_mon -A1 |
+    grep 'Node Attributes' -A24 |
+    egrep -e 'Node:|hana_{{ sap_hana_sid | lower }}_clone_state|hana_{{ sap_hana_sid | lower }}_sync_state'
   register: sap_hana_sync_state
   delegate_to: "{{ sap_hana_slave_node }}"
   run_once: true
@@ -286,8 +295,16 @@
 
 - name: Re-Registering Former primary as Secondary to new primary
   become: true
-  become_user: "{{ sap_hana_sid|lower }}adm"
-  ansible.builtin.shell: "source /usr/sap/{{ sap_hana_sid }}/home/.sapenv.sh && /usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/exe/hdbnsutil -sr_register --remoteHost={{ sap_hana_master_node }} --remoteInstance={{ sap_hana_instance_number }} --replicationMode={{ sap_hana_slave_node_srmode }} --operationMode={{ sap_hana_slave_node_opmode.stdout }} --name={{ sap_hana_slave_node_dc }} --online"
+  become_user: "{{ sap_hana_sid | lower }}adm"
+  ansible.builtin.shell: |
+    set -o pipefail
+    source /usr/sap/{{ sap_hana_sid }}/home/.sapenv.sh && \
+    /usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/exe/hdbnsutil \
+    -sr_register --remoteHost={{ sap_hana_master_node }} \
+    --remoteInstance={{ sap_hana_instance_number }} \
+    --replicationMode={{ sap_hana_slave_node_srmode }} \
+    --operationMode={{ sap_hana_slave_node_opmode.stdout }} \
+    --name={{ sap_hana_slave_node_dc }} --online
   delegate_to: "{{ sap_hana_slave_node }}"
   run_once: true
   when: "'AUTOMATED_REGISTER=false' in automated_register and 'SFAIL' in sap_hana_sync_state.stdout"
@@ -300,7 +317,7 @@
   ignore_errors: true
 
 - name: Cleaning failed resource actions up if necessary
-  ansible.builtin.shell: pcs resource cleanup
+  ansible.builtin.command: pcs resource cleanup
   when: "'Failed Resource Actions' in failed_resource_actions.stdout"
   run_once: true
 
@@ -309,14 +326,19 @@
   register: failed_fencing_actions
   run_once: true
   ignore_errors: true
+  changed_when: false
 
 - name: Cleaning failed fencing actions
-  ansible.builtin.shell: stonith_admin --cleanup --history "*"
+  ansible.builtin.command: stonith_admin --cleanup --history "*"
   when: "'Failed Fencing Actions' in failed_fencing_actions.stdout"
   run_once: true
 
 - name: Waiting for SOK Replication sync state after Re-register using Ansible
-  ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+  ansible.builtin.shell: |
+    set -o pipefail
+    crm_mon -A1 |
+    grep 'Node Attributes' -A24 |
+    grep hana_{{ sap_hana_sid | lower }}_sync_state
   register: sap_hana_sync_state
   delegate_to: "{{ sap_hana_slave_node }}"
   run_once: true
@@ -325,10 +347,11 @@
   delay: 1
   when: "'AUTOMATED_REGISTER=false' in automated_register"
   ignore_errors: true
+  changed_when: false
 
 - name: Trying to start HANA DB manually since SOK state is still not observed
   become: true
-  become_user: "{{ sap_hana_sid|lower }}adm"
+  become_user: "{{ sap_hana_sid | lower }}adm"
   ansible.builtin.shell: "source /usr/sap/{{ sap_hana_sid }}/home/.sapenv.sh && HDB start"
   delegate_to: "{{ sap_hana_slave_node }}"
   run_once: true
@@ -336,7 +359,11 @@
   register: secondary_set
 
 - name: Waiting for SOK Replication sync state after Re-register using Ansible
-  ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+  ansible.builtin.shell: |
+    set -o pipefail
+    crm_mon -A1 |
+    grep 'Node Attributes' -A24 |
+    grep hana_{{ sap_hana_sid | lower }}_sync_state
   register: sap_hana_sync_state
   delegate_to: "{{ sap_hana_slave_node }}"
   run_once: true
@@ -344,6 +371,7 @@
   retries: 240
   delay: 2
   when: "'AUTOMATED_REGISTER=false' in automated_register"
+  changed_when: false
 
 - name: Verifying SOK state as {{ automated_register }}
   ansible.builtin.debug:

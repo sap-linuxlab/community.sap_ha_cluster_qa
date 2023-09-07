@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Acquiring Firewalld state
-      ansible.builtin.shell: "systemctl is-active firewalld"
+      ansible.builtin.command: "systemctl is-active firewalld"
       register: firewalld_state
       failed_when: false
       changed_when: false

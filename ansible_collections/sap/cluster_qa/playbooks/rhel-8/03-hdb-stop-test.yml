@@ -3,8 +3,13 @@
   hosts: all
   tasks:
     - name: Acquiring Replication sync state
-      ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      ansible.builtin.shell: |
+        set -o pipefail
+        crm_mon -A1 |
+        grep 'Node Attributes' -A24 |
+        grep hana_{{ sap_hana_sid | lower }}_sync_state
       register: sap_hana_sync_state_t3
+      changed_when: false
 
     - name: Verifying SOK state before performing test
       ansible.builtin.debug:
@@ -14,7 +19,7 @@
     - name: PERFORMING HDB stop on MASTER node
       become: true
       become_user: "{{ sap_hana_sid|lower }}adm"
-      ansible.builtin.shell: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB stop"
+      ansible.builtin.command: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB stop"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
       register: sap_hana_master_node_hdb_stopped
@@ -30,16 +35,23 @@
       delay: 5
 
     - name: Waiting for Cluster to declare failure and start recovery
-      ansible.builtin.shell: pcs status | grep "Failed Resource Actions" -A1
+      ansible.builtin.shell: |
+        set -o pipefail
+        pcs status | grep "Failed Resource Actions" -A1
       register: sap_hana_master_monitor_operation_failed
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
       until: "'Failed Resource Actions' in sap_hana_master_monitor_operation_failed.stdout"
       retries: 122
       delay: 1
+      changed_when: false
 
     - name: WAITING for recovery to complete on the same node
-      ansible.builtin.shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1 | tail -n1 | xargs
+      ansible.builtin.shell: |
+        set -o pipefail
+        pcs resource status |
+        grep "{{ sap_hana_resource_name }}" -A1 |
+        tail -n1 | xargs
       register: sap_hana_resource_recovery_state
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
@@ -47,6 +59,7 @@
       when: "'PREFER_SITE_TAKEOVER=false' in prefer_site_takeover"
       retries: 120
       delay: 5
+      changed_when: false
 
     - name: VERIFYING the recovery on the same node
       ansible.builtin.debug:

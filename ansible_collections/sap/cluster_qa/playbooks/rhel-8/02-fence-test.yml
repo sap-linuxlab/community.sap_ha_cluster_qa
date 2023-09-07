@@ -3,8 +3,13 @@
   hosts: all
   tasks:
     - name: Acquiring Replication sync state
-      ansible.builtin.shell: "crm_mon -A1 | grep 'Node Attributes' -A24 | grep hana_{{ sap_hana_sid | lower }}_sync_state"
+      ansible.builtin.shell: |
+        set -o pipefail
+        crm_mon -A1 |
+        grep 'Node Attributes' -A24 |
+        grep hana_{{ sap_hana_sid | lower }}_sync_state
       register: sap_hana_sync_state_t2
+      changed_when: false
 
     - name: Verifying SOK state before performing test
       ansible.builtin.debug:
@@ -32,6 +37,7 @@
       retries: 20
       delay: 5
       ignore_errors: true
+      changed_when: false
 
     - name: Waiting for failover process to be completed
       ansible.builtin.shell: "pcs resource status | grep {{ sap_hana_resource_name }} -A1 | tail -n1"
