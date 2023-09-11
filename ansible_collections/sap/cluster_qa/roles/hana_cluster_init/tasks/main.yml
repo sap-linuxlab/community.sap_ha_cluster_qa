@@ -1,7 +1,7 @@
 ---
 
 - name: Starting the cluster
-  pacemaker_cluster:
+  community.general.pacemaker_cluster:
     state: online
     timeout: 600
 
@@ -53,7 +53,7 @@
 
 - name: Acquiring HANA release version
   become: true
-  become_user: "{{ sap_hana_sid|lower }}adm"
+  become_user: "{{ sap_hana_sid | lower }}adm"
   ansible.builtin.shell: |
     set -o pipefail
     /usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB version |
@@ -80,7 +80,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Acquiring Firewalld state
+- name: Acquiring Firewalld state # noqa command-instead-of-module
   ansible.builtin.command: "systemctl is-active firewalld"
   register: firewalld_state
   failed_when: false
