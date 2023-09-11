@@ -15,7 +15,7 @@
       ansible.builtin.shell: "ssh root@{{ sap_hana_master_node }} 'echo c > /proc/sysrq-trigger' &"
       delegate_to: localhost
       run_once: true
-      ignore_errors: true
+      failed_when: false
 
     - name: Verifying promotion process started on the other node
       ansible.builtin.shell: pcs resource status | grep "{{ sap_hana_resource_name }}" -A1

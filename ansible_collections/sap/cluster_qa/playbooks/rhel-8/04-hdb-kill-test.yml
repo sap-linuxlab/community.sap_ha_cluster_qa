@@ -13,8 +13,8 @@
 
     - name: PERFORMING HDB kill on MASTER node
       become: true
-      become_user: "{{ sap_hana_sid|lower }}adm"
-      ansible.builtin.shell: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB kill"
+      become_user: "{{ sap_hana_sid | lower }}adm"
+      ansible.builtin.command: "/usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB kill"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
       register: sap_hana_master_node_hdb_killed
@@ -55,7 +55,7 @@
       failed_when: "'Masters:' and sap_hana_master_node not in sap_hana_resource_recovery_state.stdout"
 
     - name: Cleaning up cluster for next test
-      ansible.builtin.shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
+      ansible.builtin.command: pcs resource cleanup "{{ sap_hana_resource_name }}"
       run_once: true
       delegate_to: "{{ sap_hana_master_node }}"
       when: "'PREFER_SITE_TAKEOVER=false' in prefer_site_takeover"
@@ -77,7 +77,7 @@
       failed_when: "'Masters:' and sap_hana_slave_node not in sap_hana_resource_recovery_state.stdout"
 
     - name: Cleaning up cluster for next test
-      ansible.builtin.shell: pcs resource cleanup "{{ sap_hana_resource_name }}"
+      ansible.builtin.command: pcs resource cleanup "{{ sap_hana_resource_name }}"
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"
       when: "'PREFER_SITE_TAKEOVER=true' in prefer_site_takeover"

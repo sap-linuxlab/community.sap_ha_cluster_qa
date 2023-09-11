@@ -17,7 +17,7 @@
       failed_when: "'SOK' not in sap_hana_sync_state_t2.stdout"
 
     - name: PERFORMING FENCE action of MASTER node from the slave node
-      ansible.builtin.shell: "pcs stonith fence {{ sap_hana_master_node }}"
+      ansible.builtin.command: "pcs stonith fence {{ sap_hana_master_node }}"
       run_once: true
       delegate_to: "{{ sap_hana_slave_node }}"
       register: sap_hana_master_node_fenced
