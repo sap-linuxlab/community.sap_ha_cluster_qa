@@ -13,7 +13,7 @@
         msg: "firewalld is {{ firewalld_state.stdout }}"
 
     - name: Setting Firewalld state as fact
-      set_fact:
+      ansible.builtin.set_fact:
         firewalld_state: "{{ firewalld_state.stdout }}"
 
     - name: Stopping the cluster for firewalld setup
