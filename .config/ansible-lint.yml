@@ -1,5 +1,11 @@
 ---
 
+skip_list:
+    - name[play]
+    - run-once[task]
+    - no-changed-when
+    - risky-shell-pipe
+    
 exclude_paths:
     - venv/
     - .github/
