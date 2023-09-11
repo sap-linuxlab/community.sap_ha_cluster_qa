@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Dropping corosync network connection on primary
-      ansible.builtin.shell: "firewall-cmd --direct --add-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
+      ansible.builtin.command: "firewall-cmd --direct --add-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
 
@@ -28,7 +28,7 @@
       failed_when: "'OFFLINE' not in slave_node_cluster_state.stdout"
 
     - name: Restoring Network connection on the Primary side
-      ansible.builtin.shell: "firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
+      ansible.builtin.command: "firewall-cmd --direct --remove-rule ipv4 filter OUTPUT 2 -p udp --dport=5405 -j DROP"
       delegate_to: "{{ sap_hana_master_node }}"
       run_once: true
 
