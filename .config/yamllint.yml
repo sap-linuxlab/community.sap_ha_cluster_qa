@@ -4,9 +4,9 @@ extends: default
 
 ignore:
   - changelogs
-  - venv
-  - .config
-  - .github
+  - venv/
+  - .config/
+  - .github/
   - changelogs/changelog.yaml
   - .tox/
 
