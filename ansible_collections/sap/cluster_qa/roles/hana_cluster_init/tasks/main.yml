@@ -5,20 +5,6 @@
     state: online
     timeout: 600
 
-- name: Acquiring SAP HANA SID
-  ansible.builtin.shell: |
-    set -o pipefail
-    pcs resource config | grep -w SID |
-    head -n1 |
-    awk '{print $3}' |
-    cut -d '=' -f2
-  register: sap_hana_sid
-  changed_when: false
-
-- name: Setting up SAP HANA SID as fact
-  ansible.builtin.set_fact:
-    sap_hana_sid: "{{ sap_hana_sid.stdout }}"
-
 - name: Acquiring SAP HANA Instance Number
   ansible.builtin.shell: |
     set -o pipefail
@@ -80,7 +66,7 @@
   delegate_to: localhost
   run_once: true
 
-- name: Acquiring Firewalld state # noqa command-instead-of-module
+- name: Acquiring Firewalld state  # noqa command-instead-of-module
   ansible.builtin.command: "systemctl is-active firewalld"
   register: firewalld_state
   failed_when: false
