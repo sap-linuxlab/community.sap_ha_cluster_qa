@@ -13,3 +13,4 @@ exclude_paths:
     - .config/
     - .idea/
     - tests
+    - .tox/

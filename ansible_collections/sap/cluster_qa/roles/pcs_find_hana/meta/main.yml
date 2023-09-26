@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  author: Amir Memon (@amemon-redhat)
+
+  description: Find HANA SID in pacemaker cluster
+
+  license: GPL-3.0-only
+
+  min_ansible_version: "2.1"
+
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+
+  galaxy_tags: []
+
+dependencies: []
