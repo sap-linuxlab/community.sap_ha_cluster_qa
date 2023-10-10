@@ -3,4 +3,6 @@
   hosts: all
   roles:
     - sap.cluster_qa.pcs_find_hana
+    - sap.cluster_qa.pcs_find_instance_number
     - sap.cluster_qa.hana_cluster_init
+    
