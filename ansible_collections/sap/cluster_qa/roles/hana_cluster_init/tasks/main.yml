@@ -53,19 +53,11 @@
   delegate_to: localhost
   run_once: true
 
-- name: Acquiring Firewalld state  # noqa command-instead-of-module
-  ansible.builtin.command: "systemctl is-active firewalld"
-  register: firewalld_state
-  failed_when: false
-  changed_when: false
-
-- name: Verifying Firewalld state
-  ansible.builtin.debug:
-    msg: "firewalld is {{ firewalld_state.stdout }}"
-
-- name: Setting Firewalld state as fact
-  ansible.builtin.set_fact:
-    firewalld_state: "{{ firewalld_state.stdout }}"
+- name: Disable and stop firewalld service
+  ansible.builtin.service:
+    name: firewalld
+    state: stopped
+    enabled: false
 
 - name: Checking for failed resource actions
   ansible.builtin.shell: |
