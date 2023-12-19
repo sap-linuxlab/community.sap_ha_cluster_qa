@@ -9,4 +9,6 @@ jobs:
 
     steps:
       - name: hello-redhat-sap
-        run: echo "hello-redhat-sap"
+        run: |
+          echo "hello-redhat-sap"
+          uname -a
