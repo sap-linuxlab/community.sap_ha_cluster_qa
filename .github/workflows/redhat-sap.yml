@@ -1,0 +1,12 @@
+name: hello-redhat-sap
+
+on:
+  workflow_dispatch
+
+jobs:
+  hello-redhat-sap:
+    runs-on: redhat-sap
+
+    steps:
+      - name: hello-redhat-sap
+        run: echo "hello-redhat-sap"
