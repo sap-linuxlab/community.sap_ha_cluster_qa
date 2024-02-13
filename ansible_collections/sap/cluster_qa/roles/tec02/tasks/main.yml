@@ -1,0 +1,22 @@
+---
+- name: Collection information about SAP instances installed on the current host
+  sap.sap_operations.host_info:
+  become: true
+  become_user: root
+  register: host_info
+
+- name: Print test results.
+  ansible.builtin.debug:
+    msg: "{{ host_info.instances }}"
+
+- name: HACheckConfig for each instances
+  ansible.builtin.command:
+    cmd: sapcontrol -nr {{instance_number}} -function HACheckConfig
+  loop: "{{ host_info.instances }}"
+  vars: 
+    instance_number: "{{ item.mSystemNumber }}"
+  register: hacheckconfig
+
+- name: Print the results.
+  ansible.builtin.debug:
+    msg: "{{ hacheckconfig }}"
