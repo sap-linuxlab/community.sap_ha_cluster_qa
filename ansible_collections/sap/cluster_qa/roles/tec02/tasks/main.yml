@@ -9,9 +9,9 @@
   ansible.builtin.debug:
     msg: "{{ host_info.instances }}"
 
-- name: HACheckConfig for each instances
-  ansible.builtin.command:
-    cmd: sapcontrol -nr {{instance_number}} -function HACheckConfig
+- name: Run ha_check_config_info
+  sap.sap_operations.ha_check_config_info:
+    instance_number: "{{ instance_number }}"
   loop: "{{ host_info.instances }}"
   vars: 
     instance_number: "{{ item.mSystemNumber }}"
