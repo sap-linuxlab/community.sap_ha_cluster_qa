@@ -13,7 +13,7 @@
   sap.sap_operations.ha_check_config_info:
     instance_number: "{{ instance_number }}"
   loop: "{{ host_info.instances }}"
-  vars: 
+  vars:
     instance_number: "{{ item.mSystemNumber }}"
   register: hacheckconfig
 
