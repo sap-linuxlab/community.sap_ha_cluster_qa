@@ -1,4 +1,0 @@
----
-# vars file for find_hana
-
-sap_hana_sid: "{{ __pcs_find_hana_sap_hana_sid.stdout }}"

@@ -15,8 +15,8 @@
 
 - name: Print SAP HANA SID
   ansible.builtin.debug:
-    msg: "SAP HANA SID is {{ sap_hana_sid }}"
+    msg: "SAP HANA SID is {{ __pcs_find_hana_sap_hana_sid.stdout }}"
 
 - name: Set fact for sap_hana_sid variable (SAP HANA SID)
   ansible.builtin.set_fact:
-    sap_hana_sid: "{{ sap_hana_sid }}"
+    sap_hana_sid: "{{ __pcs_find_hana_sap_hana_sid.stdout }}"
