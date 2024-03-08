@@ -11,7 +11,7 @@
         state: stopped
       loop: "{{ molecule_yml.platforms }}"
       loop_control:
-        label: platform
+        loop_var: platform
 
     - name: Populate instance config
       ansible.builtin.set_fact:
