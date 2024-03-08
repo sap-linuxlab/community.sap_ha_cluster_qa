@@ -22,9 +22,7 @@ jobs:
 
       - name: Run molecule
         run: |
-          export PATH="$HOME/.pyenv/bin:$PATH"
-          eval "$(pyenv init --path)"
-          eval "$(pyenv virtualenv-init -)"
+          source ~/.bashrc
           pyenv install ${PYTHON_VERSION} || true
           pyenv global ${PYTHON_VERSION}
           pyenv rehash
