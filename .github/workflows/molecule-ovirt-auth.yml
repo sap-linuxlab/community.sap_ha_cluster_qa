@@ -23,7 +23,6 @@ jobs:
           pyenv rehash
           python --version
           make molecule-ovirt-auth
-molecule test
         env:
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
           OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
