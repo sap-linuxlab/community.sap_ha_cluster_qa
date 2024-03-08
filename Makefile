@@ -9,6 +9,11 @@ include Makefiles/molecule/Makefile
 	$(TOX) exec -e $* -- ansible-galaxy collection install -r requirements.yml
 	$(TOX) exec -e $* -- ansible-galaxy collection install -r tox/requirements-$*.yml
 
+.PHONY: lint/ansible_collections
+.ONESHELL:
+lint/ansible_collections: venv/bin/activate
+	$(TOX) exec -e lint -- ansible-galaxy collection install -r tox/requirements-molecule.yml
+
 .ONESHELL:
 venv/bin/activate:  ## Create virtual environment
 	python3 -m venv venv
@@ -17,13 +22,13 @@ venv/bin/activate:  ## Create virtual environment
 
 .PHONY: ansible-lint
 .ONESHELL:
-ansible-lint: venv/bin/activate .tox/lint/ansible_collections  ## Run ansible-lint
+ansible-lint: venv/bin/activate .tox/lint/ansible_collections lint/ansible_collections ## Run ansible-lint
 	. venv/bin/activate
 	$(TOX) exec -e lint -- ansible-lint --offline --config .config/ansible-lint.yml
 
 .PHONY: yamllint
 .ONESHELL:
-yamllint: venv/bin/activate .tox/lint/ansible_collections  ## Run yamllint
+yamllint: venv/bin/activate  ## Run yamllint
 	. venv/bin/activate
 	$(TOX) exec -e lint -- yamllint . --config-file .config/yamllint.yml
 
