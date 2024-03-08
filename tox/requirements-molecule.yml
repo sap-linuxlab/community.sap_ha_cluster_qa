@@ -19,20 +19,4 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 ---
-
-collections:
-  - name: community.general
-    version: 6.5.0
-  - name: ansible.posix
-    version: 1.5.1
-  - name: ansible.utils
-    version: 2.11.0
-  - name: azure.azcollection
-    version: 1.14.0
-  - name: containers.podman
-    version: 1.10.3
-  - name: fedora.linux_system_roles
-    version: 1.56.0
-  - name: https://github.com/redhat-sap/molecule.driver.git
-    type: git
-    version: 302a2f023e30f2b3ebbd6da93b69492ea5409c59
+collections: []
