@@ -1,23 +1,29 @@
 ---
 - name: Create
   hosts: localhost
-  connection: local
   gather_facts: false
-  # no_log: "{{ molecule_no_log }}"
   tasks:
-    # TODO: Developer must implement and populate 'server' variable
+    - name: Ensure VMs are running
+      ovirt.ovirt.ovirt_vm:
+        auth:
+          insecure: true
+        name: "{{ platform.name }}"
+        state: running
+      loop: "{{ molecule_yml_platforms }}"
+      loop_control:
+        label: platform
+      register: server
 
     - name: Create instance config
-      when: server.changed | default(false) | bool  # noqa no-handler
       block:
-        - name: Populate instance config dict  # noqa jinja
+        - name: Populate instance config dict # noqa jinja
           ansible.builtin.set_fact:
-            instance_conf_dict: {}
-            # instance': "{{ }}",
-            # address': "{{ }}",
-            # user': "{{ }}",
-            # port': "{{ }}",
-            # 'identity_file': "{{ }}", }
+            instance_conf_dict:
+              instance: "{{ item.host.fqdn }}"
+              address: "{{ item.host.fqdn }}"
+              user: molecule
+              port: 22
+              identity_file: ~/.ssh/id_molecule_rsa
           with_items: "{{ server.results }}"
           register: instance_config_dict
 
