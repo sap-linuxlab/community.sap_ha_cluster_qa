@@ -9,7 +9,7 @@
           insecure: true
         name: "{{ platform.name }}"
         state: running
-      loop: "{{ molecule_yml_platforms }}"
+      loop: "{{ molecule_yml.platforms }}"
       loop_control:
         label: platform
       register: server
