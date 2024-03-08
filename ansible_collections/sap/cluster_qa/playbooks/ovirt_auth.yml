@@ -1,0 +1,11 @@
+- name: Test ovirt auth
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Ensure ovirt authentication
+      ovirt.ovirt.ovirt_auth:
+      register: _
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "{{ _ }}"
