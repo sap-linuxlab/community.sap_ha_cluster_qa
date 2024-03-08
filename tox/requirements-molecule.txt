@@ -20,4 +20,3 @@
 # If not, see <https://www.gnu.org/licenses/>.
 
 molecule==24.2.0
-ara[server]==1.6.1  ## required for ARA to record all playbooks runs
