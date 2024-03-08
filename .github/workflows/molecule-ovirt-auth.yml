@@ -1,0 +1,29 @@
+name: molecule-ovirt-auth
+
+on:
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.10"
+
+jobs:
+  molecule-ovirt-auth:
+    runs-on: sap-ha-cluster
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Run molecule-ovirt-auth
+        run: |
+          source ~/.bashrc
+          pyenv install ${PYTHON_VERSION} || true
+          pyenv global ${PYTHON_VERSION}
+          pyenv rehash
+          python --version
+          make -- molecule test
+        env:
+          OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
+          OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
+          OVIRT_PASSWORD: ${{ secrets.OVIRT_USERNAME }}
