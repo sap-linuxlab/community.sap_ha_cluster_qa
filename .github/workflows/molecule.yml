@@ -24,7 +24,7 @@ jobs:
           export PATH="$HOME/.pyenv/bin:$PATH"
           eval "$(pyenv init --path)"
           eval "$(pyenv virtualenv-init -)"
-          pyenv install ${PYTHON_VERSION}
+          # pyenv install ${PYTHON_VERSION}
           pyenv global ${PYTHON_VERSION}
           pyenv rehash
           python --version
