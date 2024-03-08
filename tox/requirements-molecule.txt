@@ -19,10 +19,5 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-molecule==5.1.0
-molecule-driver-azure==0.0.4
-molecule-plugins[azure]  ## required for whatever reason, otherwise molecule fails
-molecule-plugins[docker]  ## required for whatever reason, otherwise molecule fails
+molecule==24.2.0
 ara[server]==1.6.1  ## required for ARA to record all playbooks runs
-passlib==1.7.4  ## required for ansible-vault
-# pyrfc==2.8.3  ## required to connect to SAP systems
