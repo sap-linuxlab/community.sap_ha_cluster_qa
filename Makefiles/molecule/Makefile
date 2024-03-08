@@ -21,5 +21,12 @@ molecule: venv/bin/activate .tox/molecule/ansible_collections  ## Run Ansible Mo
 # both ways are equivalent:
 # WORKDIR=roles/unpack make -- molecule --help
 # make molecule -- --help WORKDIR=roles/unpack
-	. venv/bin/activate
+	ansible_collections  . venv/bin/activate
 	$(TOX) -s exec -e molecule -- molecule $(filter-out molecule,${MAKECMDGOALS})
+
+.ONESHELL:
+.PHONY: molecule-ovirt-auth
+molecule-ovirt-auth: venv/bin/activate .tox/molecule/ansible_collections  ## Make sure that can authenticate to ovirt
+	. venv/bin/activate
+	$(TOX) -s exec -e molecule -- ansible-playbook $(CURDIR)/ansible_collections/sap/cluster_qa/playbooks/ovirt_auth.yml 
+
