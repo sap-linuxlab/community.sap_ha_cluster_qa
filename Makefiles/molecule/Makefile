@@ -22,6 +22,7 @@ molecule: venv/bin/activate  ## Run Ansible Molecule commands in python virtual 
 # WORKDIR=roles/unpack make -- molecule --help
 # make molecule -- --help WORKDIR=roles/unpack
 	. venv/bin/activate
-	$(TOX) exec -e molecule -- ansible-galaxy collection install -r tox/requirements-molecule.yml 1>/dev/null 2>&1
-	$(TOX) exec -e molecule -- ansible-galaxy collection install -r requirements.yml 1>/dev/null 2>&1
-	WORKDIR=${WORKDIR} $(TOX) exec -e molecule -- molecule $(filter-out molecule,${MAKECMDGOALS})
+	# $(TOX) exec -e molecule -- ansible-galaxy collection install -r tox/requirements-molecule.yml 1>/dev/null 2>&1
+	# $(TOX) exec -e molecule -- ansible-galaxy collection install -r requirements.yml 1>/dev/null 2>&1
+	cd ${WORKDIR}
+	$(TOX) -s exec -e molecule -- molecule $(filter-out molecule,${MAKECMDGOALS})
