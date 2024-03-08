@@ -11,7 +11,7 @@ ifeq (molecule,$(firstword $(MAKECMDGOALS)))
 endif
 
 .ONESHELL:
-molecule: venv/bin/activate  ## Run Ansible Molecule commands in python virtual environment in "$WORKDIR" folder
+molecule: venv/bin/activate .tox/molecule/ansible_collections  ## Run Ansible Molecule commands in python virtual environment in "$WORKDIR" folder
 # This target is required to use virtual environment for molecule - otherwise there are dependency conflicts with installed python packages
 # One has to run molecule commands following way
 # make molecule -- create -s cluster
@@ -22,7 +22,4 @@ molecule: venv/bin/activate  ## Run Ansible Molecule commands in python virtual 
 # WORKDIR=roles/unpack make -- molecule --help
 # make molecule -- --help WORKDIR=roles/unpack
 	. venv/bin/activate
-	# $(TOX) exec -e molecule -- ansible-galaxy collection install -r tox/requirements-molecule.yml 1>/dev/null 2>&1
-	# $(TOX) exec -e molecule -- ansible-galaxy collection install -r requirements.yml 1>/dev/null 2>&1
-	cd ${WORKDIR}
 	$(TOX) -s exec -e molecule -- molecule $(filter-out molecule,${MAKECMDGOALS})
