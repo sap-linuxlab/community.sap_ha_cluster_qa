@@ -26,4 +26,4 @@ jobs:
         env:
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
           OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
-          OVIRT_PASSWORD: ${{ secrets.OVIRT_USERNAME }}
+          OVIRT_PASSWORD: ${{ secrets.OVIRT_PASSWORD }}
