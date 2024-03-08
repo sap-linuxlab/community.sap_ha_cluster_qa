@@ -29,8 +29,11 @@ jobs:
           pyenv rehash
           python --version
 
-      - name: Run lint
+      - name: Run molecule
         run: |
+          pyenv global ${PYTHON_VERSION}
+          pyenv rehash
+          python --version
           make -- molecule test
         env:
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
