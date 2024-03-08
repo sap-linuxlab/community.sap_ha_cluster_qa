@@ -2,5 +2,5 @@
 driver:
   name: default
 platforms:
-  - name: s4hana09
-  - name: s4hana10
+  - name: s4hana09-amemon
+  - name: s4hana10-amemon
