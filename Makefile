@@ -12,6 +12,7 @@ include Makefiles/molecule/Makefile
 .PHONY: lint/ansible_collections
 .ONESHELL:
 lint/ansible_collections: venv/bin/activate
+	. venv/bin/activate
 	$(TOX) exec -e lint -- ansible-galaxy collection install -r tox/requirements-molecule.yml
 
 .ONESHELL:
