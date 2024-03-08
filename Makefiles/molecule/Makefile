@@ -21,7 +21,7 @@ molecule: venv/bin/activate .tox/molecule/ansible_collections  ## Run Ansible Mo
 # both ways are equivalent:
 # WORKDIR=roles/unpack make -- molecule --help
 # make molecule -- --help WORKDIR=roles/unpack
-	ansible_collections  . venv/bin/activate
+	. venv/bin/activate
 	$(TOX) -s exec -e molecule -- molecule $(filter-out molecule,${MAKECMDGOALS})
 
 .ONESHELL:
