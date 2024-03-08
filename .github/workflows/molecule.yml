@@ -1,0 +1,31 @@
+name: molecule
+
+on:
+  push:
+    branches: [main]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+env:
+  WORKDIR: ansible_collections/sap/cluster_qa/roles/tec02
+
+jobs:
+  lint:
+    runs-on: sap-ha-cluster
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
+
+      - name: Run lint
+        run: |
+          make -- molecule test
+        env:
+          OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
+          OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
+          OVIRT_PASSWORD: ${{ secrets.OVIRT_USERNAME }}
