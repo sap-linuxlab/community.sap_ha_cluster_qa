@@ -6,7 +6,7 @@ include Makefiles/molecule/Makefile
 .ONESHELL:
 .tox/%/ansible_collections: venv/bin/activate
 	. venv/bin/activate
-	$(TOX) exec -e $* -- ansible-galaxy collection install -r tox/requirements.yml
+	$(TOX) exec -e $* -- ansible-galaxy collection install -r requirements.yml
 	$(TOX) exec -e $* -- ansible-galaxy collection install -r tox/requirements-$*.yml
 
 .ONESHELL:
