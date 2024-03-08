@@ -8,10 +8,10 @@ on:
 
 env:
   WORKDIR: ansible_collections/sap/cluster_qa/roles/tec02
-  PYTHON_VERSION: 3.10
+  PYTHON_VERSION: "3.10"
 
 jobs:
-  lint:
+  molecule-tec02:
     runs-on: sap-ha-cluster
 
     steps:
