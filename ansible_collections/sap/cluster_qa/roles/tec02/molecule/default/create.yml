@@ -11,7 +11,7 @@
         state: running
       loop: "{{ molecule_yml.platforms }}"
       loop_control:
-        label: platform
+        loop_var: platform
       register: server
 
     - name: Create instance config
