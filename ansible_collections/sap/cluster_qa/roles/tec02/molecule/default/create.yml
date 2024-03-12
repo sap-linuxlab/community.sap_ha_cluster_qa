@@ -19,6 +19,7 @@
         auth:
           insecure: true
         pattern: "name={{ platform.name }}"
+        all_content: true
       loop: "{{ molecule_yml.platforms }}"
       loop_control:
         loop_var: platform
