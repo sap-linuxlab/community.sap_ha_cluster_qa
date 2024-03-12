@@ -3,7 +3,7 @@
   hosts: localhost
   gather_facts: false
   tasks:
-    - name: Ensure VMs are running
+    - name: Ensure VMs are stopped
       ovirt.ovirt.ovirt_vm:
         auth:
           insecure: true
