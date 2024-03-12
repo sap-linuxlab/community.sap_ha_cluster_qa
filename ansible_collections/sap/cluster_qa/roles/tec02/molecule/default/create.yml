@@ -14,6 +14,10 @@
         loop_var: platform
       register: server
 
+    - name: Print server
+      ansible.builtin.debug:
+        msg: "{{ server }}"
+
     - name: Create instance config
       block:
         - name: Populate instance config dict # noqa jinja
