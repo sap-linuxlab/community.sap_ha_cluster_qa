@@ -5,7 +5,3 @@
     - name: Ensure ovirt authentication
       ovirt.ovirt.ovirt_auth:
       register: _
-
-    - name: Debug
-      ansible.builtin.debug:
-        msg: "{{ _ }}"
