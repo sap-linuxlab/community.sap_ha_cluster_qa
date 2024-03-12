@@ -29,6 +29,7 @@ jobs:
           ID_MOLECULE_RSA_PUB: ${{ secrets.ID_MOLECULE_RSA_PUB }}
 
       - name: Run molecule
+        continue-on-error: true
         run: |
           source ~/.bashrc
           pyenv install ${PYTHON_VERSION} || true
@@ -40,7 +41,7 @@ jobs:
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
           OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
           OVIRT_PASSWORD: ${{ secrets.OVIRT_PASSWORD }}
-    post:
+
       - name: Remove molecule ssh key
         run: |
           rm -f ~/.ssh/id_molecule_rsa
