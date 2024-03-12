@@ -19,8 +19,8 @@
         - name: Populate instance config dict # noqa jinja
           ansible.builtin.set_fact:
             instance_conf_dict:
-              instance: "{{ item.host.fqdn }}"
-              address: "{{ item.host.fqdn }}"
+              instance: "{{ item.fqdn }}"
+              address: "{{ item.fqdn }}"
               user: molecule
               port: 22
               identity_file: ~/.ssh/id_molecule_rsa
