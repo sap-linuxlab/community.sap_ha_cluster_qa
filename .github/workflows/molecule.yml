@@ -25,8 +25,8 @@ jobs:
           mkdir -p ~/.ssh
           touch ~/.ssh/id_molecule_rsa
           touch ~/.ssh/id_molecule_rsa.pub
-          echo $ID_MOLECULE_RSA > ~/.ssh/id_molecule_rsa
-          echo $ID_MOLECULE_RSA_PUB > ~/.ssh/id_molecule_rsa.pub
+          echo "$ID_MOLECULE_RSA" | base64 --decode > ~/.ssh/id_molecule_rsa
+          echo "$ID_MOLECULE_RSA_PUB" > ~/.ssh/id_molecule_rsa.pub
           chmod 400 ~/.ssh/id_molecule_rsa
           chmod 400 ~/.ssh/id_molecule_rsa.pub
 
