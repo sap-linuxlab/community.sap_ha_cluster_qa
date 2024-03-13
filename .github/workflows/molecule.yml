@@ -50,7 +50,7 @@ jobs:
           OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
           OVIRT_PASSWORD: ${{ secrets.OVIRT_PASSWORD }}
 
-      # - name: Remove molecule ssh key
-      #   run: |
-      #     rm -f ~/.ssh/id_molecule_rsa
-      #     rm -f ~/.ssh/id_molecule_rsa.pub
+      - name: Remove molecule ssh key
+        run: |
+          rm -f ~/.ssh/id_molecule_rsa
+          rm -f ~/.ssh/id_molecule_rsa.pub
