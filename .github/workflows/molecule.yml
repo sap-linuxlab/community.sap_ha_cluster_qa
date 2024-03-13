@@ -27,6 +27,9 @@ jobs:
           touch ~/.ssh/id_molecule_rsa.pub
           echo $ID_MOLECULE_RSA > ~/.ssh/id_molecule_rsa
           echo $ID_MOLECULE_RSA_PUB > ~/.ssh/id_molecule_rsa.pub
+          chmod 400 ~/.ssh/id_molecule_rsa
+          chmod 400 ~/.ssh/id_molecule_rsa.pub
+
         env:
           ID_MOLECULE_RSA: ${{ secrets.ID_MOLECULE_RSA }}
           ID_MOLECULE_RSA_PUB: ${{ secrets.ID_MOLECULE_RSA_PUB }}
