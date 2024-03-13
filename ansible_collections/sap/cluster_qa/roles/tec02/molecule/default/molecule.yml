@@ -3,4 +3,6 @@ driver:
   name: default
 platforms:
   - name: s4hana09-amemon
+    ip: 192.168.10.101
   - name: s4hana10-amemon
+    ip: 192.168.10.102

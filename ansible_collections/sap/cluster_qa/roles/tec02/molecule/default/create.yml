@@ -14,32 +14,19 @@
         loop_var: platform
       register: server
 
-    - name: Get info about VMs
-      ovirt.ovirt.ovirt_vm_info:
-        auth:
-          insecure: true
-        pattern: "name={{ platform.name }}"
-        all_content: true
-      loop: "{{ molecule_yml.platforms }}"
-      loop_control:
-        loop_var: platform
-      register: server_info
-
-    - name: Print server
-      ansible.builtin.debug:
-        msg: "{{ server_info }}"
-
     - name: Create instance config
       block:
         - name: Populate instance config dict # noqa jinja
           ansible.builtin.set_fact:
             instance_conf_dict:
-              instance: "{{ item.ovirt_vms[0].fqdn}}"
-              address: "{{ item.ovirt_vms[0].fqdn}}"
+              instance: "{{ platform.name }}"
+              address: "{{ platform.ip }}"
               user: molecule
               port: 22
               identity_file: ~/.ssh/id_molecule_rsa
-          with_items: "{{ server_info.results }}"
+          loop: "{{ molecule_yml.platforms }}"
+          loop_control:
+            loop_var: platform
           register: instance_config_dict
 
         - name: Convert instance config dict to a list
