@@ -1,0 +1,53 @@
+---
+# tasks file for tec07
+- name: Copying the HATool zip file to the root directories of the application servers.
+  ansible.builtin.copy:
+    src: /HATool/hatool.zip
+    dest: /hatool.zip
+    owner: "{{ omit }}"
+    group: "{{ omit }}"
+    mode: '0544'
+
+- name: Unpacking the HATool zip file
+  ansible.builtin.unarchive:
+    src: /hatool.zip
+    dest: /HATool
+    owner: "{{ omit }}"
+    group: "{{ omit }}"
+    mode: '0744'
+
+- name: Copying all the server side K*70.D95 file
+  ansible.builtin.copy:
+    remote_src: true
+    src: /HATool/HATool/server/install/1-prog+data/K000070.D95
+    dest: /usr/sap/trans/cofiles
+    owner: "s4hadm"
+    group: sapsys
+    mode:  '0744'
+
+- name: Copying all the server side K*72.D95 file
+  ansible.builtin.copy:
+    remote_src: true
+    src: /HATool/HATool/server/install/2-customizing/K000072.D95
+    dest: /usr/sap/trans/cofiles
+    owner: "s4hadm"
+    group: sapsys
+    mode:  '0744'
+
+- name: Copying all the server side R*70.D95 file
+  ansible.builtin.copy:
+    remote_src: true
+    src: /HATool/HATool/server/install/1-prog+data/R000070.D95
+    dest: /usr/sap/trans/data
+    owner: "s4hadm"
+    group: sapsys
+    mode:  '0744'
+
+- name: Copying all the server side R*72.D95 file
+  ansible.builtin.copy:
+    remote_src: true
+    src: /HATool/HATool/server/install/2-customizing/R000072.D95
+    dest: /usr/sap/trans/data
+    owner: "s4hadm"
+    group: sapsys
+    mode:  '0744'
