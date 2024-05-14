@@ -1,0 +1,28 @@
+---
+# tasks file for tec04
+- name: Acquiring latest enq_admin information
+  sap.sap_operations.enq_admin_info:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+  become: true
+  become_user: s4hadm
+  become_flags: -i
+
+- name: Acquiring latest enq_admin lock information
+  sap.sap_operations.enq_admin_locks_info:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+  become: true
+  become_user: s4hadm
+  become_flags: -i
+
+- name: Setting new locks using enq_admin
+  sap.sap_operations.enq_admin_lock:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+    lock_type: X
+    state: absent
+    owner1: DIAG
+    owner2: ""
+    name: ANSIBLE
+    argument: ANSIBLE
+  become: true
+  become_user: s4hadm
+  become_flags: -i

@@ -1,12 +1,12 @@
 Role Name
 =========
 
-This role configures the S4/HANA ENSA 2 server for testing the Failover of ASCS instance under load.
+A brief description of the role goes here.
 
 Requirements
 ------------
 
-Availability of SAP Provided latest HA test kit with instruction on the controller node.
+Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------

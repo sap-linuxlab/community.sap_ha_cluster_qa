@@ -1,12 +1,12 @@
-Role Name
+tec03
 =========
 
-This role configures the S4/HANA ENSA 2 server for testing the Failover of ASCS instance under load.
+This role extracts the contents of the sapstartsrv.log file and verifies the logs of HA-Interface Shared libraries are being loaded without any errors.
 
 Requirements
 ------------
 
-Availability of SAP Provided latest HA test kit with instruction on the controller node.
+SAP application server instances configured with the HA-Interface.
 
 Role Variables
 --------------
