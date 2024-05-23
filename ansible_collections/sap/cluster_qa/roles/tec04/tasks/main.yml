@@ -1,2 +1,47 @@
 ---
 # tasks file for tec04
+---
+# tasks file for tec04
+- name: Acquiring latest enq_admin information before move
+  sap.sap_operations.enq_admin_info:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+  become: true
+  become_user: s4hadm
+  become_flags: -i
+
+- name: Setting new locks using enq_admin before move
+  sap.sap_operations.enq_admin_lock:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+    lock_type: X
+    state: present
+    owner1: DIAG
+    owner2: ""
+    name: ANSIBLE
+    argument: ANSIBLE
+  become: true
+  become_user: s4hadm
+  become_flags: -i
+
+- name: Acquiring latest enq_admin lock information before move
+  sap.sap_operations.enq_admin_locks_info:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+  become: true
+  become_user: s4hadm
+  become_flags: -i
+  register: tec04_locks_before
+
+- name: Trigerring the failover of ASCS instance
+  shell: pcs resource move s4h_ascs20
+  run_once: true
+
+- name: Acquiring latest enq_admin lock information after move
+  sap.sap_operations.enq_admin_locks_info:
+    profile_filepath: "/sapmnt/S4H/profile/S4H_ERS29_s4ers"
+  become: true
+  become_user: s4hadm
+  become_flags: -i
+  register: tec04_locks_after
+
+- name: Comparing the locks before and after
+  ansible.builtin.assert:
+    that: tec04_locks_before.enq_admin_locks_info == tec04_locks_after.enq_admin_locks_info
