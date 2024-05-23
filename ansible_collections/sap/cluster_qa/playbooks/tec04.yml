@@ -1,4 +1,4 @@
 ---
- - hosts: s4hana17
+ - hosts: s4hana18
    roles:
     - sap.cluster_qa.tec04
