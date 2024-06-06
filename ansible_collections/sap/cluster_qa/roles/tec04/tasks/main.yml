@@ -1,7 +1,4 @@
 ---
-# tasks file for tec04
----
-# tasks file for tec04
 - name: Acquiring latest enq_admin information before move
   sap.sap_operations.enq_admin_info:
     profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
