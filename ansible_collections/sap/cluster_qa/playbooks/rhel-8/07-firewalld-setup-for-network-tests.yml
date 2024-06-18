@@ -3,7 +3,7 @@
   hosts: all
   tasks:
     - name: Installing firewalld package
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: firewalld
         state: present
 
