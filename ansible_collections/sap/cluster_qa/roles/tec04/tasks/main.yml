@@ -28,7 +28,7 @@
   register: tec04_locks_before
 
 - name: Trigerring the failover of ASCS instance
-  shell: pcs resource move s4h_ascs20
+  ansible.builtin.command: pcs resource move s4h_ascs20
   run_once: true
 
 - name: Acquiring latest enq_admin lock information after move
