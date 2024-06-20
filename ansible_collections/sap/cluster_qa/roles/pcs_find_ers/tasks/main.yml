@@ -1,6 +1,5 @@
 ---
-# tasks file for pcs_find_ers
-- name : Acquiring ERS resource name
+- name: Acquiring ERS resource name
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource config |
