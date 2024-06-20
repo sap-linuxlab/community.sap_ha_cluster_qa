@@ -8,7 +8,7 @@
       - "{{ playbook_dir }}/callback_plugins"
   tasks:
     - name: Install cups-pdf package
-      ansible.builtin.yum:
+      ansible.builtin.dnf:
         name: cups-pdf
         state: present
 

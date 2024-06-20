@@ -1,3 +1,4 @@
+---
 - name: Test ovirt auth
   hosts: localhost
   gather_facts: false
