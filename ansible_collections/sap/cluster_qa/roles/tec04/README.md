@@ -1,12 +1,18 @@
 TEST04
 =========
 
+
 Run TEST04
+=======
+
 
 Requirements
 ------------
-
 None
+=======
+sudo required to run this role
+
+Ansible collection sap.sap_operations from galaxy is required, see collection requirements.yml file
 
 Role Variables
 --------------
@@ -23,7 +29,7 @@ Example Playbook
 
     - hosts: servers
       roles:
-         - sap.cluster_ha.test04
+         - sap.cluster_qa.tec04
 
 License
 -------
