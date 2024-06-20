@@ -17,7 +17,11 @@
       sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"
 
 - name: Acquiring ASCS node name
-  ansible.builtin.shell: pcs resource status {{ sap_ascs_resource_name }} | grep SAPInstance | awk '{print $5}'
+  ansible.builtin.shell: |
+    set -o pipefail |
+    pcs resource status {{ sap_ascs_resource_name }} |
+    grep SAPInstance |
+    awk '{print $5}'
   register: __pcs_find_ascs_sap_ascs_node_name
   changed_when: false
   failed_when: __pcs_find_ascs_sap_ascs_node_name.rc != 0
@@ -33,8 +37,40 @@
     grep START_PROFILE |
     cut -d '=' -f2 |
     xargs
-  register: __pcs_find_ascs_sap_ascs_S_name
+  register: __pcs_find_ascs_sap_ascs_start_profile
   changed_when: false
-  failed_when: __pcs_find_ascs_sap_ascs_resource_name.rc != 0
+  failed_when: __pcs_find_ascs_sap_ascs_start_profile.rc != 0
+
+- name: Setting ASCS START_PROFILE as fact
+  ansible.builtin.set_fact:
+      sap_ascs_start_profile: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
+
+- name: Acquiring ASCS SID
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "{{ sap_ascs_start_profile }}" |
+    grep -w 'SAPSYSTEMNAME ' |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ascs_sap_ascs_sid
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_ascs_sid.rc != 0
+
+- name: Setting ASCS SID as fact
+  ansible.builtin.set_fact:
+    sap_ascs_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
 
 - name: Acquiring ASCS Instance number
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "{{ sap_ascs_start_profile }}" |
+    grep -w SAPSYSTEM |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ascs_sap_ascs_instance_number
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_ascs_instance_number.rc != 0
+
+- name: Setting ASCS Instance number as fact
+  ansible.builtin.set_fact:
+    sap_ascs_instance_number: "{{ __pcs_find_ascs_sap_ascs_instance_number.stdout }}"
