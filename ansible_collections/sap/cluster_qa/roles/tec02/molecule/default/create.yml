@@ -16,7 +16,7 @@
 
     - name: Create instance config
       block:
-        - name: Populate instance config dict # noqa jinja
+        - name: Populate instance config dict  # noqa jinja
           ansible.builtin.set_fact:
             instance_conf_dict:
               instance: "{{ platform.name }}"
