@@ -25,3 +25,16 @@
 - name: Setting ASCS Node name as fact
   ansible.builtin.set_fact:
       sap_ascs_node_name: "{{ __pcs_find_ascs_sap_ascs_node_name.stdout }}"
+
+- name: Acquiring ASCS start profile
+  ansible.builtin.shell: |
+    set -o pipefail |
+    pcs resource config "{{ sap_ascs_resource_name }}" |
+    grep START_PROFILE |
+    cut -d '=' -f2 |
+    xargs
+  register: __pcs_find_ascs_sap_ascs_S_name
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_ascs_resource_name.rc != 0
+
+- name: Acquiring ASCS Instance number
