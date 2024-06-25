@@ -1,4 +1,4 @@
 ---
 - hosts: all
   roles:
-    - sap.cluster_qa.tec02
+   - sap.cluster_qa.tec02
