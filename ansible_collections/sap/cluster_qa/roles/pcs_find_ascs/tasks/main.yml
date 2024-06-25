@@ -1,0 +1,26 @@
+---
+- name: Acquiring ASCS resource name
+  ansible.builtin.shell: |
+    set -o pipefail
+    pcs resource config |
+    grep SAPInstance |
+    grep ascs |
+    awk '{print $2}' |
+    xargs
+  register: __pcs_find_ascs_sap_ascs_resource_name
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_ascs_resource_name.rc != 0
+
+- name: Setting ASCS resource name as fact
+  ansible.builtin.set_fact:
+    sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"
+
+- name: Acquiring ASCS node name
+  ansible.builtin.shell: "pcs resource status {{ sap_ascs_resource_name }} | grep SAPInstance | awk '{print $5}'"
+  register: __pcs_find_ascs_sap_ascs_node_name
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_ascs_node_name.rc != 0
+
+- name: Setting ASCS Node name as fact
+  ansible.builtin.set_fact:
+    sap_ascs_node_name: "{{ __pcs_find_ascs_sap_ascs_node_name.stdout }}"
