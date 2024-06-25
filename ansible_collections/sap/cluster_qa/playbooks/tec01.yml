@@ -12,7 +12,7 @@
 
     - name: Paused to observe the test output
       ansible.builtin.pause:
-         minutes: 5
+        minutes: 5
 
     - name: Finding ERS node name
       ansible.builtin.include_role:
@@ -25,4 +25,4 @@
 
     - name: Paused to observe the test output
       ansible.builtin.pause:
-         minutes: 5
+        minutes: 5
