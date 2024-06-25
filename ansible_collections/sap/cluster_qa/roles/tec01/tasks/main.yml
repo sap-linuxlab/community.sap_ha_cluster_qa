@@ -2,6 +2,7 @@
 # tasks file for tec01
 - name: Collection information about SAP instances installed on the current host
   sap.sap_operations.ha_get_failoverconfig_info:
+    instance_number: "{{ sap_instance_number }}"
   become: true
   become_user: root
   register: failoverconfig_info
