@@ -4,8 +4,8 @@
   sap.sap_operations.ha_get_failoverconfig_info:
   become: true
   become_user: root
-  register: host_info
+  register: failoverconfig_info
 
 - name: Print test results.
   ansible.builtin.debug:
-    msg: "{{ host_info }}"
+    msg: "{{ failoverconfig_info }}"
