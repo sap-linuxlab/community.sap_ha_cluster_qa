@@ -53,7 +53,7 @@
 
 - name: Setting ERS SID as fact
   ansible.builtin.set_fact:
-    sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+      sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
 
 - name: Acquiring ERS Instance number
   ansible.builtin.shell: |
@@ -68,4 +68,4 @@
 
 - name: Setting ERS Instance number as fact
   ansible.builtin.set_fact:
-    sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+      sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
