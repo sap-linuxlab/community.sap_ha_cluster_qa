@@ -1,13 +1,7 @@
 ---
-- name: Collection information about SAP instances installed on the current host
-  sap.sap_operations.host_info:
-  become: true
-  become_user: root
-  register: host_info
-
 - name: Run ha_check_config_info
   sap.sap_operations.ha_check_config_info:
-    instance_number: "20"
+    instance_number: "{{ sap_instance_number }}"
   register: hacheckconfig
 
 - name: Print the results.
