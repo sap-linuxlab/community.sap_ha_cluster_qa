@@ -5,16 +5,9 @@
   become_user: root
   register: host_info
 
-- name: Print test results.
-  ansible.builtin.debug:
-    msg: "{{ host_info.instances }}"
-
 - name: Run ha_check_config_info
   sap.sap_operations.ha_check_config_info:
-    instance_number: "{{ instance_number }}"
-  loop: "{{ host_info.instances }}"
-  vars:
-    instance_number: "{{ item.mSystemNumber }}"
+    instance_number: "20"
   register: hacheckconfig
 
 - name: Print the results.
