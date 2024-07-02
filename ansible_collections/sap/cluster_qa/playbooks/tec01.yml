@@ -18,4 +18,3 @@
       ansible.builtin.include_role:
         name: sap.cluster_qa.tec01
       when: ansible_hostname == sap_ers_node_name
-
