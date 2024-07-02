@@ -8,11 +8,7 @@
     - name: Running TEC01 test role on ASCS node
       ansible.builtin.include_role:
         name: sap.cluster_qa.tec01
-      when: sap_ascs_node_name != "" and ansible_hostname == sap_ascs_node_name
-
-    - name: Paused to observe the test output
-      ansible.builtin.pause:
-        minutes: 5
+      when: ansible_hostname == sap_ascs_node_name
 
     - name: Finding ERS node name
       ansible.builtin.include_role:
@@ -21,8 +17,5 @@
     - name: Running TEC01 test role on ERS node
       ansible.builtin.include_role:
         name: sap.cluster_qa.tec01
-      when: sap_ers_node_name != "" and ansible_hostname == sap_ers_node_name
+      when: ansible_hostname == sap_ers_node_name
 
-    - name: Paused to observe the test output
-      ansible.builtin.pause:
-        minutes: 5
