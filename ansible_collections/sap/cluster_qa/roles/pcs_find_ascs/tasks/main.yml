@@ -43,9 +43,9 @@
     grep -w 'SAPSYSTEMNAME ' |
     awk '{print $3}' |
     xargs
-  register: sap_ascs_sid
+  register: sap_sid
   changed_when: false
-  failed_when: sap_ascs_sid.rc != 0
+  failed_when: sap_sid.rc != 0
 
 - name: Acquiring ASCS Instance number
   ansible.builtin.shell: |
@@ -61,3 +61,18 @@
 - name: Setting ASCS Instance number as fact
   ansible.builtin.set_fact:
     sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+
+- name: Acquiring ASCS Instance name
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}" |
+    grep -w 'INSTANCE_NAME ' |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ascs_sap_ascs_instance_name
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_ascs_instance_name.rc != 0
+
+- name: Setting ASCS Instance name as fact
+  ansible.builtin.set_fact:
+    sap_instance_name: "{{ __pcs_find_ascs_sap_ascs_instance_name.stdout }}"

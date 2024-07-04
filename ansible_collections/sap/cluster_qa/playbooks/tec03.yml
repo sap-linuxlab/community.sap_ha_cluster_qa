@@ -1,0 +1,20 @@
+---
+- hosts: all
+  tasks:
+    - name: Finding ASCS node name
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.pcs_find_ascs
+
+    - name: Running TEC03 test role on ASCS node
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.tec03
+      when: ansible_hostname == sap_ascs_node_name
+
+    - name: Finding ERS node name
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.pcs_find_ers
+
+    - name: Running TEC03 test role on ERS node
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.tec03
+      when: ansible_hostname == sap_ers_node_name
