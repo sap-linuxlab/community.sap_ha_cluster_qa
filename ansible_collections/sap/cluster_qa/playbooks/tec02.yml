@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: s4hana6-3n
   tasks:
     - name: Finding ASCS node name
       ansible.builtin.include_role:
