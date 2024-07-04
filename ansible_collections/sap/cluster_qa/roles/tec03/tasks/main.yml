@@ -1,5 +1,5 @@
 ---
-- name: Acquiring {{ sap_sid.stdout }} {{ sap_instance_name }} SAP HA trace logs.
+- name: Acquiring SAP HA trace logs for {{ sap_sid.stdout }} {{ sap_instance_name }}
   ansible.builtin.shell: |
     set -o pipefail |
     cat "/usr/sap/{{ sap_sid.stdout }}/{{ sap_instance_name }}/work/sapstartsrv.log" |
@@ -7,6 +7,6 @@
     tail -n 50
   register: ha_trace_logs
 
-- name: Printing {{ sap_sid.stdout }} {{ sap_instance_name }} SAP HA trace logs.
-  debug:
+- name: Printing SAP HA trace logs for {{ sap_sid.stdout }} {{ sap_instance_name }}
+  ansible.builtin.debug:
     msg: "{{ ha_trace_logs.stdout_lines }}"
