@@ -1,44 +1,108 @@
 ---
-- name: Acquiring latest enq_admin information before move
-  sap.sap_operations.enq_admin_info:
-    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
-  become: true
-  become_user: s4hadm
-  become_flags: -i
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
 
-- name: Setting new locks using enq_admin before move
+- name: Acquiring latest enq_admin information on ASCS before move
+  sap.sap_operations.enq_admin_info:
+    profile_filepath: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
+  become: true
+  become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
+  become_flags: -i
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Removing 10 new locks via command line before move
+  ansible.builtin.shell: |
+    set -o pipefail |
+    enq_admin --release_locks=10:X:DIAG::TAB:%u pf={{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}
+  become: true
+  become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
+  become_flags: -i
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Creating 10 new locks via command line before move
+  ansible.builtin.shell: |
+    set -o pipefail |
+    enq_admin --set_locks=10:X:DIAG::TAB:%u pf={{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}
+  become: true
+  become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
+  become_flags: -i
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Setting 10 additional new locks using enq_admin_lock before move
   sap.sap_operations.enq_admin_lock:
-    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+    profile_filepath: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
     lock_type: X
-    state: present
+    state: absent
     owner1: DIAG
     owner2: ""
     name: ANSIBLE
     argument: ANSIBLE
   become: true
-  become_user: s4hadm
+  become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
+  when: ansible_hostname == sap_ascs_node_name
 
 - name: Acquiring latest enq_admin lock information before move
   sap.sap_operations.enq_admin_locks_info:
-    profile_filepath: "/sapmnt/S4H/profile/S4H_ASCS20_s4ascs"
+    profile_filepath: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
   become: true
-  become_user: s4hadm
+  become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
-  register: tec04_locks_before
+  register: tec04_ascs_locks_before
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Acquiring latest enq_admin lock information on ERS before move
+  sap.sap_operations.enq_admin_locks_info:
+    profile_filepath: "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}"
+  become: true
+  become_user: "{{ sap_ers_sid.stdout | lower }}adm"
+  become_flags: -i
+  register: tec04_ers_locks_before
+  when: ansible_hostname == sap_ers_node_name
+
+- name: Comparing the locks of ASCS and ERS before move
+  ansible.builtin.assert:
+    that: "tec04_ascs_locks_before.stdout_lines == tec04_ers_locks_before.stdout_lines"
 
 - name: Trigerring the failover of ASCS instance
-  ansible.builtin.command: pcs resource move s4h_ascs20
+  ansible.builtin.command: "pcs resource move {{ sap_ascs_resource_name }}"
   run_once: true
 
-- name: Acquiring latest enq_admin lock information after move
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Acquiring latest enq_admin lock information before move
   sap.sap_operations.enq_admin_locks_info:
-    profile_filepath: "/sapmnt/S4H/profile/S4H_ERS29_s4ers"
+    profile_filepath: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
   become: true
-  become_user: s4hadm
+  become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
-  register: tec04_locks_after
+  register: tec04_ascs_locks_after
+  when: ansible_hostname == sap_ascs_node_name
 
 - name: Comparing the locks before and after
   ansible.builtin.assert:
-    that: tec04_locks_before.enq_admin_locks_info == tec04_locks_after.enq_admin_locks_info
+    that: "tec04_ascs_locks_before.enq_admin_locks_info == tec04_ascs_locks_after.enq_admin_locks_info"
+
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Acquiring latest enq_admin lock information on ERS before move
+  sap.sap_operations.enq_admin_locks_info:
+    profile_filepath: "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}"
+  become: true
+  become_user: "{{ sap_ers_sid.stdout | lower }}adm"
+  become_flags: -i
+  register: tec04_ers_locks_after
+  when: ansible_hostname == sap_ers_node_name
+
+- name: Comparing the locks before and after
+  ansible.builtin.assert:
+    that: "tec04_ascs_locks_after.enq_admin_locks_info == tec04_ers_locks_after.enq_admin_locks_info"
