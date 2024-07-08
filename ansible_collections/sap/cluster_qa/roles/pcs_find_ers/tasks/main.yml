@@ -47,10 +47,6 @@
   changed_when: false
   failed_when: sap_ers_sid.rc != 0
 
-- name: Setting ERS SID as fact
-  ansible.builtin.set_fact:
-      sap_ers_sid: "{{ sap_ers_sid.stdout }}"
-
 - name: Acquiring ERS Instance number
   ansible.builtin.shell: |
     set -o pipefail |
