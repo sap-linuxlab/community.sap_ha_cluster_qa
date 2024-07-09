@@ -1,9 +1,30 @@
 ---
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
 - name: Run ha_check_config_info
   sap.sap_operations.ha_check_config_info:
     instance_number: "{{ sap_instance_number }}"
   register: hacheckconfig
+  when: ansible_hostname == sap_ascs_node_name
 
 - name: Print the results.
   ansible.builtin.debug:
     msg: "{{ hacheckconfig }}"
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Run ha_check_config_info
+  sap.sap_operations.ha_check_config_info:
+    instance_number: "{{ sap_instance_number }}"
+  register: hacheckconfig
+  when: ansible_hostname == sap_ers_node_name
+
+- name: Print the results.
+  ansible.builtin.debug:
+    msg: "{{ hacheckconfig }}"
+  when: ansible_hostname == sap_ers_node_name
