@@ -1,20 +1,6 @@
 ---
 - hosts: s4hana6-3n
   tasks:
-    - name: Finding ASCS node name
-      ansible.builtin.include_role:
-        name: sap.cluster_qa.pcs_find_ascs
-
-    - name: Running TEC02 test role on ASCS node
+    - name: Running TEC02 test role on S4/HANA Cluster
       ansible.builtin.include_role:
         name: sap.cluster_qa.tec02
-      when: ansible_hostname == sap_ascs_node_name
-
-    - name: Finding ERS node name
-      ansible.builtin.include_role:
-        name: sap.cluster_qa.pcs_find_ers
-
-    - name: Running TEC01 test role on ERS node
-      ansible.builtin.include_role:
-        name: sap.cluster_qa.tec02
-      when: ansible_hostname == sap_ers_node_name
