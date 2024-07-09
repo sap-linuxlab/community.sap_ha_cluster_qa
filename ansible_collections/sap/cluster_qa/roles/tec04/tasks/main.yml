@@ -65,6 +65,14 @@
   register: tec04_ers_locks_before
   when: ansible_hostname == sap_ers_node_name
 
+- name: Printing output of ASCS locks before
+  ansible.builtin.debug:
+    msg: "{{ tec04_ascs_locks_before.enq_admin_locks_info }}"
+
+- name: Printing output of ERS locks before
+  ansible.builtin.debug:
+    msg: "{{ tec04_ers_locks_before.enq_admin_locks_info }}"
+
 - name: Comparing the locks of ASCS and ERS before move
   ansible.builtin.assert:
     that: "tec04_ascs_locks_before.enq_admin_locks_info == tec04_ers_locks_before.enq_admin_locks_info"
