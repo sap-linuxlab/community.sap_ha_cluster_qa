@@ -1,22 +1,30 @@
 ---
-- name: Collection information about SAP instances installed on the current host
-  sap.sap_operations.host_info:
-  become: true
-  become_user: root
-  register: host_info
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
 
-- name: Print test results.
-  ansible.builtin.debug:
-    msg: "{{ host_info.instances }}"
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
 
 - name: Run ha_check_config_info
   sap.sap_operations.ha_check_config_info:
-    instance_number: "{{ instance_number }}"
-  loop: "{{ host_info.instances }}"
-  vars:
-    instance_number: "{{ item.mSystemNumber }}"
-  register: hacheckconfig
+    instance_number: "{{ sap_ascs_instance_number }}"
+  register: hacheckconfigascs
+  when: (ansible_hostname == sap_ascs_node_name)
+
+- name: Run ha_check_config_info
+  sap.sap_operations.ha_check_config_info:
+    instance_number: "{{ sap_ers_instance_number }}"
+  register: hacheckconfigers
+  when: (ansible_hostname == sap_ers_node_name)
 
 - name: Print the results.
   ansible.builtin.debug:
-    msg: "{{ hacheckconfig }}"
+    msg: "{{ hacheckconfigascs }}"
+  when: (ansible_hostname == sap_ascs_node_name)
+
+- name: Print the results.
+  ansible.builtin.debug:
+    msg: "{{ hacheckconfigers }}"
+  when: (ansible_hostname == sap_ers_node_name)
