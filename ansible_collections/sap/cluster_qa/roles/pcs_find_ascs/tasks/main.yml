@@ -60,4 +60,4 @@
 
 - name: Setting ASCS Instance number as fact
   ansible.builtin.set_fact:
-    sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+    sap_ascs_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
