@@ -67,7 +67,7 @@
 
 - name: Comparing the locks of ASCS and ERS before move
   ansible.builtin.assert:
-    that: "tec04_ascs_locks_before.stdout_lines == tec04_ers_locks_before.stdout_lines"
+    that: "tec04_ascs_locks_before.enq_admin_locks_info == tec04_ers_locks_before.enq_admin_locks_info"
 
 - name: Trigerring the failover of ASCS instance
   ansible.builtin.command: "pcs resource move {{ sap_ascs_resource_name }}"
