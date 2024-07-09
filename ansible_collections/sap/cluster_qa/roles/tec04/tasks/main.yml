@@ -9,7 +9,7 @@
   become: true
   become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
-  when: ansible_hostname == sap_ascs_node_name
+  when: (ansible_hostname == sap_ascs_node_name)
 
 - name: Removing 10 new locks via command line before move
   ansible.builtin.shell: |
@@ -18,7 +18,7 @@
   become: true
   become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
-  when: ansible_hostname == sap_ascs_node_name
+  when: (ansible_hostname == sap_ascs_node_name)
 
 - name: Creating 10 new locks via command line before move
   ansible.builtin.shell: |
@@ -27,7 +27,7 @@
   become: true
   become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
-  when: ansible_hostname == sap_ascs_node_name
+  when: (ansible_hostname == sap_ascs_node_name)
 
 - name: Setting 10 additional new locks using enq_admin_lock before move
   sap.sap_operations.enq_admin_lock:
@@ -41,7 +41,7 @@
   become: true
   become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
-  when: ansible_hostname == sap_ascs_node_name
+  when: (ansible_hostname == sap_ascs_node_name)
 
 - name: Acquiring latest enq_admin lock information before move
   sap.sap_operations.enq_admin_locks_info:
@@ -50,7 +50,7 @@
   become_user: "{{ sap_ascs_sid.stdout | lower }}adm"
   become_flags: -i
   register: tec04_ascs_locks_before
-  when: ansible_hostname == sap_ascs_node_name
+  when: (ansible_hostname == sap_ascs_node_name)
 
 - name: Finding ERS node name
   ansible.builtin.include_role:
@@ -63,19 +63,35 @@
   become_user: "{{ sap_ers_sid.stdout | lower }}adm"
   become_flags: -i
   register: tec04_ers_locks_before
-  when: ansible_hostname == sap_ers_node_name
+  when: (ansible_hostname == sap_ers_node_name)
 
 - name: Printing output of ASCS locks before
   ansible.builtin.debug:
     msg: "{{ tec04_ascs_locks_before.enq_admin_locks_info }}"
+  when: (ansible_hostname == sap_ascs_node_name)
+
+- name: Setting ASCS locks as fact
+  ansible.builtin.set_fact:
+    tec04_ascs_locks_before: "{{ tec04_ascs_locks_before.enq_admin_locks_info }}"
+  when: (ansible_hostname == sap_ascs_node_name)
 
 - name: Printing output of ERS locks before
   ansible.builtin.debug:
     msg: "{{ tec04_ers_locks_before.enq_admin_locks_info }}"
+  when: (ansible_hostname == sap_ers_node_name)
+
+- name: Setting ERS locks as fact
+  ansible.builtin.set_fact:
+    tec04_ers_locks_before: "{{ tec04_ers_locks_before.enq_admin_locks_info }}"
+  when: (ansible_hostname == sap_ers_node_name)
 
 - name: Comparing the locks of ASCS and ERS before move
   ansible.builtin.assert:
-    that: "tec04_ascs_locks_before.enq_admin_locks_info == tec04_ers_locks_before.enq_admin_locks_info"
+    that: "tec04_ascs_locks_before == tec04_ers_locks_before"
+
+- name: pause here
+  ansible.builtin.pause:
+    minutes: 5
 
 - name: Trigerring the failover of ASCS instance
   ansible.builtin.command: "pcs resource move {{ sap_ascs_resource_name }}"
