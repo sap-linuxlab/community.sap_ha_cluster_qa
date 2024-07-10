@@ -66,6 +66,9 @@
   ansible.builtin.copy:
     src: /tmp/tec04_ascs_locks_before.enq_admin_locks_info
     dest: /tmp/tec04_ascs_locks_before.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Re-assigning ASCS locks value to all hosts before move
   ansible.builtin.shell: |
