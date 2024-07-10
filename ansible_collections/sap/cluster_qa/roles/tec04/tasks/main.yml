@@ -56,10 +56,13 @@
   ansible.builtin.copy:
     content: "{{ tec04_ascs_locks_before.enq_admin_locks_info }}"
     dest: /tmp/tec04_ascs_locks_before.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
   delegate_to: localhost
   when: (ansible_hostname == sap_ascs_node_name)
 
-- name: copying ASCS lock data file to all nodes before move
+- name: Copying ASCS lock data file to all nodes before move
   ansible.builtin.copy:
     src: /tmp/tec04_ascs_locks_before.enq_admin_locks_info
     dest: /tmp/tec04_ascs_locks_before.enq_admin_locks_info
@@ -87,6 +90,9 @@
   ansible.builtin.copy:
     content: "{{ tec04_ers_locks_before.enq_admin_locks_info }}"
     dest: /tmp/tec04_ers_locks_before.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
   delegate_to: localhost
   when: (ansible_hostname == sap_ers_node_name)
 
@@ -94,6 +100,9 @@
   ansible.builtin.copy:
     src: /tmp/tec04_ers_locks_before.enq_admin_locks_info
     dest: /tmp/tec04_ers_locks_before.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: RE-Assigning ERS locks value to all hosts before move
   ansible.builtin.shell: |
@@ -126,13 +135,19 @@
   ansible.builtin.copy:
     content: "{{ tec04_ascs_locks_after.enq_admin_locks_info }}"
     dest: /tmp/tec04_ascs_locks_after.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
   delegate_to: localhost
   when: (ansible_hostname == sap_ascs_node_name)
 
-- name: copying ASCS lock data file to all nodes after move
+- name: Copying ASCS lock data file to all nodes after move
   ansible.builtin.copy:
     src: /tmp/tec04_ascs_locks_after.enq_admin_locks_info
     dest: /tmp/tec04_ascs_locks_after.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: Re-Assigning ASCS locks value to all hosts after move
   ansible.builtin.shell: |
@@ -157,6 +172,9 @@
   ansible.builtin.copy:
     content: "{{ tec04_ers_locks_after.enq_admin_locks_info }}"
     dest: /tmp/tec04_ers_locks_after.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
   delegate_to: localhost
   when: (ansible_hostname == sap_ers_node_name)
 
@@ -164,6 +182,9 @@
   ansible.builtin.copy:
     src: /tmp/tec04_ers_locks_after.enq_admin_locks_info
     dest: /tmp/tec04_ers_locks_after.enq_admin_locks_info
+    owner: root
+    group: root
+    mode: '0644'
 
 - name: RE-Assigning ERS locks value to all hosts after move
   ansible.builtin.shell: |
