@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: s4hana6-3n
   tasks:
     - name: Running TEC04 test role on the S4/HANA Cluster
       ansible.builtin.include_role:
