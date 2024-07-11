@@ -19,5 +19,5 @@
 # You should have received a copy of the GNU General Public License along with this program.
 # If not, see <https://www.gnu.org/licenses/>.
 
-molecule==24.6.1
+molecule==24.7.0
 ovirt-engine-sdk-python==4.6.1
