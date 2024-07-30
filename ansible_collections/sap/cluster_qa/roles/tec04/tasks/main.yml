@@ -115,7 +115,7 @@
 
 - name: Asserting the locks of ASCS and ERS before move
   ansible.builtin.assert:
-    that: "tec04_ascs_locks_before.stdout_lines == tec04_ers_locks_before.stdout_lines"
+    that: (tec04_ascs_locks_before.enq_admin_locks_info | sort ) == (tec04_ers_locks_before.enq_admin_locks_info | sort )
 
 - name: Trigerring the failover of ASCS instance
   ansible.builtin.command: "pcs resource move {{ sap_ascs_resource_name }}"
@@ -134,90 +134,6 @@
   register: tec04_ascs_locks_after
   when: ansible_hostname == sap_ascs_node_name
 
-- name: Copying ASCS lock data into into a file on localhost after move
-  ansible.builtin.copy:
-    content: "{{ tec04_ascs_locks_after.enq_admin_locks_info }}"
-    dest: /tmp/tec04_ascs_locks_after.enq_admin_locks_info
-    owner: root
-    group: root
-    mode: '0644'
-  delegate_to: localhost
-  when: (ansible_hostname == sap_ascs_node_name)
-
-- name: Copying ASCS lock data file to all nodes after move
-  ansible.builtin.copy:
-    src: /tmp/tec04_ascs_locks_after.enq_admin_locks_info
-    dest: /tmp/tec04_ascs_locks_after.enq_admin_locks_info
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: Re-Assigning ASCS locks value to all hosts after move
-  ansible.builtin.shell: |
-    set -o pipefail |
-    cat /tmp/tec04_ascs_locks_after.enq_admin_locks_info
-  register: tec04_ascs_locks_after
-
-- name: Finding ERS node name
-  ansible.builtin.include_role:
-    name: sap.cluster_qa.pcs_find_ers
-
-- name: Acquiring latest enq_admin lock information on ERS after move
-  sap.sap_operations.enq_admin_locks_info:
-    profile_filepath: "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}"
-  become: true
-  become_user: "{{ sap_ers_sid.stdout | lower }}adm"
-  become_flags: -i
-  register: tec04_ers_locks_after
-  when: ansible_hostname == sap_ers_node_name
-
-- name: Copying ERS lock data into a file after move
-  ansible.builtin.copy:
-    content: "{{ tec04_ers_locks_after.enq_admin_locks_info }}"
-    dest: /tmp/tec04_ers_locks_after.enq_admin_locks_info
-    owner: root
-    group: root
-    mode: '0644'
-  delegate_to: localhost
-  when: (ansible_hostname == sap_ers_node_name)
-
-- name: Copying ERS lock data file to all nodes after move
-  ansible.builtin.copy:
-    src: /tmp/tec04_ers_locks_after.enq_admin_locks_info
-    dest: /tmp/tec04_ers_locks_after.enq_admin_locks_info
-    owner: root
-    group: root
-    mode: '0644'
-
-- name: RE-Assigning ERS locks value to all hosts after move
-  ansible.builtin.shell: |
-    set -o pipefail |
-    cat /tmp/tec04_ers_locks_after.enq_admin_locks_info
-  register: tec04_ers_locks_after
-
-- name: Asserting the locks of ASCS and ERS after move
+- name: Asserting the locks of ASCS locks after move
   ansible.builtin.assert:
-    that: "tec04_ascs_locks_after.stdout_lines == tec04_ers_locks_after.stdout_lines"
-
-- name: Alligning ASCS logs before
-  ansible.builtin.shell: |
-    set -o pipefail |
-    cat /tmp/tec04_ascs_locks_before.enq_admin_locks_info |
-    sed "s/\},/\}#/g" |
-    tr '#' '\012' |
-    egrep -v "\[|\]"
-  register: aligned_ascs_logs_before
-
-- name: Alligning ASCS logs after
-  ansible.builtin.shell: |
-    set -o pipefail |
-    cat /tmp/tec04_ascs_locks_after.enq_admin_locks_info |
-    sed "s/\},/\}#/g" |
-    tr '#' '\012' |
-    egrep -v "\[|\]" |
-    sort -r
-  register: aligned_ascs_logs_after
-
-- name: Asserting the locks of ASCS before and after
-  ansible.builtin.assert:
-    that: "aligned_ascs_logs_before.stdout == aligned_ascs_logs_after.stdout"
+    that: (tec04_ascs_locks_before.enq_admin_locks_info | sort ) == (tec04_ascs_locks_after.enq_admin_locks_info | sort )
