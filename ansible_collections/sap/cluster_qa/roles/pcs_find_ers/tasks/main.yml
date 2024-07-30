@@ -60,19 +60,4 @@
 
 - name: Setting ERS Instance number as fact
   ansible.builtin.set_fact:
-      sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
-
-- name: Acquiring ERS Instance name
-  ansible.builtin.shell: |
-    set -o pipefail |
-    cat "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}" |
-    grep -w 'INSTANCE_NAME ' |
-    awk '{print $3}' |
-    xargs
-  register: __pcs_find_ers_sap_ers_instance_name
-  changed_when: false
-  failed_when: __pcs_find_ers_sap_ers_instance_name.rc != 0
-
-- name: Setting ERS Instance number as fact
-  ansible.builtin.set_fact:
-      sap_instance_name: "{{ __pcs_find_ers_sap_ers_instance_name.stdout }}"
+      sap_ers_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
