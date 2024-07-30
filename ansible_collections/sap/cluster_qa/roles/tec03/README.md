@@ -1,12 +1,13 @@
-Role Name
+TEC03
 =========
 
-A brief description of the role goes here.
+This Role extracts information to verify that the shared Library (HA-Interface) is being loaded correctly
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+A 2 or more node pacemaker cluster managing S4/HANA ASCS, ERS, PAS and AAS Instances using the `SAPInstance` resource agent with the SAP HA interface for SAP ABAP application server instances as mentioned in: https://access.redhat.com/solutions/3606101.
+
 
 Role Variables
 --------------
@@ -16,7 +17,7 @@ A description of the settable variables for this role should go here, including 
 Dependencies
 ------------
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+`saphostcontrol` should be installed
 
 Example Playbook
 ----------------
@@ -25,14 +26,14 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - { role: username.rolename, x: 42 }
+         - sap.cluster_qa.tec03
 
 License
 -------
 
-BSD
+GPLv3
 
 Author Information
 ------------------
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Amir Memon

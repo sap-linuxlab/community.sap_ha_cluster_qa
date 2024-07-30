@@ -1,8 +1,7 @@
-TEC01
+TEC02
 =========
 
-This Role extracts information to verify the Name and version of the 3rd-party HA software and ensure it is delivered
-correctly. The name and the version of the used HA software is important information when the configuration of an SAP system should be shown.
+This Role extracts information to verify that there are no errors in the HA configuration as per HACheckConfig module in HA interface
 
 Requirements
 ------------
@@ -27,7 +26,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - sap.cluster_qa.tec01
+         - sap.cluster_qa.tec02
 
 License
 -------
