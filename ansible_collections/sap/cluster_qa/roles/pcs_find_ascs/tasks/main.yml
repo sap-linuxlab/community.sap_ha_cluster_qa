@@ -43,9 +43,9 @@
     grep -w 'SAPSYSTEMNAME ' |
     awk '{print $3}' |
     xargs
-  register: sap_ascs_sid
+  register: sap_sid
   changed_when: false
-  failed_when: sap_ascs_sid.rc != 0
+  failed_when: sap_sid.rc != 0
 
 - name: Acquiring ASCS Instance number
   ansible.builtin.shell: |

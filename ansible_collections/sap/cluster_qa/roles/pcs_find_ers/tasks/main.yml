@@ -43,7 +43,7 @@
     grep -w 'SAPSYSTEMNAME ' |
     awk '{print $3}' |
     xargs
-  register: sap_ers_sid
+  register: sap_sid
   changed_when: false
   failed_when: sap_ers_sid.rc != 0
 
