@@ -1,0 +1,36 @@
+---
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Acquiring SAP HA trace logs.
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "/usr/sap/{{ sap_sid.stdout }}/{{ sap_instance_name }}/work/sapstartsrv.log" |
+    grep "SAP HA Trace" |
+    tail -n 50
+  register: ha_trace_logs
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Printing SAP HA trace logs.
+  ansible.builtin.debug:
+    msg: "{{ ha_trace_logs.stdout_lines }}"
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Acquiring SAP HA trace logs.
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "/usr/sap/{{ sap_sid.stdout }}/{{ sap_instance_name }}/work/sapstartsrv.log" |
+    grep "SAP HA Trace" |
+    tail -n 50
+  register: ha_trace_logs
+  when: ansible_hostname == sap_ers_node_name
+
+- name: Printing SAP HA trace logs.
+  ansible.builtin.debug:
+    msg: "{{ ha_trace_logs.stdout_lines }}"
+  when: ansible_hostname == sap_ers_node_name
