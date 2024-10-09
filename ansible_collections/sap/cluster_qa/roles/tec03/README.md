@@ -1,7 +1,7 @@
-TEC02
+TEC03
 =========
 
-This Role extracts information to verify that there are no errors in the HA configuration as per HACheckConfig module in HA interface
+This Role extracts information to verify that the shared Library (HA-Interface) is being loaded correctly
 
 Requirements
 ------------
@@ -26,7 +26,7 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       roles:
-         - sap.cluster_qa.tec02
+         - sap.cluster_qa.tec03
 
 License
 -------
