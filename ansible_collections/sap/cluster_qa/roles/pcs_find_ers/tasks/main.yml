@@ -45,7 +45,7 @@
     xargs
   register: sap_sid
   changed_when: false
-  failed_when: sap_sid.rc != 0
+  failed_when: sap_ers_sid.rc != 0
 
 - name: Acquiring ERS Instance number
   ansible.builtin.shell: |
