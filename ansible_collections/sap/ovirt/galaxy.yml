@@ -1,0 +1,23 @@
+---
+namespace: sap
+name: ovirt
+version: 1.0.0
+readme: README.md
+authors:
+  - Kirill Satarin (@kksat)
+description: Provision VMs for SAP with Ovirt.ovirt collection for Ansible molecule
+license:
+  - GPL-3.0-only
+license_file: ''
+tags:
+  - sap
+  - ovirt
+  - application
+  - molecule
+dependencies:
+  "ovirt.ovirt": ">=3.2.0"
+repository: https://github.com/redhat-sap/ha-cluster-qa
+documentation: https://github.com/redhat-sap/ha-cluster-qa
+homepage: https://github.com/redhat-sap/ha-cluster-qa
+issues: https://github.com/redhat-sap/ha-cluster-qa
+build_ignore: []
