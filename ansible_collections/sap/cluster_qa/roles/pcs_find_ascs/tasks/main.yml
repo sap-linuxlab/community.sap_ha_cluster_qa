@@ -16,7 +16,11 @@
     sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"
 
 - name: Acquiring ASCS node name
-  ansible.builtin.shell: "pcs resource status {{ sap_ascs_resource_name }} | grep SAPInstance | awk '{print $5}'"
+  ansible.builtin.shell: |
+    set -o pipefail |
+    pcs resource status {{ sap_ascs_resource_name }} |
+    grep SAPInstance |
+    awk '{print $5}'
   register: __pcs_find_ascs_sap_ascs_node_name
   changed_when: false
   failed_when: __pcs_find_ascs_sap_ascs_node_name.rc != 0
@@ -43,9 +47,36 @@
     grep -w 'SAPSYSTEMNAME ' |
     awk '{print $3}' |
     xargs
-  register: sap_sid
+  register: __pcs_find_ascs_sap_ascs_sid
   changed_when: false
-  failed_when: sap_sid.rc != 0
+  failed_when: __pcs_find_ascs_sap_ascs_sid.rc != 0
+
+- name: Setting ASCS SID as a separate fact
+  ansible.builtin.set_fact:
+    sap_ascs_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
+
+- name: Setting ASCS SID as a general fact
+  ansible.builtin.set_fact:
+    sap_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
+
+- name: Acquiring ASCS Instance Name
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}" |
+    grep -w 'INSTANCE_NAME =' |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ascs_sap_instance_name
+  changed_when: false
+  failed_when: __pcs_find_ascs_sap_instance_name.rc != 0
+
+- name: Setting ASCS Instance Name as a separate fact
+  ansible.builtin.set_fact:
+    sap_ascs_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
+
+- name: Setting ASCS Instance Name as a general fact
+  ansible.builtin.set_fact:
+    sap_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
 
 - name: Acquiring ASCS Instance number
   ansible.builtin.shell: |
@@ -61,3 +92,7 @@
 - name: Setting ASCS Instance number as fact
   ansible.builtin.set_fact:
     sap_ascs_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+
+- name: Setting ASCS Instance number as fact
+  ansible.builtin.set_fact:
+    sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"

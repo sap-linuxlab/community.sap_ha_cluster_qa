@@ -43,9 +43,36 @@
     grep -w 'SAPSYSTEMNAME ' |
     awk '{print $3}' |
     xargs
-  register: sap_sid
+  register: __pcs_find_ers_sap_ers_sid
   changed_when: false
-  failed_when: sap_ers_sid.rc != 0
+  failed_when: __pcs_find_ers_sap_ers_sid.rc != 0
+
+- name: Setting ERS SID as a separate fact
+  ansible.builtin.set_fact:
+    sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+
+- name: Setting ERS SID as a general fact
+  ansible.builtin.set_fact:
+    sap_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+
+- name: Acquiring ERS Instance Name
+  ansible.builtin.shell: |
+    set -o pipefail |
+    cat "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}" |
+    grep -w 'INSTANCE_NAME =' |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ers_sap_instance_name
+  changed_when: false
+  failed_when: __pcs_find_ers_sap_instance_name.rc != 0
+
+- name: Setting ERS Instance Name as a separate fact
+  ansible.builtin.set_fact:
+    sap_ers_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+
+- name: Setting ERS Instance Name as a general fact
+  ansible.builtin.set_fact:
+    sap_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
 
 - name: Acquiring ERS Instance number
   ansible.builtin.shell: |
@@ -58,6 +85,10 @@
   changed_when: false
   failed_when: __pcs_find_ers_sap_instance_number.rc != 0
 
-- name: Setting ERS Instance number as fact
+- name: Setting ERS Instance number as fact separately
   ansible.builtin.set_fact:
       sap_ers_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+
+- name: Setting ERS Instance number as fact without appserver name
+  ansible.builtin.set_fact:
+      sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
