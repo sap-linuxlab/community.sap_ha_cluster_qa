@@ -8,6 +8,7 @@ Requirements
 
 The resource which is managing the ascs instance should have the keyword `ascs` in lower case.
 Pacemaker cluster with ascs resource.
+No other resource managed by ocf:heartbeat:SAPInstance should have the same keyword as `ascs`
 
 Role Variables
 --------------

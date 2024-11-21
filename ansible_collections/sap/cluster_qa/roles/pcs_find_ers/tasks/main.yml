@@ -4,7 +4,7 @@
     set -o pipefail
     pcs resource config |
     grep SAPInstance |
-    grep ers |
+    grep -i ers |
     awk '{print $2}' |
     xargs
   register: __pcs_find_ers_sap_ers_resource_name

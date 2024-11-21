@@ -7,6 +7,6 @@
   become_user: root
   register: failoverconfig_info
 
-- name: Print test results.
+- name: Print test results completing TEC01 test case for current Host.
   ansible.builtin.debug:
     msg: "{{ failoverconfig_info }}"
