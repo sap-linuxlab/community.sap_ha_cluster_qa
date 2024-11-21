@@ -8,6 +8,7 @@ Requirements
 
 The resource which is managing the ers instance should have the keyword `ers` in lower case.
 Pacemaker cluster with ers resource.
+No other resource managed by ocf:heartbeat:SAPInstance should have the same keyword as `ers`
 
 Role Variables
 --------------

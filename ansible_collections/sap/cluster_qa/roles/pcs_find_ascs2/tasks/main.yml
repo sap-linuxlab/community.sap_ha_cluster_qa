@@ -4,7 +4,7 @@
     set -o pipefail
     pcs resource config |
     grep SAPInstance |
-    grep ascs |
+    grep -i ascs |
     awk '{print $2}' |
     xargs
   register: __pcs_find_ascs_sap_ascs_resource_name
