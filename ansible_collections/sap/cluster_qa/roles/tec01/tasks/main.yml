@@ -1,12 +1,12 @@
 ---
-# tasks file for tec01
-- name: Collection information about SAP instances installed on the current host
+- name: Collection information about SAP instances installed on the current instance
   sap.sap_operations.ha_get_failoverconfig_info:
     instance_number: "{{ sap_instance_number }}"
   become: true
   become_user: root
   register: failoverconfig_info
 
-- name: Print test results completing TEC01 test case for current Host.
+- name: Print test results completing TEC01 test case for current instance
   ansible.builtin.debug:
     msg: "{{ failoverconfig_info }}"
+  failed_when: "'null' in failoverconfig_info"

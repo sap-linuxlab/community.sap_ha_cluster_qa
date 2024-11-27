@@ -1,0 +1,21 @@
+---
+- name: Playbook to run TEC01 test case on ASCS and ERS instances
+  hosts: s4hanax86-3n
+  tasks:
+    - name: Finding ASCS node name
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.pcs_find_ascs
+
+    - name: Running TEC01 test role on the ASCS Node
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.tec01
+      when: ansible_hostname == sap_ascs_node_name
+
+    - name: Finding ERS node name
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.pcs_find_ers
+
+    - name: Running TEC01 test role on the ERS Node
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.tec01
+      when: ansible_hostname == sap_ers_node_name

@@ -11,20 +11,22 @@
   sap.sap_operations.ha_check_config_info:
     instance_number: "{{ sap_ascs_instance_number }}"
   register: hacheckconfigascs
-  when: (ansible_hostname == sap_ascs_node_name)
+  when: ansible_hostname == sap_ascs_node_name
 
 - name: Run ha_check_config_info
   sap.sap_operations.ha_check_config_info:
     instance_number: "{{ sap_ers_instance_number }}"
   register: hacheckconfigers
-  when: (ansible_hostname == sap_ers_node_name)
+  when: ansible_hostname == sap_ers_node_name
 
-- name: Print the results completing TEC02 test case for ASCS node.
+- name: Print the results completing TEC02 test case for ASCS node
   ansible.builtin.debug:
     msg: "{{ hacheckconfigascs }}"
-  when: (ansible_hostname == sap_ascs_node_name)
+  when: ansible_hostname == sap_ascs_node_name
+  failed_when: "'SAPControl-HA-WARNING' in hacheckconfigascs"
 
-- name: Print the results completing TEC02 test case for ERS node.
+- name: Print the results completing TEC02 test case for ERS node
   ansible.builtin.debug:
     msg: "{{ hacheckconfigers }}"
-  when: (ansible_hostname == sap_ers_node_name)
+  when: ansible_hostname == sap_ers_node_name
+  failed_when: "'SAPControl-HA-WARNING' in hacheckconfigers"

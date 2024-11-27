@@ -36,4 +36,5 @@ GPLv3
 Author Information
 ------------------
 
-Amir Memon
+Amir Memon (@amemon-redhat)
+Kirill Satarin (@kksat)
