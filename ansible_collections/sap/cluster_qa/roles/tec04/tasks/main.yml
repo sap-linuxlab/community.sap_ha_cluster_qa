@@ -77,7 +77,9 @@
 
 - name: Asserting the locks of ASCS and ERS before move
   ansible.builtin.assert:
-    that: hostvars[sap_ascs_node_name]['tec04_ascs_locks_before'] | symmetric_difference(hostvars[sap_ers_node_name]['tec04_ers_locks_before']) == []
+    that: >-
+      hostvars[sap_ascs_node_name]['tec04_ascs_locks_before']
+      | symmetric_difference(hostvars[sap_ers_node_name]['tec04_ers_locks_before']) == []
 
 - name: Setting ASCS node name before move as facts
   ansible.builtin.set_fact:
@@ -111,7 +113,9 @@
 
 - name: Asserting the locks of ASCS before and after move
   ansible.builtin.assert:
-    that: hostvars[sap_ascs_node_name_before]['tec04_ascs_locks_before'] | symmetric_difference(hostvars[sap_ascs_node_name_after]['tec04_ascs_locks_after']) == []
+    that: >-
+      hostvars[sap_ascs_node_name_before]['tec04_ascs_locks_before']
+      | symmetric_difference(hostvars[sap_ascs_node_name_after]['tec04_ascs_locks_after']) == []
 
 - name: Finding ERS node name
   ansible.builtin.include_role:
@@ -133,4 +137,6 @@
 
 - name: Asserting the locks of ASCS and ERS after move completing the TEC04 Test Case
   ansible.builtin.assert:
-    that: hostvars[sap_ascs_node_name_after]['tec04_ascs_locks_after'] | symmetric_difference(hostvars[sap_ers_node_name]['tec04_ers_locks_after']) == []
+    that: >-
+      hostvars[sap_ascs_node_name_after]['tec04_ascs_locks_after']
+      | symmetric_difference(hostvars[sap_ers_node_name]['tec04_ers_locks_after']) == []
