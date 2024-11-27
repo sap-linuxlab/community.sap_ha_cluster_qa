@@ -3,7 +3,7 @@
   ansible.builtin.include_role:
     name: sap.cluster_qa.pcs_find_ascs
 
-- name: Acquiring SAP HA trace logs.
+- name: Acquiring SAP HA trace logs
   ansible.builtin.shell: |
     set -o pipefail |
     cat "/usr/sap/{{ sap_sid }}/{{ sap_instance_name }}/work/sapstartsrv.log" |
@@ -12,7 +12,7 @@
   register: ha_trace_logs
   when: ansible_hostname == sap_ascs_node_name
 
-- name: Printing SAP HA trace logs.
+- name: Printing SAP HA trace logs for ASCS Instance
   ansible.builtin.debug:
     msg: "{{ ha_trace_logs.stdout_lines }}"
   when: ansible_hostname == sap_ascs_node_name
@@ -30,7 +30,7 @@
   register: ha_trace_logs
   when: ansible_hostname == sap_ers_node_name
 
-- name: Printing SAP HA trace logs.
+- name: Printing SAP HA trace logs for ERS instance
   ansible.builtin.debug:
     msg: "{{ ha_trace_logs.stdout_lines }}"
   when: ansible_hostname == sap_ers_node_name

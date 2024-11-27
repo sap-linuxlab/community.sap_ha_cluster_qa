@@ -12,7 +12,7 @@ A 2 or more node pacemaker cluster managing S4/HANA ASCS, ERS, PAS and AAS Insta
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+N/A
 
 Dependencies
 ------------
@@ -36,4 +36,5 @@ GPLv3
 Author Information
 ------------------
 
-Amir Memon
+Amir Memon (@amemon-redhat)
+Kirill Satarin (@kksat)
