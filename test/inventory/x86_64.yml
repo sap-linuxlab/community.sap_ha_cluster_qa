@@ -1,0 +1,12 @@
+---
+all:
+  children:
+    s4hana-3n:
+      hosts:
+        s4hana17:
+        s4hana18:
+        s4hana19:
+    s4hana-2n:
+      hosts:
+        s4hana17:
+        s4hana18:
