@@ -28,9 +28,9 @@ tags:
   - tools
 
 dependencies:
-  sap.sap_operations: '==1.1.0'
-  ansible.posix: '==1.5.4'
-  community.general: '==7.3.0'
+  "sap.sap_operations": ">=2.10.0"
+  "ansible.posix": ">=1.5.4"
+  "community.general": ">=7.3.0"
 
 repository: https://github.com/redhat-sap/ha-cluster-qa
 
