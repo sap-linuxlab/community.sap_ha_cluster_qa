@@ -5,7 +5,6 @@ skip_list:
     - run-once[task]
     - no-changed-when
     - risky-shell-pipe
-    - galaxy[no-changelog]
 
 exclude_paths:
     - venv/
