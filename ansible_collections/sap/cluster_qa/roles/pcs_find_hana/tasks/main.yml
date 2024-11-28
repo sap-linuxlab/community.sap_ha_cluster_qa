@@ -1,6 +1,4 @@
 ---
-# tasks file for find_hana
-
 - name: Acquiring SAP HANA SID
   ansible.builtin.shell: |
     set -o pipefail
