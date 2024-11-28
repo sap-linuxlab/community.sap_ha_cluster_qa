@@ -1,0 +1,12 @@
+---
+all:
+  children:
+    s4hana-3n:
+      hosts:
+        lsh40410:
+        lsh40411:
+        lsh40412:
+    s4hana-2n:
+      hosts:
+        lsh40410:
+        lsh40411:
