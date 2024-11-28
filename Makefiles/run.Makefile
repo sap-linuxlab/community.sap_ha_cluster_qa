@@ -9,3 +9,11 @@ run-playbook-%:
 		--inventory test/inventory/${TEST_ANSIBLE_ARCHITECTURE}.yml \
 		--limit ${TEST_ANSIBLE_GROUP} \
 		./ansible_collections/sap/cluster_qa/playbooks/$*.yml
+
+test-playbooks:
+	$(MAKE) run-playbook-find_ascs
+	$(MAKE) run-playbook-find_ers
+	$(MAKE) run-playbook-tec01
+	$(MAKE) run-playbook-tec02
+	$(MAKE) run-playbook-tec03
+	$(MAKE) run-playbook-tec04
