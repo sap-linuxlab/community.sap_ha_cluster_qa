@@ -1,6 +1,0 @@
----
-- hosts: s4hanappc-3n
-  tasks:
-    - name: Running TEC03 test role on the S4/HANA Cluster
-      ansible.builtin.include_role:
-        name: sap.cluster_qa.tec03
