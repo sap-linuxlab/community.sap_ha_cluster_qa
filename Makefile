@@ -34,7 +34,7 @@ yamllint: venv/bin/activate  ## Run yamllint
 	$(TOX) exec -e lint -- yamllint . --config-file .config/yamllint.yml
 
 .PHONY: lint
-lint: ansible-lint yamllint  ## Run all linting for the project
+lint: collection-dependencies ansible-lint yamllint  ## Run all linting for the project
 
 .PHONY: clean-venv
 clean-venv:  ## Clean virtual environment
@@ -56,3 +56,7 @@ clean: clean-venv clean-tox  ## Clean
 collection-list-%: venv/bin/activate ## List ansible installed collections
 	. venv/bin/activate
 	$(TOX) exec -e $* -- ansible-galaxy collection list
+
+.PHONY: collection-dependencies
+collection-dependencies:  ## Check if collection dependencies and project requiements are the same
+	./hack/collection-dependencies.sh
