@@ -1,13 +1,12 @@
 ---
 galaxy_info:
   author: Amir Memon (@amemon-redhat)
-  description: Run test02
+  description: Run test04
   license: GPl-3.0-only
   min_ansible_version: "2.15"
   platforms:
     - name: EL
       versions:
-        - "7"
         - "8"
         - "9"
   galaxy_tags: []
