@@ -1,8 +1,8 @@
 ---
 collections:
-  - name: sap.sap_operations
-    version: 2.1.0
-  - name: ansible.posix
-    version: 1.5.4
-  - name: community.general
-    version: 7.3.0
+  - name: "sap.sap_operations"
+    version: ">=2.10.0"
+  - name: "ansible.posix"
+    version: ">=1.5.4"
+  - name: "community.general"
+    version: ">=7.3.0"
