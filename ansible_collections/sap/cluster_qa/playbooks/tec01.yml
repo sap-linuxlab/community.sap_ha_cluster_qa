@@ -1,6 +1,9 @@
 ---
 - name: Playbook to run TEC01 test case on ASCS and ERS instances
   hosts: all
+  gather_facts: false
+  become: true
+  become_user: root
   tasks:
     - name: Finding ASCS node name
       ansible.builtin.include_role:
