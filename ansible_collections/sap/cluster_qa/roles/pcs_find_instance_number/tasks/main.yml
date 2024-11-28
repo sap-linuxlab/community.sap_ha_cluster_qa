@@ -1,6 +1,4 @@
 ---
-# tasks file for pcs_find_instance_number
-
 - name: Acquiring SAP HANA Instance Number
   ansible.builtin.shell: |
     set -o pipefail
