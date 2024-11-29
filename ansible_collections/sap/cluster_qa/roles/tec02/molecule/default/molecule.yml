@@ -6,3 +6,15 @@ platforms:
     ip: 192.168.10.101
   - name: s4hana10-amemon
     ip: 192.168.10.102
+
+scenario:
+  converge_sequence:
+    - create
+    - converge
+  test_sequence:
+    - destroy
+    - create
+    - converge
+    - destroy
+  destroy_sequence:
+    - destroy
