@@ -1,0 +1,11 @@
+---
+- name: Prepare
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Starting the cluster
+      community.general.pacemaker_cluster:
+        state: online
+        timeout: 900
+      become: true
+      become_user: root

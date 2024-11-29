@@ -10,10 +10,12 @@ platforms:
 scenario:
   converge_sequence:
     - create
+    - prepare
     - converge
   test_sequence:
     - destroy
     - create
+    - prepare
     - converge
     - destroy
   destroy_sequence:
