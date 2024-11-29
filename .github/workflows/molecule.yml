@@ -49,6 +49,10 @@ jobs:
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
           OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
           OVIRT_PASSWORD: ${{ secrets.OVIRT_PASSWORD }}
+          ARA_API_USERNAME: ${{ secrets.ARA_API_USERNAME }}
+          ARA_API_PASSWORD: ${{ secrets.ARA_API_PASSWORD }}
+          ARA_API_CLIENT: ${{ vars.ARA_API_CLIENT }}
+          ARA_API_SERVER: ${{ vars.ARA_API_SERVER }}
 
       - name: Remove molecule ssh key
         run: |
