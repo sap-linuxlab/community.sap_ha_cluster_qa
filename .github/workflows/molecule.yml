@@ -37,7 +37,6 @@ jobs:
           ID_MOLECULE_RSA_PUB: ${{ secrets.ID_MOLECULE_RSA_PUB }}
 
       - name: Run molecule
-        continue-on-error: true
         run: |
           source ~/.bashrc
           pyenv install ${PYTHON_VERSION} || true
@@ -55,6 +54,7 @@ jobs:
           ARA_API_SERVER: ${{ vars.ARA_API_SERVER }}
 
       - name: Remove molecule ssh key
+        if: always()
         run: |
           rm -f ~/.ssh/id_molecule_rsa
           rm -f ~/.ssh/id_molecule_rsa.pub
