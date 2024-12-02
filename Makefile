@@ -4,6 +4,7 @@ export TOX
 include Makefiles/molecule/Makefile
 include Makefiles/run.Makefile
 include Makefiles/spelling.Makefile
+include Makefiles/build.Makefile
 
 .ONESHELL:
 .tox/%/ansible_collections: venv/bin/activate
