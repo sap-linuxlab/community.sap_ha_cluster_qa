@@ -19,8 +19,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        role:
-          - tec02
+        include:
+          - scenario: s4hana-3n-ppc64le
+            role: tec02
+          - scenario: s4hana-3n-x86_64
+            role: tec02
     steps:
       - uses: actions/checkout@v3
         with:
@@ -48,7 +51,7 @@ jobs:
           pyenv global ${PYTHON_VERSION}
           pyenv rehash
           python --version
-          make -- molecule test
+          make -- molecule test -s ${{ matrix.scenario }}
         env:
           WORKDIR: ansible_collections/sap/cluster_qa/roles/${{ matrix.role }}
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
