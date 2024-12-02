@@ -7,7 +7,7 @@
 
 - name: Checking Hardware CPU Architecture
   ansible.builtin.debug:
-    msg: "Hardware Archirecture of {{ ansible_hostname }} is {{ ansible_architecture }}"
+    msg: "Hardware Architecture of {{ ansible_hostname }} is {{ ansible_architecture }}"
 
 - name: Checking RHEL Version
   ansible.builtin.debug:
@@ -89,7 +89,7 @@
   run_once: true
   changed_when: true
 
-- name: Aquiring SAPHanaTopology resource name
+- name: Acquiring SAPHanaTopology resource name
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource config |
@@ -126,7 +126,7 @@
     msg: "Current state of SAP HANA Topology resource is {{ sap_hana_topology_resource_state.stdout }}"
   failed_when: "'Started:' not in sap_hana_topology_resource_state.stdout"
 
-- name: Aquiring SAPHana resource name
+- name: Acquiring SAPHana resource name
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource config |
@@ -227,7 +227,7 @@
   ansible.builtin.set_fact:
     sap_hana_master_node: "{{ sap_hana_master_node.stdout }}"
 
-- name: Waiting for 60 seconds to stabalize
+- name: Waiting for 60 seconds to stabilize
   ansible.builtin.pause:
     seconds: 60
   when: "'AUTOMATED_REGISTER=false' in automated_register"
@@ -293,7 +293,7 @@
   failed_when: "'SOK' not in sap_hana_sync_state.stdout"
   when: "'AUTOMATED_REGISTER=true' in automated_register"
 
-- name: Waiting for 10 seconds to stabalize
+- name: Waiting for 10 seconds to stabilize
   ansible.builtin.pause:
     seconds: 10
   when: "'AUTOMATED_REGISTER=false' in automated_register"
