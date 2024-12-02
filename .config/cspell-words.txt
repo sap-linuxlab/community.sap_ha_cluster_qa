@@ -51,3 +51,4 @@ saph
 dport
 pstv
 Annots
+ONESHELL
