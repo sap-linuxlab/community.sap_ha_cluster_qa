@@ -1,20 +1,26 @@
 name: molecule
 
-on:
+"on":
   workflow_dispatch:
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request_target:
-    types: [opened, synchronize, reopened]
-
+    types:
+      - opened
+      - synchronize
+      - reopened
 env:
-  WORKDIR: ansible_collections/sap/cluster_qa/roles/tec02
   PYTHON_VERSION: "3.10"
 
 jobs:
-  molecule-tec02:
+  molecule-test:
     runs-on: sap-ha-cluster
-
+    strategy:
+      fail-fast: false
+      matrix:
+        role:
+          - tec02
     steps:
       - uses: actions/checkout@v3
         with:
@@ -31,7 +37,6 @@ jobs:
           echo "$ID_MOLECULE_RSA_PUB" > ~/.ssh/id_molecule_rsa.pub
           chmod 400 ~/.ssh/id_molecule_rsa
           chmod 400 ~/.ssh/id_molecule_rsa.pub
-
         env:
           ID_MOLECULE_RSA: ${{ secrets.ID_MOLECULE_RSA }}
           ID_MOLECULE_RSA_PUB: ${{ secrets.ID_MOLECULE_RSA_PUB }}
@@ -45,6 +50,7 @@ jobs:
           python --version
           make -- molecule test
         env:
+          WORKDIR: ansible_collections/sap/cluster_qa/roles/${{ matrix.role }}
           OVIRT_HOSTNAME: ${{ secrets.OVIRT_HOSTNAME }}
           OVIRT_USERNAME: ${{ secrets.OVIRT_USERNAME }}
           OVIRT_PASSWORD: ${{ secrets.OVIRT_PASSWORD }}
