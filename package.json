@@ -1,0 +1,12 @@
+{
+  "name": "cluster_qa",
+  "version": "1.0.0",
+  "scripts": {
+    "cspell": "cspell ** --no-progress --show-suggestions --show-context --config .config/cspell.yml",
+    "cspell-precommit": "cspell --no-progress --show-suggestions --show-context --config .config/cspell.yml $(git diff --name-only main)",
+    "cspell:addwords": "cspell ** --no-progress --words-only --unique --config .config/cspell.yml"
+  },
+  "dependencies": {
+    "cspell": "^8.16.1"
+  }
+}
