@@ -7,9 +7,9 @@ if [ "$collection_dependencies" == "$requirements" ]; then
   echo "The collection requirements in galaxy.yml and requirements.yml are the same."
 else
   echo "The collection requirements in galaxy.yml and requirements.yml are different."
-  echo "Collcetion requirements in galaxy.yml:"
-  echo $collection_dependencies
+  echo "Collection requirements in galaxy.yml:"
+  echo "$collection_dependencies"
   echo "Collection requirements in requirements.yml:"
-  echo $requirements
+  echo "$requirements"
   exit 1
 fi

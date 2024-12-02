@@ -85,7 +85,7 @@
   ansible.builtin.set_fact:
     sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
 
-- name: Trigerring the failover of ASCS instance
+- name: Triggering the failover of ASCS instance
   ansible.builtin.command: "pcs resource move {{ sap_ascs_resource_name }}"
   run_once: true
 
