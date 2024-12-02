@@ -1,3 +1,5 @@
 .PHONY: build
-build:  ## Build ansible collections
+.ONESHELL:
+build: venv/bin/activate  ## Build ansible collections
+	. venv/bin/activate
 	$(TOX) run -e build
