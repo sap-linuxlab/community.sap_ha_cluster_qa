@@ -1,5 +1,6 @@
 venv/
 .vscode/
 .tox/
-.env
+.
 node_modules
+build
