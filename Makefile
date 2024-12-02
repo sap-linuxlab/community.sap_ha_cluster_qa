@@ -36,7 +36,7 @@ yamllint: venv/bin/activate  ## Run yamllint
 	$(TOX) exec -e lint -- yamllint . --config-file .config/yamllint.yml
 
 .PHONY: lint
-lint: collection-dependencies ansible-lint yamllint  ## Run all linting for the project
+lint: cspell collection-dependencies ansible-lint yamllint  ## Run all linting for the project
 
 .PHONY: clean-venv
 clean-venv:  ## Clean virtual environment
