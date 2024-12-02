@@ -1,0 +1,25 @@
+---
+version: "0.2"
+language: en
+words: []
+flagWords: []
+dictionaries:
+  - cspell-words
+
+dictionaryDefinitions:
+  - name: cspell-words
+    path: ./cspell-words.txt
+
+ignorePaths:
+  - .config/cspell-words.txt
+  - .config/cspell.yml
+  - node_modules/**
+  - .git/**
+  - venv/**
+  - .vscode/**
+  - .github/**
+  - .idea/**
+  - .venv/**
+  - "**/__pycache__/**"
+  - "**/*.pyc"
+  - build/

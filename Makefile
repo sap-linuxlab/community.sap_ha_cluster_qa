@@ -3,6 +3,7 @@ export TOX
 
 include Makefiles/molecule/Makefile
 include Makefiles/run.Makefile
+include Makefiles/spelling.Makefile
 
 .ONESHELL:
 .tox/%/ansible_collections: venv/bin/activate
@@ -59,5 +60,5 @@ collection-list-%: venv/bin/activate ## List ansible installed collections
 	$(TOX) exec -e $* -- ansible-galaxy collection list
 
 .PHONY: collection-dependencies
-collection-dependencies:  ## Check if collection dependencies and project requiements are the same
+collection-dependencies:  ## Check if collection dependencies and project requirements are the same
 	./hack/collection-dependencies.sh
