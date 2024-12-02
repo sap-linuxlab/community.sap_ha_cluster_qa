@@ -9,6 +9,7 @@ ignore:
   - .github/
   - changelogs/changelog.yaml
   - .tox/
+  - node_modules
 
 rules:
   line-length:
