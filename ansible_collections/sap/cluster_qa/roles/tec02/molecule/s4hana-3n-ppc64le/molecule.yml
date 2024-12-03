@@ -25,6 +25,7 @@ scenario:
 provisioner:
   name: ansible
   playbooks:
-    create: ../default/create.yml
+    create: ../default/create_power.yml
+    prepare: ../default/prepare.yml
     converge: ../default/converge.yml
-    destroy: ../default/destroy.yml
+    destroy: ""
