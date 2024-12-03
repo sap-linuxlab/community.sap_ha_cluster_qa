@@ -2,11 +2,11 @@
 driver:
   name: default
 platforms:
-  - name: s4hana17
+  - name: s4hana17-amemon
     ip: 192.168.5.191
-  - name: s4hana18
+  - name: s4hana18-amemon
     ip: 192.168.5.192
-  - name: s4hana19
+  - name: s4hana19-amemon
     ip: 192.168.5.193
 
 scenario:
