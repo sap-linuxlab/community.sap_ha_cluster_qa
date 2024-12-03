@@ -64,3 +64,9 @@ jobs:
         run: |
           rm -f ~/.ssh/id_molecule_rsa
           rm -f ~/.ssh/id_molecule_rsa.pub
+
+      - name: Reset molecule scenario
+        if: always()
+        run: make -- molecule reset -s ${{ matrix.scenario }}
+        env:
+          WORKDIR: ansible_collections/sap/cluster_qa/roles/${{ matrix.role }}
