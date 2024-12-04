@@ -19,10 +19,10 @@
         - name: Populate instance config dict  # noqa jinja
           ansible.builtin.set_fact:
             instance_conf_dict:
-              instance: "{{ platform.name }}"
+              instance: "{{ platform.hostname }}"
               address: "{{ platform.ip }}"
-              user: molecule
-              port: 22
+              user: "{{ platform.user | default('molecule') }}"
+              port: "{{ platform.port | default('22') }}"
               identity_file: ~/.ssh/id_molecule_rsa
           loop: "{{ molecule_yml.platforms }}"
           loop_control:
