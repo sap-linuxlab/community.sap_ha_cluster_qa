@@ -1,6 +1,6 @@
 ---
 - name: Acquiring ASCS resource name
-  ansible.builtin.shell: |
+  ansible.builtin.shell: |-
     set -o pipefail |
     pcs resource config |
     grep SAPInstance |
@@ -16,7 +16,7 @@
     sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"
 
 - name: Acquiring ASCS node name
-  ansible.builtin.shell: |
+  ansible.builtin.shell: |-
     set -o pipefail |
     pcs resource status {{ sap_ascs_resource_name }} |
     grep SAPInstance |
@@ -30,7 +30,7 @@
     sap_ascs_node_name: "{{ __pcs_find_ascs_sap_ascs_node_name.stdout }}"
 
 - name: Acquiring ASCS start profile
-  ansible.builtin.shell: |
+  ansible.builtin.shell: |-
     set -o pipefail |
     pcs resource config "{{ sap_ascs_resource_name }}" |
     grep START_PROFILE |
@@ -41,7 +41,7 @@
   failed_when: __pcs_find_ascs_sap_ascs_start_profile.rc != 0
 
 - name: Acquiring ASCS SID
-  ansible.builtin.shell: |
+  ansible.builtin.shell: |-
     set -o pipefail |
     cat "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}" |
     grep -w 'SAPSYSTEMNAME ' |
@@ -60,7 +60,7 @@
     sap_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
 
 - name: Acquiring ASCS Instance Name
-  ansible.builtin.shell: |
+  ansible.builtin.shell: |-
     set -o pipefail |
     cat "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}" |
     grep -w 'INSTANCE_NAME =' |
@@ -79,7 +79,7 @@
     sap_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
 
 - name: Acquiring ASCS Instance number
-  ansible.builtin.shell: |
+  ansible.builtin.shell: |-
     set -o pipefail |
     cat "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}" |
     grep -w SAPSYSTEM |
