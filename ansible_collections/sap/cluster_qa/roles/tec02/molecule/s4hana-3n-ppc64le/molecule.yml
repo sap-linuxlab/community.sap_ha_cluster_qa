@@ -1,6 +1,9 @@
 ---
 driver:
   name: default
+  options:
+    ansible_connection_options:
+      ansible_ssh_common_args: '-o ControlMaster=no'
 platforms:
   - name: lsh40410
     ip: 10.98.84.201
