@@ -5,6 +5,11 @@
   become: true
   become_user: root
   tasks:
+    - name: Collect necessary gather_facts
+      ansible.builtin.setup:
+        gather_subset:
+          - min
+
     - name: Finding ASCS node name
       ansible.builtin.include_role:
         name: sap.cluster_qa.pcs_find_ascs
