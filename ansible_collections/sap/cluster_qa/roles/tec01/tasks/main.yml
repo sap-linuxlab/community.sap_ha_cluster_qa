@@ -9,4 +9,13 @@
 - name: Print test results completing TEC01 test case for current instance
   ansible.builtin.debug:
     msg: "{{ failoverconfig_info }}"
-  failed_when: "'null' in failoverconfig_info"
+  failed_when: >
+    (failoverconfig_info.ha_get_failoverconfig_info.HAActive == false)
+    or
+    (failoverconfig_info.ha_get_failoverconfig_info.HAActiveNode is none)
+    or
+    (failoverconfig_info.ha_get_failoverconfig_info.HADocumentation is none)
+    or
+    (failoverconfig_info.ha_get_failoverconfig_info.HAProductVersion is none)
+    or
+    (failoverconfig_info.ha_get_failoverconfig_info.HASAPInterfaceVersion is none)
