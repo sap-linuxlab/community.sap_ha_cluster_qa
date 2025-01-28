@@ -1,7 +1,7 @@
 # README #
 
 This is a collection of Roles for testing an S4/HANA Clusters.
-It is designed to test S4/HANA Clusters comprising of 2 or more nodes where SAP S4/HANA ASCS and ERS instances are panaged by RHEL Pacemaker Clusters that use `pcs` commands for Cluster administration.\
+It is designed to test S4/HANA Clusters comprising of 2 or more nodes where SAP S4/HANA ASCS and ERS instances are managed by RHEL Pacemaker Clusters that use `pcs` commands for Cluster administration.
 
 
 ## Usage
