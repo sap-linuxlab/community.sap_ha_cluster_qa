@@ -16,6 +16,8 @@
     tail -n 50
   register: ha_trace_logs
   when: ansible_hostname == sap_ascs_node_name
+  changed_when: false
+  failed_when: "'SAP HA Trace' not in ha_trace_logs.stdout"
 
 - name: Printing SAP HA trace logs for ASCS Instance
   ansible.builtin.debug:
@@ -34,6 +36,8 @@
     tail -n 50
   register: ha_trace_logs
   when: ansible_hostname == sap_ers_node_name
+  changed_when: false
+  failed_when: "'SAP HA Trace' not in ha_trace_logs.stdout"
 
 - name: Printing SAP HA trace logs for ERS instance
   ansible.builtin.debug:
