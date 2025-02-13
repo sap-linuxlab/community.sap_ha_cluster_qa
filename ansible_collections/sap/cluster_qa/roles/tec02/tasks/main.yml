@@ -28,10 +28,16 @@
   ansible.builtin.debug:
     msg: "{{ hacheckconfigascs }}"
   when: ansible_hostname == sap_ascs_node_name
-  failed_when: "'SAPControl-HA-WARNING' in hacheckconfigascs['ha_check_config_info'] | map(attribute='state') or 'SAPControl-HA-ERROR' in hacheckconfigascs['ha_check_config_info'] | map(attribute='state')"
+  failed_when: >
+    ('SAPControl-HA-WARNING' in hacheckconfigascs['ha_check_config_info'] | map(attribute='state'))
+    or
+    ('SAPControl-HA-ERROR' in hacheckconfigascs['ha_check_config_info'] | map(attribute='state'))
 
 - name: Print the results completing TEC02 test case for ERS node
   ansible.builtin.debug:
     msg: "{{ hacheckconfigers }}"
   when: ansible_hostname == sap_ers_node_name
-  failed_when: "'SAPControl-HA-WARNING' in hacheckconfigers['ha_check_config_info'] | map(attribute='state') or or 'SAPControl-HA-ERROR' in hacheckconfigers['ha_check_config_info'] | map(attribute='state')"
+  failed_when: >
+    ('SAPControl-HA-WARNING' in hacheckconfigers['ha_check_config_info'] | map(attribute='state'))
+    or
+    ('SAPControl-HA-ERROR' in hacheckconfigers['ha_check_config_info'] | map(attribute='state'))
