@@ -1,2 +1,2 @@
-yamllint==1.36.0
+yamllint==1.36.2
 ansible-lint==25.1.3
