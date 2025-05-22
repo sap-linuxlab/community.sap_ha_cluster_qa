@@ -43,7 +43,7 @@
   retries: 15
   run_once: true
 
-- name: Pausing for ASCS to stabalize
+- name: Pausing for ASCS to stabilize
   ansible.builtin.pause:
     seconds: 15
 
