@@ -16,7 +16,7 @@
 
     - name: Running TEST01 test role on the ASCS Node
       ansible.builtin.include_role:
-        name: sap.cluster_qa.tec01
+        name: sap.cluster_qa.test01
       when: ansible_hostname == sap_ascs_node_name
 
     - name: Finding ERS node name
@@ -25,5 +25,5 @@
 
     - name: Running TEST01 test role on the ERS Node
       ansible.builtin.include_role:
-        name: sap.cluster_qa.tec01
+        name: sap.cluster_qa.test01
       when: ansible_hostname == sap_ers_node_name
