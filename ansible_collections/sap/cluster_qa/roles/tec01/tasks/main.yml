@@ -6,7 +6,7 @@
   become_user: root
   register: failoverconfig_info
 
-- name: Print test results completing TEC01 test case for current instance
+- name: Print test results completing TEST01 test case for current instance
   ansible.builtin.debug:
     msg: "{{ failoverconfig_info }}"
   failed_when: >

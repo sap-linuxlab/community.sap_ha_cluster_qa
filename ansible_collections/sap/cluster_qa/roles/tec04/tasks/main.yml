@@ -140,7 +140,7 @@
     tec04_ers_locks_after: "{{ tec04_ers_locks_after.enq_admin_locks_info }}"
   when: ansible_hostname == sap_ers_node_name
 
-- name: Asserting the locks of ASCS and ERS after move completing the TEC04 Test Case
+- name: Asserting the locks of ASCS and ERS after move completing the TEST04 Test Case
   ansible.builtin.assert:
     that: >-
       hostvars[sap_ascs_node_name_after]['tec04_ascs_locks_after']
