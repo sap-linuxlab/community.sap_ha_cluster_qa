@@ -1,10 +1,10 @@
 ---
-- name: Running TEC03 test role on the S4/HANA Cluster
+- name: Running TEST03 test role on the S4/HANA Cluster
   hosts: all
   gather_facts: false
   become: true
   become_user: root
   tasks:
-    - name: Running TEC03 test role on the S4/HANA Cluster
+    - name: Running TEST03 test role on the S4/HANA Cluster
       ansible.builtin.include_role:
         name: sap.cluster_qa.tec03
