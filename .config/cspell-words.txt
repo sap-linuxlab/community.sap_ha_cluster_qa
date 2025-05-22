@@ -53,3 +53,5 @@ pstv
 Annots
 ONESHELL
 HASAP
+selectattr
+equalto
