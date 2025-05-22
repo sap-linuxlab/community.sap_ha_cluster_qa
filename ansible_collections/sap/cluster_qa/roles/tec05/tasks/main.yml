@@ -48,7 +48,7 @@
     seconds: 15
 
 - name: Debug resource started tasks
-  debug:
+  ansible.builtin.debug:
     msg: >-
          {{ pcs_status_ascs_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
          | selectattr('group.id' , 'equalto' , 's4h_ASCS20_group') }}
