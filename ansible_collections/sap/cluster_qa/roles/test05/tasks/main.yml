@@ -14,7 +14,7 @@
 
 - name: Running Host info for enq.sap pid
   sap.sap_operations.host_info:
-  register: tec05_ascs_host_info
+  register: test05_ascs_host_info
   when: ansible_hostname == sap_ascs_node_name
 
 - name: Killing the enq.sap process
@@ -22,7 +22,7 @@
   changed_when: true
   vars:
     enq_sap_process_id: "{{ (enq_sap_process_list | selectattr('name', 'equalto', 'enq_server') | first)['pid'] }}"
-    enq_sap_process_list: "{{ (tec05_ascs_host_info.instances | selectattr('mSystemNumber', 'equalto', sap_ascs_instance_number) | first)['ProcessList'] }}"
+    enq_sap_process_list: "{{ (test05_ascs_host_info.instances | selectattr('mSystemNumber', 'equalto', sap_ascs_instance_number) | first)['ProcessList'] }}"
   when: ansible_hostname == sap_ascs_node_name
 
 - name: Watching pcs status info for failures
