@@ -1,0 +1,7 @@
+---
+all:
+  children:
+    nwhana-2n:
+      hosts:
+        nwhana09:
+        nwhana10:
