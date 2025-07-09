@@ -1,0 +1,73 @@
+---
+- name: Clean-up of cluster
+  ansible.builtin.shell: |-
+    set -o pipefail |
+    pcs resource cleanup
+
+- name: Collect necessary gather_facts
+  ansible.builtin.setup:
+    gather_subset:
+      - min
+
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Setting ERS node name before failure as facts
+  ansible.builtin.set_fact:
+    sap_ers_node_name_before: "{{ sap_ers_node_name }}"
+
+- name: Running Host info for enq_replicator pid
+  sap.sap_operations.host_info:
+  register: test06_ers_host_info
+  when: ansible_hostname == sap_ers_node_name_before
+
+- name: Killing the enq_replicator process
+  ansible.builtin.command: "kill -9 {{ enq_replicator_process_id }}"
+  changed_when: true
+  vars:
+    enq_replicator_process_id: "{{ (enq_replicator_process_list | selectattr('name', 'equalto', 'enq_replicator') | first)['pid'] }}"
+    enq_replicator_process_list: "{{ (test06_ers_host_info.instances | selectattr('mSystemNumber', 'equalto', sap_ers_instance_number) | first)['ProcessList'] }}"
+  when: ansible_hostname == sap_ers_node_name_before
+
+- name: Watching pcs status info for failures
+  sap.sap_operations.pcs_status_info:
+  register: pcs_status_post_enq_replicator_kill
+  until: "(pcs_status_post_enq_replicator_kill.pacemaker_status['pacemaker-result'].failures | default([]) | length > 0)"
+  delay: 5
+  retries: 30
+  run_once: true
+
+- name: Watching pcs status info for resource started
+  sap.sap_operations.pcs_status_info:
+  register: pcs_status_ers_new_start
+  until: >-
+         (pcs_status_ers_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+         | selectattr('group.resource.id', 'equalto', sap_ers_resource_name) | selectattr('group.resource.role', 'equalto', 'Started'))
+  delay: 5
+  retries: 30
+  run_once: true
+
+- name: Debug resource started tasks
+  ansible.builtin.debug:
+    msg: >-
+         {{ pcs_status_ers_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+         | selectattr('group.resource.id', 'equalto', sap_ers_resource_name) | selectattr('group.resource.role', 'equalto', 'Started') }}
+
+- name: Finding ERS node name after move
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Setting ERS node name after failure as facts
+  ansible.builtin.set_fact:
+    sap_ers_node_name_after: "{{ sap_ers_node_name }}"
+
+- name: Finding current ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Verifying ERS not on the same node as ASCS
+  ansible.builtin.assert:
+    that: sap_ers_node_name_after != sap_ascs_node_name
+    fail_msg: "ERS moved to the same node as ASCS ({{ sap_ascs_node_name }}), which violates HA principles"
+    success_msg: "ERS successfully moved to {{ sap_ers_node_name_after }}, different from ASCS node {{ sap_ascs_node_name }}"
