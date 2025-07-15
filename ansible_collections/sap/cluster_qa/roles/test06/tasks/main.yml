@@ -41,18 +41,14 @@
 - name: Watching pcs status info for resource started
   sap.sap_operations.pcs_status_info:
   register: pcs_status_ers_new_start
-  until: >-
-         (pcs_status_ers_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
-         | selectattr('group.resource.id', 'equalto', sap_ers_resource_name) | selectattr('group.resource.role', 'equalto', 'Started'))
+  until: pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id = sap_ers_resource_name)
   delay: 5
   retries: 30
   run_once: true
 
 - name: Debug resource started tasks
   ansible.builtin.debug:
-    msg: >-
-         {{ pcs_status_ers_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
-         | selectattr('group.resource.id', 'equalto', sap_ers_resource_name) | selectattr('group.resource.role', 'equalto', 'Started') }}
+    msg: "{{ pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id = sap_ers_resource_name) }}"
 
 - name: Finding ERS node name after move
   ansible.builtin.include_role:
