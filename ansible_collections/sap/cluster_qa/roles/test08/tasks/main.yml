@@ -51,7 +51,7 @@
   changed_when: false
   ignore_errors: true
 
-- name: Waiting a few seconds to stabalize after UNCLEAN
+- name: Waiting a few seconds to stabilize after UNCLEAN
   ansible.builtin.pause:
     seconds: 20
 
