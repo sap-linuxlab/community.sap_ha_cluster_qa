@@ -48,7 +48,7 @@
 
 - name: Debug resource started tasks
   ansible.builtin.debug:
-    msg: "{{ pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id = sap_ers_resource_name) }}"
+    msg: "{{ pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id=sap_ers_resource_name) }}"
 
 - name: Finding ERS node name after move
   ansible.builtin.include_role:
