@@ -50,15 +50,11 @@
   changed_when: false
   failed_when: false
 
-- name: Waiting a few seconds to stabilize after UNCLEAN
-  ansible.builtin.pause:
-    seconds: 20
-
 - name: Watching pcs status info for resource started
   sap.sap_operations.pcs_status_info:
   register: pcs_status_ascs_new_start
   until: pcs_status_ascs_new_start | 
-    sap.sap_operations.pcs_resources_from_status(id=sap_ascs_resource_name, role='Started') | length = 1
+    sap.sap_operations.pcs_resources_from_status(id=sap_ascs_resource_name, role='Started') | length == 1
   delay: 5
   retries: 30
   run_once: true
