@@ -24,14 +24,14 @@
 
 - name: Check if ASCS profile file exists
   ansible.builtin.stat:
-    path: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
+    path: "{{ sap_ascs_start_profile }}"
   register: profile_file_stat
   run_once: true
   delegate_to: "{{ sap_ascs_node_name }}"
 
 - name: Check for Restart_Program parameter in ASCS profile
   ansible.builtin.shell: |
-    grep "Restart_Program" "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}" | grep "_MS" || echo "NOT_FOUND"
+    grep "Restart_Program" "{{ sap_ascs_start_profile }}" | grep "_MS" || echo "NOT_FOUND"
   register: restart_program_check
   changed_when: false
   run_once: true
@@ -46,7 +46,7 @@
       - restart_program_check.stdout | length > 0
     fail_msg: |
       PREREQUISITE FAILED: Restart_Program parameter for Message Server not found in ASCS profile.
-      Profile checked: {{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}
+      Profile checked: {{ sap_ascs_start_profile }}
       Profile exists: {{ profile_file_stat.stat.exists | default(false) }}
 
       Please manually configure it according to: https://help.sap.com/docs/SUPPORT_CONTENT/si/3362959619.html

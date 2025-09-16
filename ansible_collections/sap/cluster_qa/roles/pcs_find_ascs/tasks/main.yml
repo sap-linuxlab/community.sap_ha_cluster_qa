@@ -96,3 +96,7 @@
 - name: Setting ASCS Instance number as fact
   ansible.builtin.set_fact:
     sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+
+- name: Setting ASCS start profile path as fact
+  ansible.builtin.set_fact:
+    sap_ascs_start_profile: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"

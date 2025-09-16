@@ -43,7 +43,7 @@ This role uses variables provided by the `sap.cluster_qa.pcs_find_ascs` and `sap
 - `sap_ascs_resource_name` - The name of the ASCS resource in the cluster
 - `sap_ascs_instance_number` - The ASCS instance number
 - `max_kill_attempts` - Maximum Message Server kill attempts (default: 6)
-- `__pcs_find_ascs_sap_ascs_start_profile.stdout` - Path to ASCS profile file (used for Restart_Program validation)
+- `sap_ascs_start_profile` - Path to ASCS profile file (used for Restart_Program validation)
 
 **Expected Outcomes:**
 - **Restart_Program parameter validation passes** (auto-configured if missing)
