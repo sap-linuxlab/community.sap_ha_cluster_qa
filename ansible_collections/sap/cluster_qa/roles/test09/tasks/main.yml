@@ -88,8 +88,8 @@
     success_msg: "ASCS on {{ sap_ascs_node_name_initial }}, ERS on {{ sap_ers_node_name_initial }} - proper HA setup confirmed"
 
 - name: Execute Message Server kill attempts
-  include_tasks: kill_message_server.yml
-  loop: "{{ range(1, max_kill_attempts|int + 1)|list }}"
+  ansible.builtin.include_tasks: kill_message_server.yml
+  loop: "{{ range(1, max_kill_attempts | int + 1) | list }}"
   loop_control:
     loop_var: kill_attempt
   when: msg_server_restarted | bool
@@ -121,7 +121,7 @@
 
 - name: Display test summary
   ansible.builtin.debug:
-    msg: 
+    msg:
       - "==============================================="
       - "              TEST09 SUMMARY"
       - "==============================================="
