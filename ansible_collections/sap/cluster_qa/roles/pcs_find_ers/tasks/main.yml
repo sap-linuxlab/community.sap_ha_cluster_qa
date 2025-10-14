@@ -12,7 +12,7 @@
       register: __pcs_find_ers_sap_ers_resource_name
       changed_when: false
       failed_when: __pcs_find_ers_sap_ers_resource_name.rc != 0
-    
+
     - name: Set ERS resource name as fact
       ansible.builtin.set_fact:
         sap_ers_resource_name: "{{ __pcs_find_ers_sap_ers_resource_name.stdout }}"
@@ -28,7 +28,7 @@
       register: __pcs_find_ers_sap_ers_node_name
       changed_when: false
       failed_when: __pcs_find_ers_sap_ers_node_name.rc != 0
-    
+
     - name: Set ERS node name as fact
       ansible.builtin.set_fact:
         sap_ers_node_name: "{{ __pcs_find_ers_sap_ers_node_name.stdout }}"
@@ -94,4 +94,4 @@
 
 - name: Setting ERS start profile path as fact
   ansible.builtin.set_fact:
-      sap_ers_start_profile: "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}"
+    sap_ers_start_profile: "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}"
