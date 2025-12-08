@@ -55,3 +55,4 @@ ONESHELL
 HASAP
 selectattr
 equalto
+crmsh
