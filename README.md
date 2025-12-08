@@ -38,4 +38,3 @@ The following issues have been identified in this collection. These are document
 ## Notes
 
 As this collection is being developed against upstream requirements and is currently focused on RHEL environments, the above limitations are documented for reference and awareness.
-
