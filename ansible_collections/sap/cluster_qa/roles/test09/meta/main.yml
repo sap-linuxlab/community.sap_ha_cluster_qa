@@ -1,0 +1,14 @@
+---
+galaxy_info:
+  author: Amir Memon (@amemon-redhat)
+  description: Run test09 - Message Server automatic restart and HA interaction test
+  license: GPl-3.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+        - "10"
+  galaxy_tags: []
+dependencies: []
