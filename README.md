@@ -1,4 +1,4 @@
-# README: community.sap_ha_cluster_qa collection #
+# community.sap_ha_cluster_qa Ansible collection #
 
 **⚠️ EXPERIMENTAL - This collection has only been tested on RHEL (Red Hat Enterprise Linux) systems.**
 
