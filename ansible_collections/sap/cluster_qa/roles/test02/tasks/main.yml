@@ -1,0 +1,43 @@
+---
+- name: Collect necessary gather_facts
+  ansible.builtin.setup:
+    gather_subset:
+      - min
+
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Run ha_check_config_info
+  sap.sap_operations.ha_check_config_info:
+    instance_number: "{{ sap_ascs_instance_number }}"
+  register: hacheckconfigascs
+  when: ansible_hostname == sap_ascs_node_name
+
+- name: Run ha_check_config_info
+  sap.sap_operations.ha_check_config_info:
+    instance_number: "{{ sap_ers_instance_number }}"
+  register: hacheckconfigers
+  when: ansible_hostname == sap_ers_node_name
+
+- name: Print the results completing TEST02 test case for ASCS node
+  ansible.builtin.debug:
+    msg: "{{ hacheckconfigascs }}"
+  when: ansible_hostname == sap_ascs_node_name
+  failed_when: >
+    ('SAPControl-HA-WARNING' in hacheckconfigascs['ha_check_config_info'] | map(attribute='state'))
+    or
+    ('SAPControl-HA-ERROR' in hacheckconfigascs['ha_check_config_info'] | map(attribute='state'))
+
+- name: Print the results completing TEST02 test case for ERS node
+  ansible.builtin.debug:
+    msg: "{{ hacheckconfigers }}"
+  when: ansible_hostname == sap_ers_node_name
+  failed_when: >
+    ('SAPControl-HA-WARNING' in hacheckconfigers['ha_check_config_info'] | map(attribute='state'))
+    or
+    ('SAPControl-HA-ERROR' in hacheckconfigers['ha_check_config_info'] | map(attribute='state'))

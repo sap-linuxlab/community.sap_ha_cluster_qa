@@ -1,0 +1,97 @@
+---
+- name: Acquiring ERS resource name and setting as fact
+  block:
+    - name: Get ERS resource name
+      ansible.builtin.shell: |-
+        set -o pipefail |
+        pcs resource config |
+        grep SAPInstance |
+        grep -i ers |
+        awk '{print $2}' |
+        xargs
+      register: __pcs_find_ers_sap_ers_resource_name
+      changed_when: false
+      failed_when: __pcs_find_ers_sap_ers_resource_name.rc != 0
+
+    - name: Set ERS resource name as fact
+      ansible.builtin.set_fact:
+        sap_ers_resource_name: "{{ __pcs_find_ers_sap_ers_resource_name.stdout }}"
+
+- name: Acquiring ERS node name and setting as fact
+  block:
+    - name: Get ERS node name
+      ansible.builtin.shell: |-
+        set -o pipefail |
+        pcs resource status "{{ sap_ers_resource_name }}" |
+        grep SAPInstance |
+        awk '{print $5}'
+      register: __pcs_find_ers_sap_ers_node_name
+      changed_when: false
+      failed_when: __pcs_find_ers_sap_ers_node_name.rc != 0
+
+    - name: Set ERS node name as fact
+      ansible.builtin.set_fact:
+        sap_ers_node_name: "{{ __pcs_find_ers_sap_ers_node_name.stdout }}"
+
+- name: Acquiring ERS start profile
+  ansible.builtin.shell: |-
+    set -o pipefail |
+    pcs resource config "{{ sap_ers_resource_name }}" |
+    grep START_PROFILE |
+    cut -d '=' -f2 |
+    xargs
+  register: __pcs_find_ers_sap_ers_start_profile
+  changed_when: false
+  failed_when: __pcs_find_ers_sap_ers_start_profile.rc != 0
+
+- name: Acquiring ERS SID
+  ansible.builtin.shell: |-
+    set -o pipefail |
+    cat "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}" |
+    grep -w 'SAPSYSTEMNAME ' |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ers_sap_ers_sid
+  changed_when: false
+  failed_when: __pcs_find_ers_sap_ers_sid.rc != 0
+
+- name: Setting ERS SID as facts
+  ansible.builtin.set_fact:
+    sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+    sap_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+
+- name: Acquiring ERS Instance Name
+  ansible.builtin.shell: |-
+    set -o pipefail |
+    cat "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}" |
+    grep -w 'INSTANCE_NAME =' |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ers_sap_instance_name
+  changed_when: false
+  failed_when: __pcs_find_ers_sap_instance_name.rc != 0
+
+- name: Setting ERS Instance Name as facts
+  ansible.builtin.set_fact:
+    sap_ers_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+    sap_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+
+- name: Acquiring ERS Instance number
+  ansible.builtin.shell: |-
+    set -o pipefail |
+    cat "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}" |
+    grep -w SAPSYSTEM |
+    awk '{print $3}' |
+    xargs
+  register: __pcs_find_ers_sap_instance_number
+  changed_when: false
+  failed_when: __pcs_find_ers_sap_instance_number.rc != 0
+
+- name: Setting ERS Instance number as facts
+  ansible.builtin.set_fact:
+    sap_ers_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+    sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+
+- name: Setting ERS start profile path as fact
+  ansible.builtin.set_fact:
+    sap_ers_start_profile: "{{ __pcs_find_ers_sap_ers_start_profile.stdout }}"

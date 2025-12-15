@@ -1,0 +1,16 @@
+---
+- name: Display test summary
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "              TEST09 SUMMARY"
+      - "==============================================="
+      - "Message Server killed: {{ message_server_kill_count }} times"
+      - "Initial ASCS location: {{ sap_ascs_node_name_initial }}"
+      - "Final ASCS location: {{ sap_ascs_node_name_final }}"
+      - "Initial ERS location: {{ sap_ers_node_name_initial }}"
+      - "Final ERS location: {{ sap_ers_node_name_final }}"
+      - "HA Action taken: {{ 'ASCS Failover' if sap_ascs_node_name_initial != sap_ascs_node_name_final else 'ASCS Restart on same node' }}"
+      - "ASCS/ERS separation maintained: {{ 'YES' if sap_ascs_node_name_final != sap_ers_node_name_final else 'NO' }}"
+      - "==============================================="
+  run_once: true

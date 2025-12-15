@@ -1,0 +1,10 @@
+---
+- name: Running TEST02 test role on S4/HANA Cluster
+  hosts: all
+  gather_facts: false
+  become: true
+  become_user: root
+  tasks:
+    - name: Running TEST02 test role on S4/HANA Cluster
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test02

@@ -1,0 +1,20 @@
+---
+- name: Check final ASCS location after HA intervention
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Check final ERS location
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Set final location facts
+  ansible.builtin.set_fact:
+    sap_ascs_node_name_final: "{{ sap_ascs_node_name }}"
+    sap_ers_node_name_final: "{{ sap_ers_node_name }}"
+
+- name: Verify HA solution responded appropriately
+  ansible.builtin.assert:
+    that:
+      - sap_ascs_node_name_final != sap_ers_node_name_final
+    fail_msg: "HA solution failed: ASCS and ERS ended up on the same node ({{ sap_ascs_node_name_final }})"
+    success_msg: "HA solution succeeded: ASCS on {{ sap_ascs_node_name_final }}, ERS on {{ sap_ers_node_name_final }}"
