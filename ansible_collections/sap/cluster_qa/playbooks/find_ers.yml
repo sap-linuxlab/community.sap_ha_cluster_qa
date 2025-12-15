@@ -1,4 +1,0 @@
----
-- hosts: all
-  roles:
-    - sap.cluster_qa.pcs_find_ers

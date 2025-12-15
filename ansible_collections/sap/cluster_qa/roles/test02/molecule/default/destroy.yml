@@ -1,3 +1,0 @@
----
-- name: Destroy
-  ansible.builtin.import_playbook: sap.ovirt.destroy

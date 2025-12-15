@@ -27,10 +27,12 @@ Hana
 srmode
 opmode
 sapenv
+sapstart
 hdbnsutil
 SFAIL
 SAPSYSTEMNAME
 SAPSYSTEM
+INSTANCENAME
 appserver
 ABAP
 saphostcontrol
@@ -55,4 +57,3 @@ ONESHELL
 HASAP
 selectattr
 equalto
-crmsh

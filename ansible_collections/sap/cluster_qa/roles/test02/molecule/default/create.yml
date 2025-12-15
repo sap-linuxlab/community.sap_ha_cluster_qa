@@ -1,3 +1,0 @@
----
-- name: Create
-  ansible.builtin.import_playbook: sap.ovirt.create
