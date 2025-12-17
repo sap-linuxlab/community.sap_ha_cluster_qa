@@ -17,12 +17,12 @@
   ansible.builtin.shell: |
     set -o pipefail
     rpm -qa | grep resource-agents-sap-hana
-  register: sap_hana_resource_agent
+  register: hana_cluster_init_sap_hana_resource_agent
   changed_when: false
 
 - name: Checking Installed  SAP HANA Resource agent
   ansible.builtin.debug:
-    msg: "Installed SAP HANA Resource agent is {{ sap_hana_resource_agent.stdout }}"
+    msg: "Installed SAP HANA Resource agent is {{ hana_cluster_init_sap_hana_resource_agent.stdout }}"
 
 - name: Acquiring HANA release version
   become: true
@@ -31,12 +31,12 @@
     set -o pipefail
     /usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/HDB version |
     egrep -e 'version:|branch:' | xargs
-  register: sap_hana_release_version
+  register: hana_cluster_init_sap_hana_release_version
   changed_when: false
 
 - name: Checking HANA Release Version
   ansible.builtin.debug:
-    msg: "HANA {{ sap_hana_release_version.stdout }}"
+    msg: "HANA {{ hana_cluster_init_sap_hana_release_version.stdout }}"
 
 - name: Acquiring Control Node's Ansible Version
   ansible.builtin.shell: |
@@ -44,12 +44,12 @@
     ansible --version | head -n1
   delegate_to: localhost
   run_once: true
-  register: control_node_ansible_version
+  register: hana_cluster_init_control_node_ansible_version
   changed_when: false
 
 - name: Checking Control Node's Ansible Version
   ansible.builtin.debug:
-    msg: "{{ control_node_ansible_version.stdout }}"
+    msg: "{{ hana_cluster_init_control_node_ansible_version.stdout }}"
   delegate_to: localhost
   run_once: true
 
@@ -63,14 +63,14 @@
   ansible.builtin.shell: |
     set -o pipefail
     pcs status | grep "Failed Resource Actions"
-  register: failed_resource_actions
+  register: hana_cluster_init_failed_resource_actions
   run_once: true
   ignore_errors: true
   changed_when: false
 
 - name: Cleaning failed resource actions up if necessary
   ansible.builtin.command: pcs resource cleanup
-  when: "'Failed Resource Actions' in failed_resource_actions.stdout"
+  when: "'Failed Resource Actions' in hana_cluster_init_failed_resource_actions.stdout"
   run_once: true
   changed_when: true
 
@@ -78,14 +78,14 @@
   ansible.builtin.shell: |
     set -o pipefail
     pcs status | grep "Failed Fencing Actions"
-  register: failed_fencing_actions
+  register: hana_cluster_init_failed_fencing_actions
   run_once: true
   ignore_errors: true
   changed_when: false
 
 - name: Cleaning failed fencing actions
   ansible.builtin.command: stonith_admin --cleanup --history "*"
-  when: "'Failed Fencing Actions' in failed_fencing_actions.stdout"
+  when: "'Failed Fencing Actions' in hana_cluster_init_failed_fencing_actions.stdout"
   run_once: true
   changed_when: true
 
@@ -95,36 +95,36 @@
     pcs resource config |
     grep type=SAPHanaTopology |
     awk '{print $2}'
-  register: sap_hana_topology_resource_name
+  register: hana_cluster_init_sap_hana_topology_resource_name
   changed_when: false
 
 - name: Setting up SAPHanaTopology resource name as fact
   ansible.builtin.set_fact:
-    sap_hana_topology_resource_name: "{{ sap_hana_topology_resource_name.stdout }}"
+    hana_cluster_init_sap_hana_topology_resource_name: "{{ hana_cluster_init_sap_hana_topology_resource_name.stdout }}"
 
-- name: Acquiring the state of {{ sap_hana_topology_resource_name }}
+- name: Acquiring the state of {{ hana_cluster_init_sap_hana_topology_resource_name }}
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource status |
-    grep  "{{ sap_hana_topology_resource_name }}" -A1 | tail -n1 | xargs
-  register: sap_hana_topology_resource_state
+    grep  "{{ hana_cluster_init_sap_hana_topology_resource_name }}" -A1 | tail -n1 | xargs
+  register: hana_cluster_init_sap_hana_topology_resource_state
   changed_when: false
 
 - name: Waiting for cluster to start SAP HANA Topology resource.
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource status |
-    grep {{ sap_hana_topology_resource_name }} -A1 | tail -n1
-  register: sap_hana_topology_resource_state
-  until: "'Started' in sap_hana_topology_resource_state.stdout"
+    grep {{ hana_cluster_init_sap_hana_topology_resource_name }} -A1 | tail -n1
+  register: hana_cluster_init_sap_hana_topology_resource_state
+  until: "'Started' in hana_cluster_init_sap_hana_topology_resource_state.stdout"
   retries: 120
   delay: 10
   changed_when: false
 
 - name: VERIFYING the running state of SAPHanaTopology resource
   ansible.builtin.debug:
-    msg: "Current state of SAP HANA Topology resource is {{ sap_hana_topology_resource_state.stdout }}"
-  failed_when: "'Started:' not in sap_hana_topology_resource_state.stdout"
+    msg: "Current state of SAP HANA Topology resource is {{ hana_cluster_init_sap_hana_topology_resource_state.stdout }}"
+  failed_when: "'Started:' not in hana_cluster_init_sap_hana_topology_resource_state.stdout"
 
 - name: Acquiring SAPHana resource name
   ansible.builtin.shell: |
@@ -132,116 +132,116 @@
     pcs resource config |
     grep "AUTOMATED_REGISTER" -B1 |
     grep "type=SAPHana" | awk '{print $2}'
-  register: sap_hana_resource_name
+  register: hana_cluster_init_sap_hana_resource_name
   changed_when: false
 
 - name: Setting up SAPHana resource name as fact
   ansible.builtin.set_fact:
-    sap_hana_resource_name: "{{ sap_hana_resource_name.stdout }}"
+    hana_cluster_init_sap_hana_resource_name: "{{ hana_cluster_init_sap_hana_resource_name.stdout }}"
 
 - name: Acquiring SAP HANA resource state
   ansible.builtin.shell: |
     set -o pipefail
     pcs status |
-    grep "{{ sap_hana_resource_name }}-clone" -A1
-  register: sap_hana_resource_disabled
+    grep "{{ hana_cluster_init_sap_hana_resource_name }}-clone" -A1
+  register: hana_cluster_init_sap_hana_resource_disabled
   changed_when: false
 
 - name: Enabling the SAP HANA resource to start
-  ansible.builtin.command: pcs resource enable {{ sap_hana_resource_name }}
-  when: "'Stopped' and '(disabled)' in sap_hana_resource_disabled.stdout"
+  ansible.builtin.command: pcs resource enable {{ hana_cluster_init_sap_hana_resource_name }}
+  when: "'Stopped' and '(disabled)' in hana_cluster_init_sap_hana_resource_disabled.stdout"
   changed_when: true
 
 - name: Acquiring AUTOMATED_REGISTER value
   ansible.builtin.shell: |
     set -o pipefail
-    pcs resource config {{ sap_hana_resource_name }} |
+    pcs resource config {{ hana_cluster_init_sap_hana_resource_name }} |
     grep "AUTOMATED_REGISTER" |
     awk '{print $2}' | xargs
-  register: automated_register
+  register: hana_cluster_init_automated_register
   changed_when: false
 
 - name: Setting AUTOMATED_REGISTER value as fact
   ansible.builtin.set_fact:
-    automated_register: "{{ automated_register.stdout }}"
+    hana_cluster_init_automated_register: "{{ hana_cluster_init_automated_register.stdout }}"
 
 - name: Acquiring PREFER_SITE_TAKEOVER value
   ansible.builtin.shell: |
     set -o pipefail
-    pcs resource config {{ sap_hana_resource_name }} |
+    pcs resource config {{ hana_cluster_init_sap_hana_resource_name }} |
     grep "PREFER_SITE_TAKEOVER" |
     awk '{print $5}' | xargs
-  register: prefer_site_takeover
+  register: hana_cluster_init_prefer_site_takeover
   changed_when: false
 
 - name: Setting PREFER_SITE_TAKEOVER value as fact
   ansible.builtin.set_fact:
-    prefer_site_takeover: "{{ prefer_site_takeover.stdout }}"
+    hana_cluster_init_prefer_site_takeover: "{{ hana_cluster_init_prefer_site_takeover.stdout }}"
 
 - name: Waiting for cluster to start SAP HANA resource on both nodes.
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource status |
-    grep {{ sap_hana_resource_name }} -A2 |
+    grep {{ hana_cluster_init_sap_hana_resource_name }} -A2 |
     egrep -e "Masters|Slaves" | awk '{print $0}'
-  register: sap_hana_resource_state
-  until: "'Masters:' and 'Slaves:' in sap_hana_resource_state.stdout"
+  register: hana_cluster_init_sap_hana_resource_state
+  until: "'Masters:' and 'Slaves:' in hana_cluster_init_sap_hana_resource_state.stdout"
   retries: 120
   delay: 10
-  when: "'AUTOMATED_REGISTER=true' in automated_register"
+  when: "'AUTOMATED_REGISTER=true' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: VERIFYING the running state of the SAP HANA Resource
   ansible.builtin.debug:
-    msg: "Current node and state of SAP HANA master is {{ sap_hana_resource_state.stdout }}"
-  failed_when: "'Masters:' and 'Slaves:' not in sap_hana_resource_state.stdout"
-  when: "'AUTOMATED_REGISTER=true' in automated_register"
+    msg: "Current node and state of SAP HANA master is {{ hana_cluster_init_sap_hana_resource_state.stdout }}"
+  failed_when: "'Masters:' and 'Slaves:' not in hana_cluster_init_sap_hana_resource_state.stdout"
+  when: "'AUTOMATED_REGISTER=true' in hana_cluster_init_automated_register"
 
 - name: Waiting for cluster to start SAP HANA resource on master node.
   ansible.builtin.shell: |
     set -o pipefail
     pcs resource status |
-    grep {{ sap_hana_resource_name }} -A2 |
+    grep {{ hana_cluster_init_sap_hana_resource_name }} -A2 |
     egrep -e "Masters" | awk '{print $0}'
-  register: sap_hana_resource_state
-  until: "'Masters:' in sap_hana_resource_state.stdout"
+  register: hana_cluster_init_sap_hana_resource_state
+  until: "'Masters:' in hana_cluster_init_sap_hana_resource_state.stdout"
   retries: 120
   delay: 10
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: VERIFYING the running state of the SAP HANA Resource
   ansible.builtin.debug:
-    msg: "Current node and state of SAP HANA master is {{ sap_hana_resource_state.stdout }}"
-  failed_when: "'Masters:' not in sap_hana_resource_state.stdout"
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+    msg: "Current node and state of SAP HANA master is {{ hana_cluster_init_sap_hana_resource_state.stdout }}"
+  failed_when: "'Masters:' not in hana_cluster_init_sap_hana_resource_state.stdout"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring SAP HANA master node name
   ansible.builtin.shell: |
     set -o pipefail
     pcs status | grep "Masters:" | awk '{print $4}'
-  register: sap_hana_master_node
+  register: hana_cluster_init_sap_hana_master_node
   changed_when: false
 
 - name: Setting SAP HANA master node name as fact
   ansible.builtin.set_fact:
-    sap_hana_master_node: "{{ sap_hana_master_node.stdout }}"
+    hana_cluster_init_sap_hana_master_node: "{{ hana_cluster_init_sap_hana_master_node.stdout }}"
 
 - name: Waiting for 60 seconds to stabilize
   ansible.builtin.pause:
     seconds: 60
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring SAP HANA slave node name
   ansible.builtin.shell: |
     set -o pipefail
     pcs status | egrep -e "Slaves:|Stopped:" | awk '{print $4}'
-  register: sap_hana_slave_node
+  register: hana_cluster_init_sap_hana_slave_node
   changed_when: false
 
 - name: Setting SAP HANA Slave node name as fact
   ansible.builtin.set_fact:
-    sap_hana_slave_node: "{{ sap_hana_slave_node.stdout }}"
+    hana_cluster_init_sap_hana_slave_node: "{{ hana_cluster_init_sap_hana_slave_node.stdout }}"
 
 - name: Acquiring SAP HANA VIP resource name
   ansible.builtin.shell: |
@@ -250,27 +250,27 @@
     grep "type=IPaddr2" |
     grep "{{ sap_hana_sid }}_{{ sap_hana_instance_number }}" |
     awk '{print $2}'
-  register: sap_hana_vip_name
+  register: hana_cluster_init_sap_hana_vip_name
   changed_when: false
 
 - name: Setting up SAP HANA VIP name as fact
   ansible.builtin.set_fact:
-    sap_hana_vip_name: "{{ sap_hana_vip_name.stdout }}"
+    hana_cluster_init_sap_hana_vip_name: "{{ hana_cluster_init_sap_hana_vip_name.stdout }}"
 
 - name: Waiting for cluster to start the SAP HANA VIP Resource
   ansible.builtin.shell: |
     set -o pipefail
-    pcs resource status | grep "{{ sap_hana_vip_name }}"
-  register: sap_hana_vip_state
-  until: "'Started' in sap_hana_vip_state.stdout"
+    pcs resource status | grep "{{ hana_cluster_init_sap_hana_vip_name }}"
+  register: hana_cluster_init_sap_hana_vip_state
+  until: "'Started' in hana_cluster_init_sap_hana_vip_state.stdout"
   retries: 20
   delay: 2
   changed_when: false
 
 - name: VERIFYING the running/started state of the SAP HANA VIP
   ansible.builtin.debug:
-    msg: "Current state of SAP HANA VIP is {{ sap_hana_vip_state.stdout }}"
-  failed_when: "'Started' not in sap_hana_vip_state.stdout"
+    msg: "Current state of SAP HANA VIP is {{ hana_cluster_init_sap_hana_vip_state.stdout }}"
+  failed_when: "'Started' not in hana_cluster_init_sap_hana_vip_state.stdout"
 
 - name: Waiting for SOK Replication sync state
   ansible.builtin.shell: |
@@ -278,76 +278,76 @@
     crm_mon -A1 |
     grep 'Node Attributes' -A24 |
     grep hana_{{ sap_hana_sid | lower }}_sync_state
-  register: sap_hana_sync_state
-  delegate_to: "{{ sap_hana_slave_node }}"
+  register: hana_cluster_init_sap_hana_sync_state
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  until: "'SOK' in sap_hana_sync_state.stdout"
+  until: "'SOK' in hana_cluster_init_sap_hana_sync_state.stdout"
   retries: 240
   delay: 2
-  when: "'AUTOMATED_REGISTER=true' in automated_register"
+  when: "'AUTOMATED_REGISTER=true' in hana_cluster_init_automated_register"
   changed_when: false
 
-- name: Verifying SOK state as {{ automated_register }}
+- name: Verifying SOK state as {{ hana_cluster_init_automated_register }}
   ansible.builtin.debug:
-    msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state.stdout }}"
-  failed_when: "'SOK' not in sap_hana_sync_state.stdout"
-  when: "'AUTOMATED_REGISTER=true' in automated_register"
+    msg: "SAP HANA Replication sync state is {{ hana_cluster_init_sap_hana_sync_state.stdout }}"
+  failed_when: "'SOK' not in hana_cluster_init_sap_hana_sync_state.stdout"
+  when: "'AUTOMATED_REGISTER=true' in hana_cluster_init_automated_register"
 
 - name: Waiting for 10 seconds to stabilize
   ansible.builtin.pause:
     seconds: 10
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring Slave Node DC Name
   ansible.builtin.shell: |
     set -o pipefail
     pcs node attribute |
-    grep {{ sap_hana_slave_node }}: |
+    grep {{ hana_cluster_init_sap_hana_slave_node }}: |
     awk '{print $4}' |
     cut -d '=' -f2 | xargs
-  delegate_to: "{{ sap_hana_slave_node }}"
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
   register: sap_hana_slave_node_dc
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Setting Slave Node DC Name as Fact
   ansible.builtin.set_fact:
     sap_hana_slave_node_dc: "{{ sap_hana_slave_node_dc.stdout }}"
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring Slave Node System Replication Mode
   ansible.builtin.shell: |
     set -o pipefail
-    pcs node attribute | grep {{ sap_hana_slave_node }}: | awk '{print $5}' | cut -d '=' -f2 | xargs
-  delegate_to: "{{ sap_hana_slave_node }}"
+    pcs node attribute | grep {{ hana_cluster_init_sap_hana_slave_node }}: | awk '{print $5}' | cut -d '=' -f2 | xargs
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
   register: sap_hana_slave_node_srmode
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Setting Slave Node System Replication Mode as Fact
   ansible.builtin.set_fact:
     sap_hana_slave_node_srmode: "{{ sap_hana_slave_node_srmode.stdout }}"
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring Slave Node Operation Mode
   ansible.builtin.shell: |
     set -o pipefail
     pcs node attribute |
-    grep {{ sap_hana_slave_node }}:
+    grep {{ hana_cluster_init_sap_hana_slave_node }}:
     | awk '{print $2}'
     | cut -d '=' -f2 | xargs
-  delegate_to: "{{ sap_hana_slave_node }}"
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
   register: sap_hana_slave_node_opmode
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Setting Slave Node Operation Mode as Fact
   ansible.builtin.set_fact:
     sap_hana_slave_node_mode: "{{ sap_hana_slave_node_opmode.stdout }}"
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring current System Replication sync state
   ansible.builtin.shell: |
@@ -355,10 +355,10 @@
     crm_mon -A1 |
     grep 'Node Attributes' -A24 |
     egrep -e 'Node:|hana_{{ sap_hana_sid | lower }}_clone_state|hana_{{ sap_hana_sid | lower }}_sync_state'
-  register: sap_hana_sync_state
-  delegate_to: "{{ sap_hana_slave_node }}"
+  register: hana_cluster_init_sap_hana_sync_state
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Re-Registering Former primary as Secondary to new primary
@@ -368,40 +368,40 @@
     set -o pipefail
     source /usr/sap/{{ sap_hana_sid }}/home/.sapenv.sh && \
     /usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/exe/hdbnsutil \
-    -sr_register --remoteHost={{ sap_hana_master_node }} \
+    -sr_register --remoteHost={{ hana_cluster_init_sap_hana_master_node }} \
     --remoteInstance={{ sap_hana_instance_number }} \
     --replicationMode={{ sap_hana_slave_node_srmode }} \
     --operationMode={{ sap_hana_slave_node_opmode.stdout }} \
     --name={{ sap_hana_slave_node_dc }} --online
-  delegate_to: "{{ sap_hana_slave_node }}"
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  when: "'AUTOMATED_REGISTER=false' in automated_register and 'SFAIL' in sap_hana_sync_state.stdout"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register and 'SFAIL' in hana_cluster_init_sap_hana_sync_state.stdout"
   register: secondary_set
   changed_when: true
 
 - name: Checking for failed resource actions
   ansible.builtin.shell: pcs status | grep "Failed Resource Actions"
-  register: failed_resource_actions
+  register: hana_cluster_init_failed_resource_actions
   run_once: true
   ignore_errors: true
   changed_when: false
 
 - name: Cleaning failed resource actions up if necessary
   ansible.builtin.command: pcs resource cleanup
-  when: "'Failed Resource Actions' in failed_resource_actions.stdout"
+  when: "'Failed Resource Actions' in hana_cluster_init_failed_resource_actions.stdout"
   run_once: true
   changed_when: true
 
 - name: Checking for failed Fencing actions
   ansible.builtin.shell: pcs status | grep "Failed Fencing Actions"
-  register: failed_fencing_actions
+  register: hana_cluster_init_failed_fencing_actions
   run_once: true
   ignore_errors: true
   changed_when: false
 
 - name: Cleaning failed fencing actions
   ansible.builtin.command: stonith_admin --cleanup --history "*"
-  when: "'Failed Fencing Actions' in failed_fencing_actions.stdout"
+  when: "'Failed Fencing Actions' in hana_cluster_init_failed_fencing_actions.stdout"
   run_once: true
   changed_when: true
 
@@ -411,13 +411,13 @@
     crm_mon -A1 |
     grep 'Node Attributes' -A24 |
     grep hana_{{ sap_hana_sid | lower }}_sync_state
-  register: sap_hana_sync_state
-  delegate_to: "{{ sap_hana_slave_node }}"
+  register: hana_cluster_init_sap_hana_sync_state
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  until: "'SOK' in sap_hana_sync_state.stdout"
+  until: "'SOK' in hana_cluster_init_sap_hana_sync_state.stdout"
   retries: 60
   delay: 1
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   ignore_errors: true
   changed_when: false
 
@@ -425,9 +425,9 @@
   become: true
   become_user: "{{ sap_hana_sid | lower }}adm"
   ansible.builtin.shell: "source /usr/sap/{{ sap_hana_sid }}/home/.sapenv.sh && HDB start"
-  delegate_to: "{{ sap_hana_slave_node }}"
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  when: "'AUTOMATED_REGISTER=false' in automated_register and 'SFAIL' in sap_hana_sync_state.stdout"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register and 'SFAIL' in hana_cluster_init_sap_hana_sync_state.stdout"
   register: secondary_set
   changed_when: true
 
@@ -437,17 +437,17 @@
     crm_mon -A1 |
     grep 'Node Attributes' -A24 |
     grep hana_{{ sap_hana_sid | lower }}_sync_state
-  register: sap_hana_sync_state
-  delegate_to: "{{ sap_hana_slave_node }}"
+  register: hana_cluster_init_sap_hana_sync_state
+  delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  until: "'SOK' in sap_hana_sync_state.stdout"
+  until: "'SOK' in hana_cluster_init_sap_hana_sync_state.stdout"
   retries: 240
   delay: 2
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
-- name: Verifying SOK state as {{ automated_register }}
+- name: Verifying SOK state as {{ hana_cluster_init_automated_register }}
   ansible.builtin.debug:
-    msg: "SAP HANA Replication sync state is {{ sap_hana_sync_state.stdout }}"
-  failed_when: "'SOK' not in sap_hana_sync_state.stdout"
-  when: "'AUTOMATED_REGISTER=false' in automated_register"
+    msg: "SAP HANA Replication sync state is {{ hana_cluster_init_sap_hana_sync_state.stdout }}"
+  failed_when: "'SOK' not in hana_cluster_init_sap_hana_sync_state.stdout"
+  when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
