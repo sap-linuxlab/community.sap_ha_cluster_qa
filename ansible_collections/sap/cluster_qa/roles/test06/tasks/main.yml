@@ -15,12 +15,13 @@
 
 - name: Setting ERS node name before failure as facts
   ansible.builtin.set_fact:
-    sap_ers_node_name_before: "{{ sap_ers_node_name }}"
+    test06_sap_ers_node_name_before: "{{ sap_ers_node_name }}"
+    sap_ers_node_name_before: "{{ sap_ers_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Running Host info for enq_rep pid
   sap.sap_operations.host_info:
   register: test06_ers_host_info
-  when: ansible_hostname == sap_ers_node_name_before
+  when: ansible_hostname == test06_sap_ers_node_name_before
 
 - name: Killing the enq_rep process
   ansible.builtin.command: "kill -9 {{ enq_rep_process_id }}"
@@ -28,27 +29,27 @@
   vars:
     enq_rep_process_id: "{{ (enq_rep_process_list | selectattr('name', 'equalto', 'enq_replicator') | first)['pid'] }}"
     enq_rep_process_list: "{{ (test06_ers_host_info.instances | selectattr('mSystemNumber', 'equalto', sap_ers_instance_number) | first)['ProcessList'] }}"
-  when: ansible_hostname == sap_ers_node_name_before
+  when: ansible_hostname == test06_sap_ers_node_name_before
 
 - name: Watching pcs status info for failures
   sap.sap_operations.pcs_status_info:
-  register: pcs_status_post_enq_rep_kill
-  until: "(pcs_status_post_enq_rep_kill.pacemaker_status['pacemaker-result'].failures | default([]) | length > 0)"
+  register: test06_pcs_status_post_enq_rep_kill
+  until: "(test06_pcs_status_post_enq_rep_kill.pacemaker_status['pacemaker-result'].failures | default([]) | length > 0)"
   delay: 5
   retries: 30
   run_once: true
 
 - name: Watching pcs status info for resource started
   sap.sap_operations.pcs_status_info:
-  register: pcs_status_ers_new_start
-  until: pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id = sap_ers_resource_name)
+  register: test06_pcs_status_ers_new_start
+  until: test06_pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id = sap_ers_resource_name)
   delay: 5
   retries: 30
   run_once: true
 
 - name: Debug resource started tasks
   ansible.builtin.debug:
-    msg: "{{ pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id=sap_ers_resource_name) }}"
+    msg: "{{ test06_pcs_status_ers_new_start | sap.sap_operations.pcs_resources_from_status(role='Started', id=sap_ers_resource_name) }}"
 
 - name: Finding ERS node name after move
   ansible.builtin.include_role:
@@ -56,7 +57,8 @@
 
 - name: Setting ERS node name after failure as facts
   ansible.builtin.set_fact:
-    sap_ers_node_name_after: "{{ sap_ers_node_name }}"
+    test06_sap_ers_node_name_after: "{{ sap_ers_node_name }}"
+    sap_ers_node_name_after: "{{ sap_ers_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Finding current ASCS node name
   ansible.builtin.include_role:
@@ -64,6 +66,6 @@
 
 - name: Verifying ERS not on the same node as ASCS
   ansible.builtin.assert:
-    that: sap_ers_node_name_after != sap_ascs_node_name
+    that: test06_sap_ers_node_name_after != sap_ascs_node_name
     fail_msg: "ERS moved to the same node as ASCS ({{ sap_ascs_node_name }}), which violates HA principles"
-    success_msg: "ERS successfully moved to {{ sap_ers_node_name_after }}, different from ASCS node {{ sap_ascs_node_name }}"
+    success_msg: "ERS successfully moved to {{ test06_sap_ers_node_name_after }}, different from ASCS node {{ sap_ascs_node_name }}"
