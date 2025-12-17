@@ -80,16 +80,16 @@
     test04_ers_locks_before: "{{ test04_ers_locks_before.enq_admin_locks_info }}"
   when: ansible_hostname == sap_ers_node_name
 
+- name: Setting ASCS node name before move as facts
+  ansible.builtin.set_fact:
+    test04_sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
+    sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
+
 - name: Asserting the locks of ASCS and ERS before move
   ansible.builtin.assert:
     that: >-
       hostvars[test04_sap_ascs_node_name_before]['test04_ascs_locks_before']
       | symmetric_difference(hostvars[sap_ers_node_name]['test04_ers_locks_before']) == []
-
-- name: Setting ASCS node name before move as facts
-  ansible.builtin.set_fact:
-    test04_sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
-    sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Triggering the failover of ASCS instance
   ansible.builtin.command: "pcs resource move {{ sap_ascs_resource_name }}"

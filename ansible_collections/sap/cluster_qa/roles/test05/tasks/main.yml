@@ -52,7 +52,7 @@
 - name: Debug resource started tasks
   ansible.builtin.debug:
     msg: >-
-         {{ pcs_status_ascs_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+         {{ test05_pcs_status_ascs_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
          | selectattr('group.resource.id', 'equalto', sap_ascs_resource_name) | selectattr('group.resource.role', 'equalto', 'Started') }}
 
 - name: Finding ASCS node name after move
