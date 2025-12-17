@@ -101,7 +101,7 @@
 - name: Setting up SAPHanaTopology resource name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_topology_resource_name: "{{ hana_cluster_init_sap_hana_topology_resource_name.stdout }}"
-    sap_hana_topology_resource_name: "{{ hana_cluster_init_sap_hana_topology_resource_name.stdout }}"
+    sap_hana_topology_resource_name: "{{ hana_cluster_init_sap_hana_topology_resource_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring the state of {{ hana_cluster_init_sap_hana_topology_resource_name }}
   ansible.builtin.shell: |
@@ -139,7 +139,7 @@
 - name: Setting up SAPHana resource name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_resource_name: "{{ hana_cluster_init_sap_hana_resource_name.stdout }}"
-    sap_hana_resource_name: "{{ hana_cluster_init_sap_hana_resource_name.stdout }}"
+    sap_hana_resource_name: "{{ hana_cluster_init_sap_hana_resource_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring SAP HANA resource state
   ansible.builtin.shell: |
@@ -166,7 +166,7 @@
 - name: Setting AUTOMATED_REGISTER value as fact
   ansible.builtin.set_fact:
     hana_cluster_init_automated_register: "{{ hana_cluster_init_automated_register.stdout }}"
-    automated_register: "{{ hana_cluster_init_automated_register.stdout }}"
+    automated_register: "{{ hana_cluster_init_automated_register.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring PREFER_SITE_TAKEOVER value
   ansible.builtin.shell: |
@@ -180,7 +180,7 @@
 - name: Setting PREFER_SITE_TAKEOVER value as fact
   ansible.builtin.set_fact:
     hana_cluster_init_prefer_site_takeover: "{{ hana_cluster_init_prefer_site_takeover.stdout }}"
-    prefer_site_takeover: "{{ hana_cluster_init_prefer_site_takeover.stdout }}"
+    prefer_site_takeover: "{{ hana_cluster_init_prefer_site_takeover.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Waiting for cluster to start SAP HANA resource on both nodes.
   ansible.builtin.shell: |
@@ -230,7 +230,7 @@
 - name: Setting SAP HANA master node name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_master_node: "{{ hana_cluster_init_sap_hana_master_node.stdout }}"
-    sap_hana_master_node: "{{ hana_cluster_init_sap_hana_master_node.stdout }}"
+    sap_hana_master_node: "{{ hana_cluster_init_sap_hana_master_node.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Waiting for 60 seconds to stabilize
   ansible.builtin.pause:
@@ -247,7 +247,7 @@
 - name: Setting SAP HANA Slave node name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_slave_node: "{{ hana_cluster_init_sap_hana_slave_node.stdout }}"
-    sap_hana_slave_node: "{{ hana_cluster_init_sap_hana_slave_node.stdout }}"
+    sap_hana_slave_node: "{{ hana_cluster_init_sap_hana_slave_node.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring SAP HANA VIP resource name
   ansible.builtin.shell: |
@@ -262,7 +262,7 @@
 - name: Setting up SAP HANA VIP name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_vip_name: "{{ hana_cluster_init_sap_hana_vip_name.stdout }}"
-    sap_hana_vip_name: "{{ hana_cluster_init_sap_hana_vip_name.stdout }}"
+    sap_hana_vip_name: "{{ hana_cluster_init_sap_hana_vip_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Waiting for cluster to start the SAP HANA VIP Resource
   ansible.builtin.shell: |
@@ -314,13 +314,13 @@
     cut -d '=' -f2 | xargs
   delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  register: sap_hana_slave_node_dc
+  register: hana_cluster_init_sap_hana_slave_node_dc
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Setting Slave Node DC Name as Fact
   ansible.builtin.set_fact:
-    sap_hana_slave_node_dc: "{{ sap_hana_slave_node_dc.stdout }}"
+    hana_cluster_init_sap_hana_slave_node_dc: "{{ hana_cluster_init_sap_hana_slave_node_dc.stdout }}"
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring Slave Node System Replication Mode
@@ -329,13 +329,13 @@
     pcs node attribute | grep {{ hana_cluster_init_sap_hana_slave_node }}: | awk '{print $5}' | cut -d '=' -f2 | xargs
   delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  register: sap_hana_slave_node_srmode
+  register: hana_cluster_init_sap_hana_slave_node_srmode
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Setting Slave Node System Replication Mode as Fact
   ansible.builtin.set_fact:
-    sap_hana_slave_node_srmode: "{{ sap_hana_slave_node_srmode.stdout }}"
+    hana_cluster_init_sap_hana_slave_node_srmode: "{{ hana_cluster_init_sap_hana_slave_node_srmode.stdout }}"
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring Slave Node Operation Mode
@@ -347,13 +347,13 @@
     | cut -d '=' -f2 | xargs
   delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
-  register: sap_hana_slave_node_opmode
+  register: hana_cluster_init_sap_hana_slave_node_opmode
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
   changed_when: false
 
 - name: Setting Slave Node Operation Mode as Fact
   ansible.builtin.set_fact:
-    sap_hana_slave_node_mode: "{{ sap_hana_slave_node_opmode.stdout }}"
+    hana_cluster_init_sap_hana_slave_node_mode: "{{ hana_cluster_init_sap_hana_slave_node_opmode.stdout }}"
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register"
 
 - name: Acquiring current System Replication sync state
@@ -377,13 +377,13 @@
     /usr/sap/{{ sap_hana_sid }}/HDB{{ sap_hana_instance_number }}/exe/hdbnsutil \
     -sr_register --remoteHost={{ hana_cluster_init_sap_hana_master_node }} \
     --remoteInstance={{ sap_hana_instance_number }} \
-    --replicationMode={{ sap_hana_slave_node_srmode }} \
-    --operationMode={{ sap_hana_slave_node_opmode.stdout }} \
-    --name={{ sap_hana_slave_node_dc }} --online
+    --replicationMode={{ hana_cluster_init_sap_hana_slave_node_srmode }} \
+    --operationMode={{ hana_cluster_init_sap_hana_slave_node_opmode.stdout }} \
+    --name={{ hana_cluster_init_sap_hana_slave_node_dc }} --online
   delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register and 'SFAIL' in hana_cluster_init_sap_hana_sync_state.stdout"
-  register: secondary_set
+  register: hana_cluster_init_secondary_set
   changed_when: true
 
 - name: Checking for failed resource actions
@@ -435,7 +435,7 @@
   delegate_to: "{{ hana_cluster_init_sap_hana_slave_node }}"
   run_once: true
   when: "'AUTOMATED_REGISTER=false' in hana_cluster_init_automated_register and 'SFAIL' in hana_cluster_init_sap_hana_sync_state.stdout"
-  register: secondary_set
+  register: hana_cluster_init_secondary_set
   changed_when: true
 
 - name: Waiting for SOK Replication sync state after Re-register using Ansible
