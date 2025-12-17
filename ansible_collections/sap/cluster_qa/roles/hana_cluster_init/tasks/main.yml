@@ -101,6 +101,7 @@
 - name: Setting up SAPHanaTopology resource name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_topology_resource_name: "{{ hana_cluster_init_sap_hana_topology_resource_name.stdout }}"
+    sap_hana_topology_resource_name: "{{ hana_cluster_init_sap_hana_topology_resource_name.stdout }}"
 
 - name: Acquiring the state of {{ hana_cluster_init_sap_hana_topology_resource_name }}
   ansible.builtin.shell: |
@@ -138,6 +139,7 @@
 - name: Setting up SAPHana resource name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_resource_name: "{{ hana_cluster_init_sap_hana_resource_name.stdout }}"
+    sap_hana_resource_name: "{{ hana_cluster_init_sap_hana_resource_name.stdout }}"
 
 - name: Acquiring SAP HANA resource state
   ansible.builtin.shell: |
@@ -164,6 +166,7 @@
 - name: Setting AUTOMATED_REGISTER value as fact
   ansible.builtin.set_fact:
     hana_cluster_init_automated_register: "{{ hana_cluster_init_automated_register.stdout }}"
+    automated_register: "{{ hana_cluster_init_automated_register.stdout }}"
 
 - name: Acquiring PREFER_SITE_TAKEOVER value
   ansible.builtin.shell: |
@@ -177,6 +180,7 @@
 - name: Setting PREFER_SITE_TAKEOVER value as fact
   ansible.builtin.set_fact:
     hana_cluster_init_prefer_site_takeover: "{{ hana_cluster_init_prefer_site_takeover.stdout }}"
+    prefer_site_takeover: "{{ hana_cluster_init_prefer_site_takeover.stdout }}"
 
 - name: Waiting for cluster to start SAP HANA resource on both nodes.
   ansible.builtin.shell: |
@@ -226,6 +230,7 @@
 - name: Setting SAP HANA master node name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_master_node: "{{ hana_cluster_init_sap_hana_master_node.stdout }}"
+    sap_hana_master_node: "{{ hana_cluster_init_sap_hana_master_node.stdout }}"
 
 - name: Waiting for 60 seconds to stabilize
   ansible.builtin.pause:
@@ -242,6 +247,7 @@
 - name: Setting SAP HANA Slave node name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_slave_node: "{{ hana_cluster_init_sap_hana_slave_node.stdout }}"
+    sap_hana_slave_node: "{{ hana_cluster_init_sap_hana_slave_node.stdout }}"
 
 - name: Acquiring SAP HANA VIP resource name
   ansible.builtin.shell: |
@@ -256,6 +262,7 @@
 - name: Setting up SAP HANA VIP name as fact
   ansible.builtin.set_fact:
     hana_cluster_init_sap_hana_vip_name: "{{ hana_cluster_init_sap_hana_vip_name.stdout }}"
+    sap_hana_vip_name: "{{ hana_cluster_init_sap_hana_vip_name.stdout }}"
 
 - name: Waiting for cluster to start the SAP HANA VIP Resource
   ansible.builtin.shell: |
