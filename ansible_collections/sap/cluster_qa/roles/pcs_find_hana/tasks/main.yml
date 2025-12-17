@@ -17,4 +17,5 @@
 
 - name: Set fact for sap_hana_sid variable (SAP HANA SID)
   ansible.builtin.set_fact:
-    sap_hana_sid: "{{ __pcs_find_hana_sap_hana_sid.stdout }}"
+    pcs_find_hana_sap_hana_sid: "{{ __pcs_find_hana_sap_hana_sid.stdout }}"
+    sap_hana_sid: "{{ __pcs_find_hana_sap_hana_sid.stdout }}"  # noqa: var-naming[no-role-prefix]
