@@ -16,7 +16,8 @@
 
 - name: Setting ASCS node name before failure as facts
   ansible.builtin.set_fact:
-    sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
+    test08_sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
+    sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Crashing the ASCS node to simulate hardware failure
   ansible.builtin.shell: 'echo c > /proc/sysrq-trigger&'
@@ -29,26 +30,26 @@
 - name: Wait for ASCS node to show as OFFLINE in cluster status of other nodes
   ansible.builtin.shell: |
     set -o pipefail
-    pcs cluster status | grep -i "{{ sap_ascs_node_name_before }}" | grep -i offline
-  register: node_offline_status
-  until: node_offline_status.rc == 0
+    pcs cluster status | grep -i "{{ test08_sap_ascs_node_name_before }}" | grep -i offline
+  register: test08_node_offline_status
+  until: test08_node_offline_status.rc == 0
   delay: 1
   retries: 60
   run_once: true
-  delegate_to: "{{ groups['all'] | difference([sap_ascs_node_name_before]) | first }}"
+  delegate_to: "{{ groups['all'] | difference([test08_sap_ascs_node_name_before]) | first }}"
   changed_when: false
   failed_when: false
 
 - name: Wait for ASCS resource to show as UNCLEAN in cluster status of other nodes
   ansible.builtin.shell: |
     set -o pipefail
-    pcs resource status "{{ sap_ascs_resource_name }}" | grep -i "{{ sap_ascs_node_name_before }}" | grep -i unclean
-  register: resource_unclean_status
-  until: resource_unclean_status.rc == 0
+    pcs resource status "{{ sap_ascs_resource_name }}" | grep -i "{{ test08_sap_ascs_node_name_before }}" | grep -i unclean
+  register: test08_resource_unclean_status
+  until: test08_resource_unclean_status.rc == 0
   delay: 1
   retries: 20
   run_once: true
-  delegate_to: "{{ groups['all'] | difference([sap_ascs_node_name_before]) | first }}"
+  delegate_to: "{{ groups['all'] | difference([test08_sap_ascs_node_name_before]) | first }}"
   changed_when: false
   failed_when: false
 
@@ -58,37 +59,39 @@
 
 - name: Watching pcs status info for resource started
   sap.sap_operations.pcs_status_info:
-  register: pcs_status_ascs_new_start
+  register: test08_pcs_status_ascs_new_start
   until: >-
-    (pcs_status_ascs_new_start | sap.sap_operations.pcs_resources_from_status(id=sap_ascs_resource_name, role='Started') | length > 0)
+    (test08_pcs_status_ascs_new_start | sap.sap_operations.pcs_resources_from_status(id=sap_ascs_resource_name, role='Started') | length > 0)
   delay: 5
   retries: 30
   run_once: true
-  delegate_to: "{{ groups['all'] | difference([sap_ascs_node_name_before]) | first }}"
+  delegate_to: "{{ groups['all'] | difference([test08_sap_ascs_node_name_before]) | first }}"
 
 - name: Debug resource started tasks
   ansible.builtin.debug:
     msg: >-
-         {{ pcs_status_ascs_new_start | sap.sap_operations.pcs_resources_from_status(id=sap_ascs_resource_name, role='Started') }}
+         {{ test08_pcs_status_ascs_new_start | sap.sap_operations.pcs_resources_from_status(id=sap_ascs_resource_name, role='Started') }}
   run_once: true
-  delegate_to: "{{ groups['all'] | difference([sap_ascs_node_name_before]) | first }}"
+  delegate_to: "{{ groups['all'] | difference([test08_sap_ascs_node_name_before]) | first }}"
 
 - name: Finding ASCS node name after move
   ansible.builtin.include_role:
     name: sap.cluster_qa.pcs_find_ascs
-  when: ansible_hostname != sap_ascs_node_name_before
+  when: ansible_hostname != test08_sap_ascs_node_name_before
 
 - name: Setting ASCS node name after failure as facts on executing node
   ansible.builtin.set_fact:
-    sap_ascs_node_name_after: "{{ sap_ascs_node_name }}"
-  when: ansible_hostname != sap_ascs_node_name_before
+    test08_sap_ascs_node_name_after: "{{ sap_ascs_node_name }}"
+    sap_ascs_node_name_after: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
+  when: ansible_hostname != test08_sap_ascs_node_name_before
 
 - name: Verifying ASCS not on the same node
   ansible.builtin.assert:
-    that: sap_ascs_node_name_before != sap_ascs_node_name_after
+    that: test08_sap_ascs_node_name_before != test08_sap_ascs_node_name_after
     fail_msg: "ASCS did not move to a different node after hardware failure simulation"
-    success_msg: "ASCS successfully moved from {{ sap_ascs_node_name_before }} to {{ sap_ascs_node_name_after }}"
+    success_msg: "ASCS successfully moved from {{ test08_sap_ascs_node_name_before }} to {{ test08_sap_ascs_node_name_after }}"
   run_once: true
-  delegate_to: "{{ groups['all'] | difference([sap_ascs_node_name_before]) | first }}"
+  delegate_to: "{{ groups['all'] | difference([test08_sap_ascs_node_name_before]) | first }}"
   vars:
-    sap_ascs_node_name_after: "{{ hostvars[groups['all'] | difference([sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}"
+    test08_sap_ascs_node_name_after: "{{ hostvars[groups['all'] | difference([test08_sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}"
+    sap_ascs_node_name_after: "{{ hostvars[groups['all'] | difference([test08_sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}"  # noqa: var-naming[no-role-prefix]

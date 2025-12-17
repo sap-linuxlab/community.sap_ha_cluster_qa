@@ -13,12 +13,13 @@
 
 - name: Setting ASCS resource name as fact
   ansible.builtin.set_fact:
-    sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"
+    pcs_find_ascs_sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"
+    sap_ascs_resource_name: "{{ __pcs_find_ascs_sap_ascs_resource_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ASCS node name
   ansible.builtin.shell: |-
     set -o pipefail |
-    pcs resource status {{ sap_ascs_resource_name }} |
+    pcs resource status {{ pcs_find_ascs_sap_ascs_resource_name }} |
     grep SAPInstance |
     awk '{print $5}'
   register: __pcs_find_ascs_sap_ascs_node_name
@@ -27,12 +28,13 @@
 
 - name: Setting ASCS Node name as fact
   ansible.builtin.set_fact:
-    sap_ascs_node_name: "{{ __pcs_find_ascs_sap_ascs_node_name.stdout }}"
+    pcs_find_ascs_sap_ascs_node_name: "{{ __pcs_find_ascs_sap_ascs_node_name.stdout }}"
+    sap_ascs_node_name: "{{ __pcs_find_ascs_sap_ascs_node_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ASCS start profile
   ansible.builtin.shell: |-
     set -o pipefail |
-    pcs resource config "{{ sap_ascs_resource_name }}" |
+    pcs resource config "{{ pcs_find_ascs_sap_ascs_resource_name }}" |
     grep START_PROFILE |
     cut -d '=' -f2 |
     xargs
@@ -53,11 +55,13 @@
 
 - name: Setting ASCS SID as a separate fact
   ansible.builtin.set_fact:
-    sap_ascs_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
+    pcs_find_ascs_sap_ascs_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
+    sap_ascs_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Setting ASCS SID as a general fact
   ansible.builtin.set_fact:
-    sap_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
+    pcs_find_ascs_sap_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"
+    sap_sid: "{{ __pcs_find_ascs_sap_ascs_sid.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ASCS Instance Name
   ansible.builtin.shell: |-
@@ -72,11 +76,13 @@
 
 - name: Setting ASCS Instance Name as a separate fact
   ansible.builtin.set_fact:
-    sap_ascs_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
+    pcs_find_ascs_sap_ascs_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
+    sap_ascs_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Setting ASCS Instance Name as a general fact
   ansible.builtin.set_fact:
-    sap_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
+    pcs_find_ascs_sap_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"
+    sap_instance_name: "{{ __pcs_find_ascs_sap_instance_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ASCS Instance number
   ansible.builtin.shell: |-
@@ -91,8 +97,10 @@
 
 - name: Setting ASCS Instance number as fact
   ansible.builtin.set_fact:
-    sap_ascs_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+    pcs_find_ascs_sap_ascs_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+    sap_ascs_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Setting ASCS Instance number as fact
   ansible.builtin.set_fact:
-    sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+    pcs_find_ascs_sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"
+    sap_instance_number: "{{ __pcs_find_ascs_sap_instance_number.stdout }}"  # noqa: var-naming[no-role-prefix]

@@ -4,18 +4,18 @@
     instance_number: "{{ sap_instance_number }}"
   become: true
   become_user: root
-  register: failoverconfig_info
+  register: test01_failoverconfig_info
 
 - name: Print test results completing TEST01 test case for current instance
   ansible.builtin.debug:
-    msg: "{{ failoverconfig_info }}"
+    msg: "{{ test01_failoverconfig_info }}"
   failed_when: >
-    (failoverconfig_info.ha_get_failoverconfig_info.HAActive == false)
+    (test01_failoverconfig_info.ha_get_failoverconfig_info.HAActive == false)
     or
-    (failoverconfig_info.ha_get_failoverconfig_info.HAActiveNode is none)
+    (test01_failoverconfig_info.ha_get_failoverconfig_info.HAActiveNode is none)
     or
-    (failoverconfig_info.ha_get_failoverconfig_info.HADocumentation is none)
+    (test01_failoverconfig_info.ha_get_failoverconfig_info.HADocumentation is none)
     or
-    (failoverconfig_info.ha_get_failoverconfig_info.HAProductVersion is none)
+    (test01_failoverconfig_info.ha_get_failoverconfig_info.HAProductVersion is none)
     or
-    (failoverconfig_info.ha_get_failoverconfig_info.HASAPInterfaceVersion is none)
+    (test01_failoverconfig_info.ha_get_failoverconfig_info.HASAPInterfaceVersion is none)

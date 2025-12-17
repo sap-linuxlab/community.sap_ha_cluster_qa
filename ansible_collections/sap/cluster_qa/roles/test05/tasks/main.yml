@@ -15,7 +15,8 @@
 
 - name: Setting ASCS node name before failure as facts
   ansible.builtin.set_fact:
-    sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
+    test05_sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"
+    sap_ascs_node_name_before: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Running Host info for enq.sap pid
   sap.sap_operations.host_info:
@@ -32,17 +33,17 @@
 
 - name: Watching pcs status info for failures
   sap.sap_operations.pcs_status_info:
-  register: pcs_status_post_enq_kill
-  until: "(pcs_status_post_enq_kill.pacemaker_status['pacemaker-result'].failures | default([]) | length > 0)"
+  register: test05_pcs_status_post_enq_kill
+  until: "(test05_pcs_status_post_enq_kill.pacemaker_status['pacemaker-result'].failures | default([]) | length > 0)"
   delay: 5
   retries: 30
   run_once: true
 
 - name: Watching pcs status info for resource started
   sap.sap_operations.pcs_status_info:
-  register: pcs_status_ascs_new_start
+  register: test05_pcs_status_ascs_new_start
   until: >-
-         (pcs_status_ascs_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+         (test05_pcs_status_ascs_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
          | selectattr('group.resource.id', 'equalto', sap_ascs_resource_name) | selectattr('group.resource.role', 'equalto', 'Started'))
   delay: 5
   retries: 30
@@ -60,8 +61,9 @@
 
 - name: Setting ASCS node name after failure as facts
   ansible.builtin.set_fact:
-    sap_ascs_node_name_after: "{{ sap_ascs_node_name }}"
+    test05_sap_ascs_node_name_after: "{{ sap_ascs_node_name }}"
+    sap_ascs_node_name_after: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Verifying ASCS not on the same node
   ansible.builtin.assert:
-    that: sap_ascs_node_name_before != sap_ascs_node_name_after
+    that: test05_sap_ascs_node_name_before != test05_sap_ascs_node_name_after
