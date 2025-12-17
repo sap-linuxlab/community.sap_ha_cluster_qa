@@ -93,5 +93,7 @@
   run_once: true
   delegate_to: "{{ groups['all'] | difference([test08_sap_ascs_node_name_before]) | first }}"
   vars:
-    test08_sap_ascs_node_name_after: "{{ hostvars[groups['all'] | difference([test08_sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}"
-    sap_ascs_node_name_after: "{{ hostvars[groups['all'] | difference([test08_sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}"  # noqa: var-naming[no-role-prefix]
+    test08_sap_ascs_node_name_after: >-
+      {{ hostvars[groups['all'] | difference([test08_sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}
+    sap_ascs_node_name_after: >-
+      {{ hostvars[groups['all'] | difference([test08_sap_ascs_node_name_before]) | first]['sap_ascs_node_name'] }}  # noqa: var-naming[no-role-prefix]

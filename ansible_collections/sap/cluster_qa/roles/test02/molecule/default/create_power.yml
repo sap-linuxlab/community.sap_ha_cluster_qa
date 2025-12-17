@@ -7,7 +7,7 @@
       block:
         - name: Populate instance config dict
           ansible.builtin.set_fact:
-            instance_conf_dict:
+            test02_instance_conf_dict:
               instance: "{{ platform.name }}"
               address: "{{ platform.ip }}"
               user: molecule
@@ -16,7 +16,7 @@
           loop: "{{ molecule_yml.platforms }}"
           loop_control:
             loop_var: platform
-          register: instance_config_dict
+          register: test02_instance_config_dict
 
         - name: Dump instance config
           ansible.builtin.copy:
@@ -28,5 +28,5 @@
             mode: "0600"
           vars:
             instance_conf: "\
-              {{ instance_config_dict.results | \
-              map(attribute='ansible_facts.instance_conf_dict') | list }}"
+              {{ test02_instance_config_dict.results | \
+              map(attribute='ansible_facts.test02_instance_conf_dict') | list }}"
