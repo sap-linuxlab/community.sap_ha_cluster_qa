@@ -14,14 +14,14 @@
     cat "/usr/sap/{{ sap_sid }}/{{ sap_instance_name }}/work/sapstartsrv.log" |
     grep "SAP HA Trace" |
     tail -n 50
-  register: ha_trace_logs
+  register: test03_ha_trace_logs
   when: ansible_hostname == sap_ascs_node_name
   changed_when: false
-  failed_when: "'SAP HA Trace' not in ha_trace_logs.stdout"
+  failed_when: "'SAP HA Trace' not in test03_ha_trace_logs.stdout"
 
 - name: Printing SAP HA trace logs for ASCS Instance
   ansible.builtin.debug:
-    msg: "{{ ha_trace_logs.stdout_lines }}"
+    msg: "{{ test03_ha_trace_logs.stdout_lines }}"
   when: ansible_hostname == sap_ascs_node_name
 
 - name: Finding ERS node name
@@ -34,12 +34,12 @@
     cat "/usr/sap/{{ sap_sid }}/{{ sap_instance_name }}/work/sapstartsrv.log" |
     grep "SAP HA Trace" |
     tail -n 50
-  register: ha_trace_logs
+  register: test03_ha_trace_logs
   when: ansible_hostname == sap_ers_node_name
   changed_when: false
-  failed_when: "'SAP HA Trace' not in ha_trace_logs.stdout"
+  failed_when: "'SAP HA Trace' not in test03_ha_trace_logs.stdout"
 
 - name: Printing SAP HA trace logs for ERS instance
   ansible.builtin.debug:
-    msg: "{{ ha_trace_logs.stdout_lines }}"
+    msg: "{{ test03_ha_trace_logs.stdout_lines }}"
   when: ansible_hostname == sap_ers_node_name

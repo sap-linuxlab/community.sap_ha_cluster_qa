@@ -13,12 +13,13 @@
 
 - name: Setting ERS resource name as fact
   ansible.builtin.set_fact:
-      sap_ers_resource_name: "{{ __pcs_find_ers_sap_ers_resource_name.stdout }}"
+      pcs_find_ers_sap_ers_resource_name: "{{ __pcs_find_ers_sap_ers_resource_name.stdout }}"
+      sap_ers_resource_name: "{{ __pcs_find_ers_sap_ers_resource_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ERS node name
   ansible.builtin.shell: |
     set -o pipefail |
-    pcs resource status "{{ sap_ers_resource_name }}" |
+    pcs resource status "{{ pcs_find_ers_sap_ers_resource_name }}" |
     grep SAPInstance |
     awk '{print $5}'
   register: __pcs_find_ers_sap_ers_node_name
@@ -27,12 +28,13 @@
 
 - name: Setting ERS Node name as fact
   ansible.builtin.set_fact:
-      sap_ers_node_name: "{{ __pcs_find_ers_sap_ers_node_name.stdout }}"
+      pcs_find_ers_sap_ers_node_name: "{{ __pcs_find_ers_sap_ers_node_name.stdout }}"
+      sap_ers_node_name: "{{ __pcs_find_ers_sap_ers_node_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ERS start profile
   ansible.builtin.shell: |
     set -o pipefail |
-    pcs resource config "{{ sap_ers_resource_name }}" |
+    pcs resource config "{{ pcs_find_ers_sap_ers_resource_name }}" |
     grep START_PROFILE |
     cut -d '=' -f2 |
     xargs
@@ -53,11 +55,13 @@
 
 - name: Setting ERS SID as a separate fact
   ansible.builtin.set_fact:
-      sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+      pcs_find_ers_sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+      sap_ers_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Setting ERS SID as a general fact
   ansible.builtin.set_fact:
-      sap_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+      pcs_find_ers_sap_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"
+      sap_sid: "{{ __pcs_find_ers_sap_ers_sid.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ERS Instance Name
   ansible.builtin.shell: |
@@ -72,11 +76,13 @@
 
 - name: Setting ERS Instance Name as a separate fact
   ansible.builtin.set_fact:
-      sap_ers_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+      pcs_find_ers_sap_ers_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+      sap_ers_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Setting ERS Instance Name as a general fact
   ansible.builtin.set_fact:
-      sap_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+      pcs_find_ers_sap_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"
+      sap_instance_name: "{{ __pcs_find_ers_sap_instance_name.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Acquiring ERS Instance number
   ansible.builtin.shell: |
@@ -91,8 +97,10 @@
 
 - name: Setting ERS Instance number as fact separately
   ansible.builtin.set_fact:
-      sap_ers_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+      pcs_find_ers_sap_ers_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+      sap_ers_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Setting ERS Instance number as fact without appserver name
   ansible.builtin.set_fact:
-      sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+      pcs_find_ers_sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"
+      sap_instance_number: "{{ __pcs_find_ers_sap_instance_number.stdout }}"  # noqa: var-naming[no-role-prefix]
