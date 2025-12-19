@@ -8,4 +8,4 @@
   tasks:
     - name: Running TEST09 test role on the S4/HANA Cluster
       ansible.builtin.include_role:
-        name: sap.cluster_qa.test09
+        name: test09
