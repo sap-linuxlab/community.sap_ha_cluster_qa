@@ -1,0 +1,70 @@
+---
+- name: Run all test cases (test01 through test09, skipping test07)
+  hosts: all
+  gather_facts: false
+  become: true
+  become_user: root
+  any_errors_fatal: false
+  tasks:
+    - name: Display test suite information
+      ansible.builtin.debug:
+        msg: "Starting test suite execution: test01 through test09 (skipping test07)"
+      run_once: true
+
+    - name: Run TEST01 - HA software name and version verification
+      block:
+        - name: Collect necessary gather_facts
+          ansible.builtin.setup:
+            gather_subset:
+              - min
+
+        - name: Finding ASCS node name
+          ansible.builtin.include_role:
+            name: sap.cluster_qa.pcs_find_ascs
+
+        - name: Running TEST01 test role on the ASCS Node
+          ansible.builtin.include_role:
+            name: sap.cluster_qa.test01
+          when: ansible_hostname == sap_ascs_node_name
+
+        - name: Finding ERS node name
+          ansible.builtin.include_role:
+            name: sap.cluster_qa.pcs_find_ers
+
+        - name: Running TEST01 test role on the ERS Node
+          ansible.builtin.include_role:
+            name: sap.cluster_qa.test01
+          when: ansible_hostname == sap_ers_node_name
+
+    - name: Run TEST02 - HA configuration error check
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test02
+
+    - name: Run TEST03 - HA-Interface shared library loading verification
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test03
+
+    - name: Run TEST04 - Manual ASCS failover with transaction locks
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test04
+
+    - name: Run TEST05
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test05
+
+    - name: Run TEST06 - ERS failover test
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test06
+
+    - name: Run TEST08 - ASCS node crash test
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test08
+
+    - name: Run TEST09 - Message Server automatic restart and HA interaction test
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test09
+
+    - name: Display test suite completion
+      ansible.builtin.debug:
+        msg: "Test suite execution completed: test01 through test09 (test07 skipped)"
+      run_once: true

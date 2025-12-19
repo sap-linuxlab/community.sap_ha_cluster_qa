@@ -1,0 +1,43 @@
+---
+- name: Check if ASCS profile file exists
+  ansible.builtin.stat:
+    path: "{{ sap_ascs_start_profile }}"
+  register: profile_file_stat
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+
+- name: Check for Restart_Program parameter in ASCS profile
+  ansible.builtin.shell: |
+    grep "Restart_Program" "{{ sap_ascs_start_profile }}" | grep "_MS" || echo "NOT_FOUND"
+  register: restart_program_check
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when: profile_file_stat.stat.exists
+
+- name: Verify Restart_Program parameter is configured for Message Server
+  ansible.builtin.assert:
+    that:
+      - profile_file_stat.stat.exists
+      - restart_program_check.stdout != "NOT_FOUND"
+      - restart_program_check.stdout | length > 0
+    fail_msg: |
+      PREREQUISITE FAILED: Restart_Program parameter for Message Server not found in ASCS profile.
+      Profile checked: {{ sap_ascs_start_profile }}
+      Profile exists: {{ profile_file_stat.stat.exists | default(false) }}
+
+      Please manually configure it according to: https://help.sap.com/docs/SUPPORT_CONTENT/si/3362959619.html
+
+      Expected configuration format:
+      _MS = ms.sap$(SAPSYSTEMNAME)_$(INSTANCE_NAME)
+      Restart_Program_00 = local $(_MS) pf=$(_PF)
+
+      Or the expanded form:
+      Restart_Program_00 = local ms.sapSYSTEMNAME_INSTANCENAME pf=/path/to/profile
+
+      TEST WILL STOP HERE - Fix the configuration and re-run the test.
+    success_msg: |
+      ✓ PREREQUISITE VERIFIED: Restart_Program parameter found for Message Server.
+      Configuration: {{ restart_program_check.stdout }}
+      ✓ Proceeding with Message Server kill test...
+  run_once: true

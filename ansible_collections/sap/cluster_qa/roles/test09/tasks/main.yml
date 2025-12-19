@@ -1,0 +1,39 @@
+---
+- name: Clean-up of cluster
+  ansible.builtin.shell: |-
+    set -o pipefail |
+    pcs resource cleanup
+  run_once: true
+
+- name: Collect necessary gather_facts
+  ansible.builtin.setup:
+    gather_subset:
+      - min
+
+- name: Finding ASCS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Store original ASCS node name before any modifications
+  ansible.builtin.set_fact:
+    sap_ascs_node_name_original: "{{ sap_ascs_node_name }}"
+
+- name: Prerequisite verification
+  ansible.builtin.include_tasks:
+    file: prerequisite.yml
+
+- name: Test setup
+  ansible.builtin.include_tasks:
+    file: test_setup.yml
+
+- name: Test execution
+  ansible.builtin.include_tasks:
+    file: test_execution.yml
+
+- name: Test verification
+  ansible.builtin.include_tasks:
+    file: test_verification.yml
+
+- name: Test summary
+  ansible.builtin.include_tasks:
+    file: test_summary.yml

@@ -4,8 +4,9 @@
   gather_facts: false
   tasks:
     - name: Starting the cluster
-      community.general.pacemaker_cluster:
-        state: online
-        timeout: 900
+      ansible.builtin.shell: |
+        pcs cluster start --all
+        pcs cluster enable --all
       become: true
       become_user: root
+      changed_when: false

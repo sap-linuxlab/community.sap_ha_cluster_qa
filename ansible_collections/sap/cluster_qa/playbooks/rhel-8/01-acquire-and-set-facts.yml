@@ -1,7 +1,0 @@
----
-- name: Playbook to acquire the current state of RHEL HA Pacemaker cluster running SAP HANA with system Replication
-  hosts: all
-  roles:
-    - sap.cluster_qa.pcs_find_hana
-    - sap.cluster_qa.pcs_find_instance_number
-    - sap.cluster_qa.hana_cluster_init

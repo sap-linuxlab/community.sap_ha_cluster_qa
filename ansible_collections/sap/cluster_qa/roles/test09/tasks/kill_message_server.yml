@@ -1,0 +1,125 @@
+---
+- name: Get current Message Server process info
+  sap.sap_operations.host_info:
+  register: current_ascs_host_info
+  when: ansible_hostname == sap_ascs_node_name_initial
+
+- name: Store current Message Server PID
+  ansible.builtin.set_fact:
+    current_msg_server_pid: >-
+      {{ (msg_server_process_list | selectattr('name', 'equalto', 'msg_server') | first)['pid']
+         if msg_server_process_list | length > 0 else 'NO_INSTANCE' }}
+    previous_msg_server_pid: "{{ previous_msg_server_pid | default('none') }}"
+    ascs_instance_found: "{{ ascs_instance_list | length > 0 }}"
+  vars:
+    ascs_instance_list: >-
+      {{ current_ascs_host_info.instances | default([]) | selectattr('mSystemNumber', 'equalto', sap_ascs_instance_number) | list | default([]) }}
+    msg_server_process_list: >-
+      {{ (ascs_instance_list | first | default({}))['ProcessList'] | default([]) | selectattr('name', 'equalto', 'msg_server') | list | default([]) }}
+  when:
+    - ansible_hostname == sap_ascs_node_name_initial
+    - current_ascs_host_info is defined
+    - current_ascs_host_info.instances is defined
+
+- name: Handle case when ASCS instance not found
+  ansible.builtin.set_fact:
+    current_msg_server_pid: "NO_INSTANCE"
+    ascs_instance_found: false
+    msg_server_restarted: false
+  when:
+    - ansible_hostname == sap_ascs_node_name_initial
+    - current_ascs_host_info is defined
+    - (current_ascs_host_info.instances | default([]) |
+        selectattr('mSystemNumber', 'equalto', sap_ascs_instance_number) | list | length == 0)
+
+- name: Display Message Server PID info
+  ansible.builtin.debug:
+    msg: |
+      Kill attempt {{ kill_attempt }}:
+      - ASCS instance found: {{ ascs_instance_found | default(false) }}
+      - Current PID: {{ current_msg_server_pid | default('N/A') }}
+      - Previous PID: {{ previous_msg_server_pid | default('none') }}
+      {% if not (ascs_instance_found | default(false)) %}
+      - WARNING: ASCS instance {{ sap_ascs_instance_number }} not found in process list
+      {% endif %}
+  when: ansible_hostname == sap_ascs_node_name_initial
+
+- name: Killing the Message Server process
+  ansible.builtin.command: "kill -9 {{ current_msg_server_pid }}"
+  changed_when: true
+  when:
+    - ansible_hostname == sap_ascs_node_name_initial
+    - current_msg_server_pid is defined
+    - current_msg_server_pid != "NO_INSTANCE"
+    - ascs_instance_found | default(false)
+
+- name: Update kill counter
+  ansible.builtin.set_fact:
+    message_server_kill_count: "{{ kill_attempt }}"
+    previous_msg_server_pid: "{{ current_msg_server_pid | default('unknown') }}"
+
+- name: Wait for SAP automatic restart or HA intervention
+  ansible.builtin.pause:
+    seconds: 30
+    prompt: >-
+      Waiting for SAP automatic restart or HA intervention after kill attempt {{ kill_attempt }}
+
+- name: Check if ASCS resource is still running on original node
+  sap.sap_operations.pcs_status_info:
+  register: ascs_status_check
+  run_once: true
+
+- name: Verify ASCS resource status
+  ansible.builtin.set_fact:
+    ascs_still_on_original_node: >-
+      {{ ascs_status_check | sap.sap_operations.pcs_resources_from_status(role='Started', id=sap_ascs_resource_name) | length > 0 }}
+  run_once: true
+
+- name: Check if Message Server process is running again
+  sap.sap_operations.host_info:
+  register: restart_check_host_info
+  failed_when: false
+  when:
+    - ansible_hostname == sap_ascs_node_name_initial
+    - ascs_still_on_original_node | bool
+
+- name: Determine if Message Server restarted automatically
+  ansible.builtin.set_fact:
+    msg_server_restarted: "{{ (restart_msg_server_list | length > 0) }}"
+    restart_ascs_instance_found: "{{ restart_ascs_instance_list | length > 0 }}"
+  vars:
+    restart_ascs_instance_list: >-
+      {{ restart_check_host_info.instances | default([]) |
+        selectattr('mSystemNumber', 'equalto', sap_ascs_instance_number) | list | default([]) }}
+    restart_msg_server_list: >-
+      {{ (restart_ascs_instance_list | first | default({}))['ProcessList'] | default([]) |
+        selectattr('name', 'equalto', 'msg_server') | list | default([]) }}
+  when:
+    - ansible_hostname == sap_ascs_node_name_initial
+    - ascs_still_on_original_node | bool
+    - restart_check_host_info is defined
+    - not (restart_check_host_info.failed | default(false))
+
+- name: Set restart status to false if ASCS moved
+  ansible.builtin.set_fact:
+    msg_server_restarted: false
+  when:
+    - not (ascs_still_on_original_node | bool)
+
+- name: Display restart status
+  ansible.builtin.debug:
+    msg: |
+      After kill {{ kill_attempt }}:
+      - Message Server restarted: {{ msg_server_restarted | default(false) }}
+      - ASCS on original node: {{ ascs_still_on_original_node }}
+      - ASCS instance found during kill: {{ ascs_instance_found | default(false) }}
+      - ASCS instance found during restart check: {{ restart_ascs_instance_found | default(false) }}
+  when: ansible_hostname == sap_ascs_node_name_initial
+
+- name: Set global fact to stop further iterations if Message Server stopped restarting
+  ansible.builtin.set_fact:
+    msg_server_restarted: false
+  when:
+    - (not (msg_server_restarted | default(false) | bool)) or
+      (not (ascs_instance_found | default(true) | bool))
+    - kill_attempt | int >= 2

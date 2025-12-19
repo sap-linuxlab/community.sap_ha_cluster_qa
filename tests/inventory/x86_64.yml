@@ -4,9 +4,14 @@ all:
     s4hana-3n:
       hosts:
         s4hana17:
+          ansible_user: root
         s4hana18:
+          ansible_user: root
         s4hana19:
+          ansible_user: root
     s4hana-2n:
       hosts:
         s4hana17:
+          ansible_user: root
         s4hana18:
+          ansible_user: root
