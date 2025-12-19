@@ -1,8 +1,0 @@
-download_url: https://galaxy.ansible.com/api/v3/plugin/ansible/content/published/collections/artifacts/sap-sap_operations-2.17.0.tar.gz
-format_version: 1.0.0
-name: sap_operations
-namespace: sap
-server: https://galaxy.ansible.com/api/
-signatures: []
-version: 2.17.0
-version_url: /api/v3/plugin/ansible/content/published/collections/index/sap/sap_operations/versions/2.17.0/

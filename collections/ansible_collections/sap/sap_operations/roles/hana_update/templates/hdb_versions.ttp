@@ -1,2 +1,0 @@
-  {{ index | ORPHRASE }} | {{ name | ORPHRASE }} | {{ version | ORPHRASE }} | {{ batch_key | ORPHRASE }} | {{ location | ORPHRASE }}
-
