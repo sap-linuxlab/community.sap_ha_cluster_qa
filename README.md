@@ -12,7 +12,11 @@ It is designed to test S4/HANA Clusters comprising of 2 or more nodes where SAP 
 Download the collection as part of the test project and make sure that the inventory file is modified to include your machines which are subjected to these tests.
 In order for the tests to work correctly ensure that SAP HA Interface for SAP ABAP application server instances managed by RHEL HA Add-On is configured. This link can be followed to configure the same: https://access.redhat.com/solutions/3606101
 
+<<<<<<< HEAD
 ### Setup and Configuration
+=======
+## Collection Dependencies
+>>>>>>> origin/main
 
 1. **Install Collection Dependencies:**
    ```bash
