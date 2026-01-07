@@ -56,3 +56,5 @@ HASAP
 selectattr
 equalto
 crmsh
+sapstart
+INSTANCENAME
