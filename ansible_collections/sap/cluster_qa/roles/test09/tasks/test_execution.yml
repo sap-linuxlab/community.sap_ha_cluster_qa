@@ -1,0 +1,12 @@
+---
+- name: Execute Message Server kill attempts
+  ansible.builtin.include_tasks: kill_message_server.yml
+  loop: "{{ range(1, max_kill_attempts | int + 1) | list }}"
+  loop_control:
+    loop_var: kill_attempt
+  when: msg_server_restarted | bool
+
+- name: Wait for HA solution to respond to unrecoverable Message Server failure
+  ansible.builtin.pause:
+    seconds: 60
+    prompt: "Waiting for HA solution to respond to repeated Message Server failures"
