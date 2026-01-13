@@ -58,3 +58,6 @@ equalto
 crmsh
 sapstart
 INSTANCENAME
+respawn
+seboolean
+pluglin
