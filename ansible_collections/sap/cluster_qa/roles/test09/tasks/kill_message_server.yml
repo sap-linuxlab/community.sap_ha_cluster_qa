@@ -79,7 +79,7 @@
   register: test09_ascs_status_check
   run_once: true
 
-- name: Verify ASCS resource status
+- name: Verify ASCS resource status  # noqa: var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     test09_ascs_still_on_original_node: >-
       {{ test09_ascs_status_check | sap.sap_operations.pcs_resources_from_status(role='Started', id=sap_ascs_resource_name) | length > 0 }}
