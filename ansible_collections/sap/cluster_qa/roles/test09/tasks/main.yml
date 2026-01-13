@@ -16,7 +16,8 @@
 
 - name: Store original ASCS node name before any modifications
   ansible.builtin.set_fact:
-    sap_ascs_node_name_original: "{{ sap_ascs_node_name }}"
+    test09_sap_ascs_node_name_original: "{{ sap_ascs_node_name }}"
+    sap_ascs_node_name_original: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Prerequisite verification
   ansible.builtin.include_tasks:

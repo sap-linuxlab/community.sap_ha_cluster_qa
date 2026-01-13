@@ -9,12 +9,14 @@
 
 - name: Set final location facts
   ansible.builtin.set_fact:
-    sap_ascs_node_name_final: "{{ sap_ascs_node_name }}"
-    sap_ers_node_name_final: "{{ sap_ers_node_name }}"
+    test09_sap_ascs_node_name_final: "{{ sap_ascs_node_name }}"
+    test09_sap_ers_node_name_final: "{{ sap_ers_node_name }}"
+    sap_ascs_node_name_final: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
+    sap_ers_node_name_final: "{{ sap_ers_node_name }}"  # noqa: var-naming[no-role-prefix]
 
 - name: Verify HA solution responded appropriately
   ansible.builtin.assert:
     that:
-      - sap_ascs_node_name_final != sap_ers_node_name_final
-    fail_msg: "HA solution failed: ASCS and ERS ended up on the same node ({{ sap_ascs_node_name_final }})"
-    success_msg: "HA solution succeeded: ASCS on {{ sap_ascs_node_name_final }}, ERS on {{ sap_ers_node_name_final }}"
+      - test09_sap_ascs_node_name_final != test09_sap_ers_node_name_final
+    fail_msg: "HA solution failed: ASCS and ERS ended up on the same node ({{ test09_sap_ascs_node_name_final }})"
+    success_msg: "HA solution succeeded: ASCS on {{ test09_sap_ascs_node_name_final }}, ERS on {{ test09_sap_ers_node_name_final }}"
