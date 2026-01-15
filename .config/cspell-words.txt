@@ -39,6 +39,7 @@ hacheckconfigascs
 hacheckconfigers
 sapstartsrv
 sapstart
+INSTANCENAME
 Ovirt
 venv
 wordlist
