@@ -1,0 +1,23 @@
+---
+- name: Finding ERS node name
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Setting initial facts
+  ansible.builtin.set_fact:
+    test09_sap_ascs_node_name_initial: "{{ sap_ascs_node_name }}"
+    test09_sap_ers_node_name_initial: "{{ sap_ers_node_name }}"
+    test09_message_server_kill_count: 0
+    test09_max_kill_attempts: 6
+    test09_msg_server_restarted: true
+    sap_ascs_node_name_initial: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
+    sap_ers_node_name_initial: "{{ sap_ers_node_name }}"  # noqa: var-naming[no-role-prefix]
+    message_server_kill_count: 0  # noqa: var-naming[no-role-prefix]
+    max_kill_attempts: 6  # noqa: var-naming[no-role-prefix]
+    msg_server_restarted: true  # noqa: var-naming[no-role-prefix]
+
+- name: Verify ASCS and ERS are on different nodes initially
+  ansible.builtin.assert:
+    that: test09_sap_ascs_node_name_initial != test09_sap_ers_node_name_initial
+    fail_msg: "ASCS and ERS are on the same node initially, which violates HA setup requirements"
+    success_msg: "ASCS on {{ test09_sap_ascs_node_name_initial }}, ERS on {{ test09_sap_ers_node_name_initial }} - proper HA setup confirmed"

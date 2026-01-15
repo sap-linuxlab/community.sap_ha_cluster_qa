@@ -4,9 +4,14 @@ all:
     s4hana-3n:
       hosts:
         lsh40410:
+          ansible_user: root
         lsh40411:
+          ansible_user: root
         lsh40412:
+          ansible_user: root
     s4hana-2n:
       hosts:
         lsh40410:
+          ansible_user: root
         lsh40411:
+          ansible_user: root
