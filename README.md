@@ -40,13 +40,7 @@ In order for the tests to work correctly ensure that SAP HA Interface for SAP AB
    ansible-playbook -i tests/inventory/x86_64.yml ansible_collections/sap/cluster_qa/playbooks/run_all_tests.yml
    ```
 
-## Collection Dependencies
-
-This collection is dependent on
-=======
-## Collection Dependencies
-
-This collection is dependant on
+This collection is dependent on:
 - `sap.sap_operations` collection modules
 
 ### Ansible Core Compatibility
