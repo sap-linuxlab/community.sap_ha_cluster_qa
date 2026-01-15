@@ -34,7 +34,7 @@ In order for the tests to work correctly ensure that SAP HA Interface for SAP AB
 4. **Running Tests:**
    ```bash
    # Run a specific test
-   ansible-playbook -i tests/inventory/x86_64.yml ansible_collections/sap/cluster_qa/playbooks/test09.yml
+   ansible-playbook -i tests/inventory/x86_64.yml ansible_collections/sap/cluster_qa/playbooks/test01.yml
    
    # Run all tests (test01 through test09, skipping test07)
    ansible-playbook -i tests/inventory/x86_64.yml ansible_collections/sap/cluster_qa/playbooks/run_all_tests.yml
