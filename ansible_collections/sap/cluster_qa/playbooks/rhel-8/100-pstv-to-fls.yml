@@ -1,8 +1,0 @@
----
-- name: Setting PREFER_SITE_TAKEOVER value to false
-  hosts: all
-  tasks:
-    - name: Setting up PREFER_SITE_TAKEOVER value to false
-      ansible.builtin.command: "pcs resource update {{ sap_hana_resource_name }} PREFER_SITE_TAKEOVER=false"
-      delegate_to: "{{ sap_hana_master_node }}"
-      run_once: true
