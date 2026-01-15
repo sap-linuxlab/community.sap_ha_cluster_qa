@@ -42,6 +42,11 @@
   changed_when: false
   failed_when: __pcs_find_ascs_sap_ascs_start_profile.rc != 0
 
+- name: Setting ASCS start profile path as fact
+  ansible.builtin.set_fact:
+    pcs_find_ascs_sap_ascs_start_profile: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"
+    sap_ascs_start_profile: "{{ __pcs_find_ascs_sap_ascs_start_profile.stdout }}"  # noqa: var-naming[no-role-prefix]
+
 - name: Acquiring ASCS SID
   ansible.builtin.shell: |-
     set -o pipefail |
