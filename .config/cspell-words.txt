@@ -38,6 +38,7 @@ failoverconfig
 hacheckconfigascs
 hacheckconfigers
 sapstartsrv
+sapstart
 Ovirt
 venv
 wordlist
