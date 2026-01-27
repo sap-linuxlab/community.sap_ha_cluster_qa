@@ -1,5 +1,5 @@
 ---
-- name: Run all test cases (test01 through test09, skipping test07)
+- name: Run all test cases (test01 through test10, skipping test07)
   hosts: all
   gather_facts: false
   become: true
@@ -8,7 +8,7 @@
   tasks:
     - name: Display test suite information
       ansible.builtin.debug:
-        msg: "Starting test suite execution: test01 through test09 (skipping test07)"
+        msg: "Starting test suite execution: test01 through test10 (skipping test07)"
       run_once: true
 
     - name: Run TEST01 - HA software name and version verification
@@ -60,11 +60,15 @@
       ansible.builtin.include_role:
         name: sap.cluster_qa.test08
 
-    - name: Run TEST09 - Message Server automatic restart and HA interaction test
+    - name: Run TEST09 - Message Server automatic restart and possible HA interaction test
       ansible.builtin.include_role:
         name: sap.cluster_qa.test09
 
+    - name: Run TEST10 - Irrecoverable Message Server outage (Start_Program) and Mandatory HA interaction test
+      ansible.builtin.include_role:
+        name: sap.cluster_qa.test10
+
     - name: Display test suite completion
       ansible.builtin.debug:
-        msg: "Test suite execution completed: test01 through test09 (test07 skipped)"
+        msg: "Test suite execution completed: test01 through test10 (test07 skipped)"
       run_once: true
