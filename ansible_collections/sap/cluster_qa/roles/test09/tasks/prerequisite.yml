@@ -53,6 +53,7 @@
     src: "{{ sap_ascs_start_profile }}"
     dest: "{{ sap_ascs_start_profile }}.backup.test09.$(date +%Y%m%d_%H%M%S)"
     remote_src: true
+    mode: '0644'
   run_once: true
   delegate_to: "{{ sap_ascs_node_name }}"
   when:
@@ -210,8 +211,8 @@
       PREREQUISITE FAILED: Restart_Program parameter for Message Server not found in ASCS profile.
       Profile checked: {{ sap_ascs_start_profile }}
       Profile exists: {{ test09_profile_file_stat.stat.exists | default(false) }}
-      
-      Auto-configuration was attempted but failed. 
+
+      Auto-configuration was attempted but failed.
       Please check the profile manually and configure it according to: https://help.sap.com/docs/SUPPORT_CONTENT/si/3362959619.html as applicable.
     success_msg: |
       ✓ PREREQUISITE VERIFIED: Restart_Program parameter found for Message Server.

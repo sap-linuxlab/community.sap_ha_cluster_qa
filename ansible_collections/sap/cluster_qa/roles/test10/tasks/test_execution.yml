@@ -42,4 +42,3 @@
       - ⚠ ASCS restarted on same node (acceptable behavior)
       {% endif %}
   run_once: true
-

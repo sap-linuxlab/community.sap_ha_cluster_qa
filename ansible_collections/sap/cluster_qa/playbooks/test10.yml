@@ -9,4 +9,3 @@
     - name: Running TEST10 test role on the S4/HANA Cluster
       ansible.builtin.include_role:
         name: sap.cluster_qa.test10
-
