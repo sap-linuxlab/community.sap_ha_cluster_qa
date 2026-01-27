@@ -16,4 +16,3 @@
       - "ASCS/ERS separation maintained: {{ 'YES' if test10_sap_ascs_node_name_final != test10_sap_ers_node_name_final else 'NO' }}"
       - "==============================================="
   run_once: true
-

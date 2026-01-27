@@ -17,4 +17,3 @@
     that: test10_sap_ascs_node_name_initial != test10_sap_ers_node_name_initial
     fail_msg: "ASCS and ERS are on the same node initially, which violates HA setup requirements"
     success_msg: "ASCS on {{ test10_sap_ascs_node_name_initial }}, ERS on {{ test10_sap_ers_node_name_initial }} - proper HA setup confirmed"
-

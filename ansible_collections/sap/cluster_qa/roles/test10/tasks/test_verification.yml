@@ -22,7 +22,7 @@
       HA solution verification FAILED:
       - ASCS and ERS are on the same node: {{ test10_sap_ascs_node_name_final }}
       - This violates HA setup requirements
-      
+
       Initial ASCS: {{ test10_sap_ascs_node_name_initial }}
       Final ASCS: {{ test10_sap_ascs_node_name_final }}
       Final ERS: {{ test10_sap_ers_node_name_final }}
@@ -38,12 +38,11 @@
       This may indicate:
       - HA solution restarted ASCS on same node (acceptable if restart succeeded)
       - HA solution has not yet detected the failure (may need more time)
-      
+
       Initial: {{ test10_sap_ascs_node_name_initial }}
       Final: {{ test10_sap_ascs_node_name_final }}
-      
+
       Expected: ASCS should either restart on same node OR failover to different node.
       Since Start_Program is used, failover is preferred.
     success_msg: |
       ✓ HA solution responded: ASCS moved from {{ test10_sap_ascs_node_name_initial }} to {{ test10_sap_ascs_node_name_final }}
-
