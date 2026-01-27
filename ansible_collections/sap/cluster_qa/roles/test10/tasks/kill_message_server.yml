@@ -68,4 +68,3 @@
       ✓ Message Server process (PID: {{ test10_current_msg_server_pid }}) has been killed.
       Waiting for HA solution to detect failure and trigger failover...
   when: ansible_hostname == test10_sap_ascs_node_name_initial
-
