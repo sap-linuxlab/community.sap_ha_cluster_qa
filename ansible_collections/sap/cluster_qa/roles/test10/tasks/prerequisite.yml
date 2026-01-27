@@ -1,0 +1,220 @@
+---
+- name: Check if ASCS profile file exists
+  ansible.builtin.stat:
+    path: "{{ sap_ascs_start_profile }}"
+  register: test10_profile_file_stat
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+
+- name: Check for Start_Program parameter in ASCS profile
+  ansible.builtin.shell: |
+    grep "Start_Program" "{{ sap_ascs_start_profile }}" | grep "_MS" || echo "NOT_FOUND"
+  register: test10_start_program_check
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when: test10_profile_file_stat.stat.exists
+
+- name: Check for Restart_Program parameter in ASCS profile (to replace if found)
+  ansible.builtin.shell: |
+    grep "Restart_Program" "{{ sap_ascs_start_profile }}" | grep "_MS" || echo "NOT_FOUND"
+  register: test10_restart_program_check
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+
+- name: Get SAP system name and instance name from profile
+  ansible.builtin.shell: |
+    SAPSYSTEMNAME=$(grep -w 'SAPSYSTEMNAME ' "{{ sap_ascs_start_profile }}" | awk '{print $3}' | xargs)
+    INSTANCE_NAME=$(grep -w 'INSTANCE_NAME =' "{{ sap_ascs_start_profile }}" | awk '{print $3}' | xargs)
+    echo "${SAPSYSTEMNAME}|${INSTANCE_NAME}"
+  register: test10_profile_vars
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+
+- name: Extract SAP system name and instance name
+  ansible.builtin.set_fact:
+    test10_sap_system_name: "{{ test10_profile_vars.stdout.split('|')[0] }}"
+    test10_sap_instance_name: "{{ test10_profile_vars.stdout.split('|')[1] }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+    - test10_profile_vars is defined
+
+- name: Create backup of ASCS profile before modification
+  ansible.builtin.copy:
+    src: "{{ sap_ascs_start_profile }}"
+    dest: "{{ sap_ascs_start_profile }}.backup.test10.$(date +%Y%m%d_%H%M%S)"
+    remote_src: true
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+
+- name: Replace Restart_Program with Start_Program if Restart_Program exists
+  ansible.builtin.replace:
+    path: "{{ sap_ascs_start_profile }}"
+    regexp: '^Restart_Program_(\d+)\s*=\s*local\s+\$\(_MS\)\s+pf=\$\(_PF\)'
+    replace: 'Start_Program_\1 = local $(_MS) pf=$(_PF)'
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+    - test10_restart_program_check.stdout != "NOT_FOUND"
+
+- name: Check if _MS variable exists in profile
+  ansible.builtin.shell: |
+    grep "^_MS\s*=" "{{ sap_ascs_start_profile }}" || echo "NOT_FOUND"
+  register: test10_ms_variable_check
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+    - test10_restart_program_check.stdout == "NOT_FOUND"
+
+- name: Add _MS variable definition if missing
+  ansible.builtin.lineinfile:
+    path: "{{ sap_ascs_start_profile }}"
+    line: '_MS = ms.sap$(SAPSYSTEMNAME)_$(INSTANCE_NAME)'
+    insertafter: '^#.*SAP.*Profile|^SAPSYSTEMNAME'
+    state: present
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+    - test10_restart_program_check.stdout == "NOT_FOUND"
+    - test10_ms_variable_check.stdout == "NOT_FOUND"
+
+- name: Add Start_Program parameter if neither Start_Program nor Restart_Program exists
+  ansible.builtin.lineinfile:
+    path: "{{ sap_ascs_start_profile }}"
+    line: 'Start_Program_00 = local $(_MS) pf=$(_PF)'
+    insertafter: '^_MS\s*=|^Start_Program|^Restart_Program'
+    state: present
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+    - test10_restart_program_check.stdout == "NOT_FOUND"
+
+- name: Verify Start_Program parameter was configured successfully
+  ansible.builtin.shell: |
+    grep "Start_Program" "{{ sap_ascs_start_profile }}" | grep "_MS" || echo "NOT_FOUND"
+  register: test10_start_program_verify
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ sap_ascs_node_name }}"
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+
+- name: Mark that auto-configuration was performed
+  ansible.builtin.set_fact:
+    test10_auto_config_performed: true
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout == "NOT_FOUND"
+    - test10_start_program_verify.stdout != "NOT_FOUND"
+
+- name: Finding ERS resource name for restart
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Restart ASCS resource to apply profile changes
+  ansible.builtin.shell: |
+    pcs resource restart "{{ sap_ascs_resource_name }}"
+  register: test10_ascs_restart_result
+  changed_when: true
+  run_once: true
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Restart ERS resource to apply profile changes
+  ansible.builtin.shell: |
+    pcs resource restart "{{ sap_ers_resource_name }}"
+  register: test10_ers_restart_result
+  changed_when: true
+  run_once: true
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Watching pcs status info for ASCS resource started
+  sap.sap_operations.pcs_status_info:
+  register: test10_ascs_status_check
+  until: >-
+    (test10_ascs_status_check.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+    | selectattr('group.resource.id', 'equalto', sap_ascs_resource_name) | selectattr('group.resource.role', 'equalto', 'Started') | list | length > 0)
+  delay: 5
+  retries: 30
+  run_once: true
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Watching pcs status info for ERS resource started
+  sap.sap_operations.pcs_status_info:
+  register: test10_ers_status_check
+  until: >-
+    (test10_ers_status_check.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+    | selectattr('group.resource.id', 'equalto', sap_ers_resource_name) | selectattr('group.resource.role', 'equalto', 'Started') | list | length > 0)
+  delay: 5
+  retries: 30
+  run_once: true
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Re-discover ASCS location after cluster recovery (may have moved during restart)
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Display auto-configuration summary
+  ansible.builtin.debug:
+    msg: |
+      ✓ AUTO-CONFIGURATION COMPLETE:
+      - Start_Program parameter configured in ASCS profile
+      - Profile backup created: {{ sap_ascs_start_profile }}.backup.test10.*
+      - ASCS resource restarted
+      - ERS resource restarted
+      - Cluster recovery complete
+      - Current ASCS location: {{ sap_ascs_node_name }}
+      ✓ Proceeding with Message Server kill test (irrecoverable outage)...
+  run_once: true
+  when:
+    - test10_auto_config_performed | default(false) | bool
+
+- name: Verify Start_Program parameter is configured (when already present)
+  ansible.builtin.assert:
+    that:
+      - test10_profile_file_stat.stat.exists
+      - test10_start_program_check.stdout != "NOT_FOUND"
+      - test10_start_program_check.stdout | length > 0
+    fail_msg: |
+      PREREQUISITE FAILED: Start_Program parameter for Message Server not found in ASCS profile.
+      Profile checked: {{ sap_ascs_start_profile }}
+      Profile exists: {{ test10_profile_file_stat.stat.exists | default(false) }}
+      
+      Auto-configuration was attempted but failed. Please check the profile manually.
+    success_msg: |
+      ✓ PREREQUISITE VERIFIED: Start_Program parameter found for Message Server.
+      Configuration: {{ test10_start_program_check.stdout }}
+      ✓ Proceeding with Message Server kill test (irrecoverable outage)...
+  run_once: true
+  when:
+    - test10_profile_file_stat.stat.exists
+    - test10_start_program_check.stdout != "NOT_FOUND"

@@ -1,7 +1,5 @@
 # community.sap_ha_cluster_qa Ansible collection #
 
-**⚠️ EXPERIMENTAL - This collection has only been tested on RHEL (Red Hat Enterprise Linux) systems.**
-
 This collection is being developed against upstream requirements and is currently focused on RHEL environments.
 
 This is a collection of Roles for testing an S4/HANA Clusters.
