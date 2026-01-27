@@ -1,0 +1,17 @@
+---
+galaxy_info:
+  author: Amir Memon (@amemon-redhat)
+  description: Run test07 - Database connection and HA interaction test
+  license: GPL-3.0-only
+  min_ansible_version: "2.15"
+  platforms:
+    - name: EL
+      versions:
+        - "8"
+        - "9"
+        - "10"
+  galaxy_tags: []
+dependencies:
+  - sap.cluster_qa.pcs_find_ascs
+  - sap.cluster_qa.pcs_find_ers
+
