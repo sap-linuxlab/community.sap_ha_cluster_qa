@@ -1,0 +1,19 @@
+---
+- name: Display test summary
+  ansible.builtin.debug:
+    msg:
+      - "==============================================="
+      - "              TEST10 SUMMARY"
+      - "==============================================="
+      - "Test: Irrecoverable Message Server outage"
+      - "Profile Parameter: Start_Program (not Restart_Program)"
+      - "Message Server killed: {{ 'YES' if test10_message_server_killed else 'NO' }}"
+      - "Initial ASCS location: {{ test10_sap_ascs_node_name_initial }}"
+      - "Final ASCS location: {{ test10_sap_ascs_node_name_final }}"
+      - "Initial ERS location: {{ test10_sap_ers_node_name_initial }}"
+      - "Final ERS location: {{ test10_sap_ers_node_name_final }}"
+      - "HA Action taken: {{ 'ASCS Failover' if test10_sap_ascs_node_name_initial != test10_sap_ascs_node_name_final else 'No failover detected' }}"
+      - "ASCS/ERS separation maintained: {{ 'YES' if test10_sap_ascs_node_name_final != test10_sap_ers_node_name_final else 'NO' }}"
+      - "==============================================="
+  run_once: true
+

@@ -1,0 +1,49 @@
+---
+- name: Check final ASCS location after HA intervention
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Check final ERS location
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ers
+
+- name: Set final location facts
+  ansible.builtin.set_fact:
+    test10_sap_ascs_node_name_final: "{{ sap_ascs_node_name }}"
+    test10_sap_ers_node_name_final: "{{ sap_ers_node_name }}"
+    sap_ascs_node_name_final: "{{ sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
+    sap_ers_node_name_final: "{{ sap_ers_node_name }}"  # noqa: var-naming[no-role-prefix]
+
+- name: Verify ASCS/ERS separation is maintained
+  ansible.builtin.assert:
+    that:
+      - test10_sap_ascs_node_name_final != test10_sap_ers_node_name_final
+    fail_msg: |
+      HA solution verification FAILED:
+      - ASCS and ERS are on the same node: {{ test10_sap_ascs_node_name_final }}
+      - This violates HA setup requirements
+      
+      Initial ASCS: {{ test10_sap_ascs_node_name_initial }}
+      Final ASCS: {{ test10_sap_ascs_node_name_final }}
+      Final ERS: {{ test10_sap_ers_node_name_final }}
+    success_msg: |
+      ✓ ASCS/ERS separation maintained: ASCS on {{ test10_sap_ascs_node_name_final }}, ERS on {{ test10_sap_ers_node_name_final }}
+
+- name: Verify HA solution responded (failover or restart)
+  ansible.builtin.assert:
+    that:
+      - test10_sap_ascs_node_name_final != test10_sap_ascs_node_name_initial
+    fail_msg: |
+      WARNING: ASCS still on original node after Message Server failure.
+      This may indicate:
+      - HA solution restarted ASCS on same node (acceptable if restart succeeded)
+      - HA solution has not yet detected the failure (may need more time)
+      
+      Initial: {{ test10_sap_ascs_node_name_initial }}
+      Final: {{ test10_sap_ascs_node_name_final }}
+      
+      Expected: ASCS should either restart on same node OR failover to different node.
+      Since Start_Program is used, failover is preferred.
+    success_msg: |
+      ✓ HA solution responded: ASCS moved from {{ test10_sap_ascs_node_name_initial }} to {{ test10_sap_ascs_node_name_final }}
+

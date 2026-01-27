@@ -1,0 +1,45 @@
+---
+- name: Execute Message Server kill (irrecoverable outage)
+  ansible.builtin.include_tasks: kill_message_server.yml
+
+- name: Watching pcs status info for failures
+  sap.sap_operations.pcs_status_info:
+  register: test10_pcs_status_post_msg_server_kill
+  until: "(test10_pcs_status_post_msg_server_kill.pacemaker_status['pacemaker-result'].failures | default([]) | length > 0)"
+  delay: 5
+  retries: 30
+  run_once: true
+
+- name: Watching pcs status info for ASCS resource started
+  sap.sap_operations.pcs_status_info:
+  register: test10_pcs_status_ascs_new_start
+  until: >-
+    (test10_pcs_status_ascs_new_start.pacemaker_status['pacemaker-result'].resources | selectattr('group', 'defined')
+    | selectattr('group.resource.id', 'equalto', sap_ascs_resource_name) | selectattr('group.resource.role', 'equalto', 'Started') | list | length > 0)
+  delay: 5
+  retries: 30
+  run_once: true
+
+- name: Check current ASCS location after HA intervention
+  ansible.builtin.include_role:
+    name: sap.cluster_qa.pcs_find_ascs
+
+- name: Verify ASCS failover occurred
+  ansible.builtin.set_fact:
+    test10_ascs_failover_occurred: "{{ test10_sap_ascs_node_name_initial != sap_ascs_node_name }}"
+    ascs_failover_occurred: "{{ test10_sap_ascs_node_name_initial != sap_ascs_node_name }}"  # noqa: var-naming[no-role-prefix]
+
+- name: Display failover status
+  ansible.builtin.debug:
+    msg: |
+      HA Solution Response:
+      - Initial ASCS node: {{ test10_sap_ascs_node_name_initial }}
+      - Current ASCS node: {{ sap_ascs_node_name }}
+      - Failover occurred: {{ test10_ascs_failover_occurred }}
+      {% if test10_ascs_failover_occurred %}
+      - ✓ HA solution detected failure and triggered failover
+      {% else %}
+      - ⚠ ASCS restarted on same node (acceptable behavior)
+      {% endif %}
+  run_once: true
+
