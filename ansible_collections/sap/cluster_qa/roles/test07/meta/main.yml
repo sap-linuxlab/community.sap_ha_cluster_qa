@@ -14,4 +14,3 @@ galaxy_info:
 dependencies:
   - sap.cluster_qa.pcs_find_ascs
   - sap.cluster_qa.pcs_find_ers
-

@@ -7,8 +7,8 @@ skip_list:
     - risky-shell-pipe
 
 exclude_paths:
-  - venv/
-  - .github/
-  - .idea/
-  - .tox/
-  - "**/test07/files/**"
+    - venv/
+    - .github/
+    - .idea/
+    - .tox/
+    - "**/test07/files/**"
