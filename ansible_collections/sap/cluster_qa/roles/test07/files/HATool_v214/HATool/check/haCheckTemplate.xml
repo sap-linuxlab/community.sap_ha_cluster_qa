@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE XmlResult SYSTEM "xmlresult.dtd" >
+
+<XmlResult>
+	
+<!-- Remark: all of the tags below are optional -->
+
+<!-- The file xmlresult.dtd is used to check the contents.
+     This file has to be included and must not be changed.
+     xmlresult.dtd and the check file have to be in subdirectory check of the HATool directory
+-->
+	
+<!-- U N A V A I L A B I L I T Y -->
+
+<!-- Any period of unavailability of any duration is allowed; use following empty tag: -->
+<!--    <UNAVAILABILITY/>  -->
+
+<!-- Alternatively, the number of the periods and / or their duration (in seconds) can be restricted; examples: -->
+    <UNAVAILABILITY>    
+        <number_of_periods>1</number_of_periods>
+        <duration>60</duration>
+    </UNAVAILABILITY>
+    
+<!--
+    <UNAVAILABILITY>    
+        <number_of_periods>1</number_of_periods>
+    </UNAVAILABILITY>
+-->
+
+<!--
+    <UNAVAILABILITY>    
+        <duration>100</duration>
+    </UNAVAILABILITY>
+-->
+
+<!-- L O N G   R E S P O N S E   T I M E S -->
+
+<!-- Any period of long response times of any duration is allowed; use following empty tag: -->
+<!--    <LONG_RESPONSETIMES />  -->
+
+<!-- Alternatively, the number of the periods and / or their duration (in seconds) can be restricted; examples: -->
+    <LONG_RESPONSETIMES>    
+        <number_of_periods>1</number_of_periods>
+        <duration>75</duration>
+    </LONG_RESPONSETIMES>
+
+<!--
+    <LONG_RESPONSETIMES>    
+        <number_of_periods>2</number_of_periods>
+    </LONG_RESPONSETIMES>
+-->
+
+<!--
+    <LONG_RESPONSETIMES>    
+        <duration>75</duration>
+    </LONG_RESPONSETIMES>
+-->
+    
+<!-- E R R O R S -->
+
+<!-- Depending on the HA Event, errors might occur.
+     If you want to allow any error, use follwing empty tag:  -->   
+<!--    <ERRORS/>  --> 
+    
+<!-- But, in case of errors it is strongly recommended to allow only those error categories that are expected.
+     For example the categories FATAL_ERR or APP_INCONSISTENT_ERR should never occur.
+     Following error category might occur due to an HA event and can be checked: 
+     <ERRORS>
+      	<app_notavail_err />
+      	<app_repeat_err />
+      	<comm_err />
+      	<login_err />
+      	<logoff_err />
+     </ERRORS> -->
+     
+<!-- Example: During a DB failover, typically errors of category APP_NOTAVAIL_ERR occur.
+     Only in very rare cases COMM_ERR and LOGIN_ERR happen. If you want to check for APP_NOTAVAIL_ERR only, use following sequence: -->
+    <ERRORS>
+      <app_notavail_err />
+    </ERRORS>
+ 
+    
+<!-- O T H E R -->
+
+<!-- During a test run other problems, like HA Event or verification errors, could occur.
+     But, because this should not happen in a successful run, it is not possible to check for them.
+     Checks are restricted to incidents of runs that are ok.
+-->
+
+</XmlResult>
