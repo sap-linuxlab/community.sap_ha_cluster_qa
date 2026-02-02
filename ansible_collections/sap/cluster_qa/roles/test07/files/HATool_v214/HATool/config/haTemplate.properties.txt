@@ -1,0 +1,498 @@
+################################################################################
+#                        PROPERTY FILE for HA TEST TOOL                        #
+################################################################################
+
+# has to be located in subdirectory 'config'
+
+
+#-------------------------------------------------------------------------------
+# It is planned that a test run could be composed of several subtests.
+# But, in the current version of the tool, only one subtest per test run is
+# allowed. For ease of use there is currently one property file for the test
+# run and the subtest. You will find first the properties for the test run
+# and afterwards the properties for the subtest.
+
+############################################################
+#                     TEST PROPERTIES                      #
+############################################################
+
+###################################
+#     General properties          #
+###################################
+
+# test run identifier
+# if not set, the start time of the test is used (YYYYMMDDHHMMSS)
+# length must not exceed 30 characters
+#testrunid = testrunid
+
+# delete data of old test runs of the test class specified below
+# values: 0 (don't delete data) and 1 (delete data)
+# default is 1
+resettestdata = 1
+
+# test parameters could be specified for the test run
+# they are passed during the initialization phase to the server
+# default = no parameters
+# Currently supported parameters:
+#   ResetExcluded:mmm[,nnn...]  specifies list of internal subtest IDs,
+#                               whose data must not be reset
+#   ResetIncluded:mmm[,nnn...]  specifies list of internal subtest IDs,
+#                               whose data must be reset
+#   In both cases the IDs must belong to subtests of the test class
+#   specified below.
+#   These parameters could be used in combination with the property 'resettestdata = 1'
+#   as well as with the special action 'ResetTestData'. If resettestdata=0 and
+#   special action 'ResetTestData' is not set, ResetExcluded resp. ResetIncluded will be ignored.
+#   It is not allowed to set both parameters together. 
+# syntax: testparameters=ResetExcluded:mmm[,nnn...] resp. ResetIncluded:mmm[,nnn...]
+# testparameters = ...
+
+###################################
+#     Special actions             #
+###################################
+
+# no test will be executed, but the client driver should execute a special task
+# currently possible actions:
+# - CleanAdminData  is used if on the server side it is erroneously indicated that a test is running on the test class;
+#                   this scenario could happen, if the server was restarted during a test run and was not up and running,
+#                   when the test finished on client side; therefore the administration data of the test run could not be adapted
+#                   in the database on the server side;
+#                   other potential causes are severe crashes on the client or server side during a test run;
+#                   'CleanAdminData' is used to put the test administration data back to a consistent state;
+#                   no test run is executed; therefore the properties for test and measurement information are not needed;
+#                   use this action only, if you are sure that there is really no test running on server side, but the server reports
+#                   that a test is running for this class;
+#                   because this action is a severe intervention, it has to be confirmed during the run
+# - ResetTestData   is used if data of old test runs should be deleted without executing a new test;
+#                   reset of data is restricted to runs of the test class specified below and could be further limited
+#                   by setting the property testparameters=ResetExcluded or ...=ResetIncluded (see above) 
+#specialaction = CleanAdminData
+
+
+############################################################
+#                   SUBTEST PROPERTIES                     #
+############################################################
+
+###################################
+#     General properties          #
+###################################
+
+# client host; if not set, it is calculated automatically
+# length must not exceed 30 characters
+#clienthost = xxxxxxxxx
+
+# test class, which should be executed on server side
+testclass = CL_HA_TESTFRAME_ENQ
+#testclass = CL_HA_DB_LOAD
+#testclass = CL_HA_TESTFRAME_FILE
+
+# test class CL_HA_TESTFRAME_DB should only be used to remove the initial test data of test CL_HA_DB_LOAD
+#testclass = CL_HA_TESTFRAME_DB
+
+# call type to access the server
+# values: RFCStateful, HTTPStateful
+calltype = RFCStateful
+#calltype = HTTPStateful
+
+# test class parameters could be specified for the subtest;
+# they are passed during the initialization phase to the server
+# default = no parameters
+# test class CL_HA_DB_LOAD: the number of order items per order could be specified;
+#                           a value between 1 and 10.000 is allowed
+#                           if not set, 10 order items per order are created 
+#                           syntax: subtestparameters=ItemsPerOrder:nnn
+# test class CL_HA_TESTFRAME_ENQ: the number of enqueues per loop could be specified;
+#                           a value between 1 and 10.000 is allowed
+#                           if not set, 1 enqueue per loop is created 
+#                           syntax: subtestparameters=EnqueuesPerLoop:nnn
+# other test classes: parameter is ignored
+#subtestparameters = ItemsPerOrder:10
+#subtestparameters = EnqueuesPerLoop:1
+
+###################################
+#     Login information           #
+###################################
+
+# include file for properties that have the same values across several tests;
+# for example you can alternatively specify all login properties below in a separate file
+# and include it with the property <includefile>; this property can be used several times;
+# the include file has to be located in subdirectory 'config';
+# there is no directory in the name allowed
+#includefile = haLogin.properties
+
+########## login information for server user ###########
+systemclient = nnn
+# user and password are needed
+#   in case of calltype = RFCStateful
+#     if sncmode = 0 or, in case of SNC, if sncsso = 0 (see SNC properties below)
+#   in case of calltype = HTTPStateful
+#     if https = 1 and server authentication is done (key store is not set) 
+#                      without specifying user and password on server side in transaction SICF for service 'hatool'                
+user = xxxxxxxxxx
+password = xxxxxxxxx
+language = en
+
+######### Protocol specific properties #########
+# The protocol is specified by property calltype (see above)
+
+################# RFC ###################
+# For Login either an application server could be used directly or a connect via message server could be done
+# If information for both ways are provided, the connect is done via message server
+
+# login via application server; both values are mandatory
+#appserverhost = xxxxxxxxxx
+#systemnumber = 00
+
+# login via message server; values for msgserverhost and systemid are mandatory
+msgserverhost = xxxxxxxxxx
+# the port information is necessary, if there is no entry for sapms<systemid> in /etc/services resp. C:\Windows\System32\drivers\etc\services
+msgserverport = 3600
+# for the logon group, PUBLIC is used by default; if no explicit group was created, use SPACE
+logongroup = SPACE
+# if msgserverport is not set, systemid is mandatory
+#systemid = SID
+
+# properties for Secure Network Communication (SNC)
+
+# should SNC be used
+# 0: no SNC; 1: SNC
+# without SNC authentication is done via user / password (see properties above); no encryption is used
+# default: 0
+#sncmode = 0
+
+# the following SNC properties are only used if sncmode = 1
+
+# SNC library on client side
+# is not part of the distribution of the HA Test Tool;
+# the library has to provide the GSS-API V2 standard interface and has to fulfill
+# the SAP requirements for SNC libraries
+#snclibrary = <SNC library>
+
+# SNC name of client
+# if not set: name of user, which is delivered by the SNC library
+#sncmyname = <client SNC name>
+
+# should SSO behavior of SNC be used
+# 0: no SSO; user and password is used for authentication; encryption is used for communication
+# 1: the SNC identity is used for authentication; encryption is used for communication
+# default: 1
+#sncsso = 1
+
+# SNC name on server side
+# is used and needed if the login is done via application server
+#sncpartnername = <server SNC name>
+
+# Quality of protection
+# is used if sncsso = 1
+# 1 : Authentification protection
+# 2 : Integrity protection
+# 3 : Privacy protection
+# 8 : Apply default protection
+# 9 : Maximum protection
+# Default: 3
+#sncqop = 3
+
+################ HTTP ##################
+
+# HTTP and HTTPS are supported
+# 0: HTTP
+# 1: HTTPS
+# default: 0
+#https = 0
+
+# HTTP server host (used for the URL)
+httpserverhost = xxxxxxxxxx
+
+# HTTP(S) port
+# The port specified for HTTP or HTTPS (dependent on what should be used) has to be set
+httpserverport = nnnn
+
+# The following properties are only used if https = 1
+
+# Following kinds of authentication are supported:
+# - server authentication
+#   trust store is used (if not set, JRE default is used)
+#   - with user/password
+#   - w/o user/password
+#     user/password has to be set on server side in transaction SICF for service 'hatool'
+# - mutual authentication
+#   trust store and key store are used
+
+## trust store ##
+# used for root certifcate of the server to allow server authentication
+# default: <JRE_HOME>/lib/security/cacerts
+# could be provided as java property on the command line:
+#   -Djavax.net.ssl.trustStore=<file>
+# or as HA Test Tool property;
+# Setting both, the Java as well as the HA Test Tool property, results in a 'Parameter declared multiple times' error.
+# httpstruststore = <file name>
+
+# As password for the trust store, the default of cacerts can be used (no extra specification necessary)
+# or it could be provided as java property on the command line:
+#  -Djavax.net.ssl.trustStorePassword=<psw>
+# or as HA Test Tool property;
+# Setting both, the Java as well as the HA Test Tool property, results in a 'Parameter declared multiple times' error.
+# httpstruststorepassword = xxxxxxxxx
+
+## key store ##
+# contains the client certificate in PKCS12 format
+# is only needed if mutual authentication should be done;
+# could be provided as java property on the command line:
+#   -Djavax.net.ssl.keyStore=<file>
+# or as HA Test Tool property;
+# Setting both, the Java as well as the HA Test Tool property, results in a 'Parameter declared multiple times' error.
+# httpskeystore = <file name>
+
+# The password for the key store could be provided as java property on the command line:
+#  -Djavax.net.ssl.keyStorePassword=<psw>
+# or as HA Test Tool property;
+# Setting both, the Java as well as the HA Test Tool property, results in a 'Parameter declared multiple times' error.
+# httpskeystorepassword = xxxxxxxxx
+
+###################################
+#     Communication Traces        #
+###################################
+
+################# RFC ###################
+
+# JCo trace
+# is written to subdirectory jcotrace of HA Test Tool
+# file name: JCO<YYYYMMDD_HHMMSS...>.trc
+# allowed range: 0 - 10
+# 0: trace off
+# >0: trace on; see javadoc of JCo.setTrace()
+# default = 0
+#jcotrace = 0
+
+# RFC trace
+# is written to subdirectory jcotrace of HA Test Tool
+# file name: jco_rfc....trc
+# allowed range: 0 - 1
+# 0: trace off; 1: trace on 
+# default = 0
+#rfctrace = 0
+
+# CPIC trace
+# is written to current working directory
+# file name: CPIC<YYMMDD_HHMMSS...>.trc
+# allowed range: 0 - 3
+# 0: trace off
+# >0: trace on; 3: most verbose trace
+# default = 0
+#cpictrace = 0
+
+################# HTTP(S) ###################
+
+# There are no trace properties for calltype=HTTPStateful.
+# In case of HTTP errors, an HTTP trace is written together with the stack trace information
+# to the log file for the main thread or to the error files for the client threads. 
+
+###################################
+#        Subtest execution        #
+###################################
+
+# number of simulated client users
+# allowed range: 1 - 10000 (but check carefully, how many users your system could handle)
+clientnum = 10
+
+# delay in seconds, in which the single clients are started
+# allowed range: 0 - 10 
+# default is 1
+# As of version 2.11 the value can also be specified in milliseconds to allow faster startup,
+# especially if many client users are simulated. Use suffix 'ms' in that case.
+# Example: clientdelay = 100ms
+#clientdelay = 1
+
+# number of steps per loop
+# allowed range: 1 - max. number of steps allowed by the test class
+# if there is no dedicated limit by the test class, not more than 100 steps are allowed
+# Test class CL_HA_TESTFRAME_ENQ: allowed range 2 - 100 (2 - 5 is sufficient)
+# Test class CL_HA_HA_DB_LOAD: allowed range 2 - 5
+# Test class CL_HA_TESTFRAME_FILE: allowed range 1 - 100 (up to 5 is sufficient)
+stepnum = 5
+
+# number of loops per session (surrounded by login - logoff)
+# 0: process all loops in one session
+# default = 1
+# loopspersession = 1
+
+# duration in seconds of high load phase of the test run
+# starts after all client users have at least one time executed one loop of their work
+# allowed range: 1 - 864000 (= 10 days)
+duration = 180
+
+# duration of test after all events are finished
+# is defined by the time in seconds after all events finished their work;
+# if not set, property duration (see above) is used without taking care of the events;
+# if set, the highload phase ended dependant on the values of duration or durationafterevents, whatever occurs first;
+# the value of durationafterevents has to be lower than the value of duration
+durationafterevents = 60
+
+# think time between two steps (in seconds)
+# allowed range: 0 - 60
+# default = 5
+thinktime = 5
+
+# think time after a disturbance on server side (unavailability, long response times)
+# random value in seconds in the range between low and high value
+# allowed range: 0 - 60
+# default for lower bound: thinktime
+# default for upper bound: errorthinktimelow
+#errorthinktimelow = 3
+#errorthinktimehigh = 8
+
+###################################
+#     Measurement information     #
+###################################
+
+# tact duration (in seconds)
+# has to be lower or equal than duration
+# recommendation: should be a divisor of duration
+# default = 10
+tactduration = 10
+
+# check, whether the server does not respond for a certain amount of time, although it is up and running;
+# for the analysis calls (steps only, not login/logoff) to the server are used, which last at least as long
+# as specified in the threshold property; the value must not be bigger than the value of duration
+# if the threshold is set to 0, no check is done
+# default = 10 (seconds)
+noresponsethreshold = 10
+
+####################
+#   One HA Event   #
+####################
+
+# relative time (in seconds), when event is called
+# the clock is ticking, when the high load phase starts or in other words, when the period,
+# specified by the property 'duration' begins;
+# the HA event has to start within the high load phase and the system should return to normal
+# behavior (concerning availability, response times, throughput) during that phase again;
+# therefore following condition should be fulfilled concerning the properties:
+#   eventstarthighload + period, in which HA event effects the system behavior < duration
+#eventstarthighload = 10
+
+# name of HA event
+#eventname = SCS Failover
+
+# call of HA event
+# call of a program / script, which starts the HA event;
+# program / script has to be located in subdirectory 'event';
+# there is no directory in the name allowed
+# as of version 2.13, you can specify variable call parameters:
+#   user-defined properties (indicated by <(...)>) or test properties (indicated by <...>);
+#   event properties, file collection properties, and password properties are not allowed;
+#   the values of user-defined properties are specified by the property eventcallparameters;
+#   if a test property is used but not set, its default is used;
+#   if a default does not exist, the program aborts
+#   example: eventcall=script.sh 20 <systemid> <(myparam)> 
+#eventcall = <script or program including all parameters>
+
+# values of user-defined variables for an HA event call (as of version 2.13)
+# the right-hand side must not contain white space characters;
+# you must use the following format:
+#   eventcallparameters=<param1>:<value1>[;<param2>…]
+# if the property is used on the command line, you should consider the special character handling of the shell;
+# especially ';' is used if two eventcall parameters are specified; in such a case, you must quote the parameter value
+#   Example: Windows:    eventcallparameters="myparam1:myvalue1>;myparam2:myvalue2" 
+#            Linux/Unix: eventcallparameters='myparam1:myvalue1>;myparam2:myvalue2'
+#eventcallparameters=<key-value pairs of user defined variables for the corresponding event call>
+
+# event properties file
+# could be used alternatively to specify the event properties above (except eventstarthighload)
+# the event properties file has to be located in subdirectory 'config';
+# there is no directory in the name allowed
+#eventdefinitionfile = haEventTemplate.properties
+
+########################
+#   Several HA Events  #
+########################
+
+# Several events have to be specified via event definition files for each event;
+# the events have to be consecutively numbered starting with 1;
+# event chains could be build via property eventstartprevious
+
+# relative time (in seconds), when event is called
+# the clock is ticking, when the high load phase starts or in other words, when the period,
+# specified by the property 'duration' begins;
+# the HA event has to start within the high load phase and the system should return to normal
+# behavior (concerning availability, response times, throughput) during that phase again;
+# therefore following condition should be fulfilled concerning the properties:
+#   eventstarthighload + period, in which HA event effects the system behavior < duration
+#eventstarthighload.1 = 10
+
+# values of user-defined variables for an HA event call (as of version 2.13)
+# the right-hand side must not contain white space characters;
+# you must use the following format:
+#   eventcallparameters=<param1>:<value1>[;<param2>…]
+# if the property is used on the command line, you should take care of the special character handling of the shell;
+# especially ';' is used if two eventcall parameters are specified; in such a case, you must escape those characters
+#   Example: Windows:    eventcallparameters="myparam1:myvalue1>;myparam2:myvalue2" 
+#            Linux/Unix: eventcallparameters='myparam1:myvalue1>;myparam2:myvalue2'
+#eventcallparameters.1=<key-value pairs of user defined variables for the corresponding event call>
+
+# event properties file for first event
+# is be used to specify the event properties (except eventstarthighload)
+# the event properties file has to be located in subdirectory 'config';
+# there is no directory in the name allowed
+#eventdefinitionfile.1 = haEventTemplate.properties
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# relative time (in seconds), when event is called
+# the clock is ticking, when the high load phase starts or in other words, when the period,
+# specified by the property 'duration' begins;
+# the HA event has to start within the high load phase and the system should return to normal
+# behavior (concerning availability, response times, throughput) during that phase again;
+# therefore following condition should be fulfilled concerning the properties:
+#   eventstarthighload + period, in which HA event effects the system behavior < duration
+#eventstarthighload.2 = 60
+
+# or
+
+# relative time (in seconds), when event is called
+# the clock is ticking, when the previous event call has ended with exit code 0;
+# in case of an exit code of the previous event <> 0, the subsequent event is not executed;
+# the HA event has to start within the high load phase and the system should return to normal
+# behavior (concerning availability, response times, throughput) during that phase again
+#eventstartprevious.2 = 20
+
+# values of user-defined variables for an HA event call (as of version 2.13)
+# the right-hand side must not contain white space characters;
+# you must use the following format:
+#   eventcallparameters=<param1>:<value1>[;<param2>…]
+# if the property is used on the command line, you should take care of the special character handling of the shell;
+# especially ';' is used if two eventcall parameters are specified; in such a case, you must escape those characters
+#   Example: Windows:    eventcallparameters="myparam1:myvalue1>;myparam2:myvalue2" 
+#            Linux/Unix: eventcallparameters='myparam1:myvalue1>;myparam2:myvalue2'
+#eventcallparameters.2=<key-value pairs of user defined variables for the corresponding event call>
+
+# event properties file for second event
+# is be used to specify the event properties (except eventstarthighload and eventstartprevious)
+# the event properties file has to be located in subdirectory 'config';
+# there is no directory in the name allowed
+#eventdefinitionfile.2 = haEventTemplate2.properties
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# ....
+
+################################
+#   Check for expected result  #
+################################
+
+# check file
+# could optionally be used to check for the expected result; the exit code of the test is adapted accordingly;
+# if the test outcome is as expected, exit code 0 will be returned;
+# the check file (is in XML format) and its corresponding DTD (xmlresult.dtd) must be located in subdirectory 'check';
+# there is no directory in the name allowed
+#checkfile = haCheckTemplate.xml
+
+################################
+#          HTML output         #
+################################
+
+# graphics library
+# is needed to display the file loadtest.html in a web browser;
+# loadtest.html is generated even if the graphics library does not exist (a warning is written to loadtest.log in that case);
+# default = .../HATool/bin/d3.min.js
+#graphicslibrary = <HATool>/bin/d3.min.js

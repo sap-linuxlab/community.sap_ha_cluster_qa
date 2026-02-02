@@ -1,0 +1,21 @@
+<!--
+DTD for checking the result of a run of the HA Test Tool
+-->
+
+<!ELEMENT XmlResult (UNAVAILABILITY?, LONG_RESPONSETIMES?, ERRORS?)>
+
+<!ELEMENT UNAVAILABILITY (number_of_periods?, duration?)>
+
+<!ELEMENT LONG_RESPONSETIMES (number_of_periods?, duration?)>
+
+<!ELEMENT number_of_periods (#PCDATA)>
+<!ELEMENT duration (#PCDATA)>
+
+<!ELEMENT ERRORS (app_notavail_err?, app_repeat_err?, comm_err?, login_err?, logoff_err?)>
+
+<!ELEMENT app_notavail_err EMPTY>
+<!ELEMENT app_repeat_err EMPTY>
+<!ELEMENT comm_err EMPTY>
+<!ELEMENT login_err EMPTY>
+<!ELEMENT logoff_err EMPTY>
+

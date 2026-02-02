@@ -1,0 +1,1 @@
+/usr/sap/hostctrl/exe/sapcontrol -prot NI_HTTP -user s4hadm RedHat2024 -host s4ascs -nr 20 -function HAFailoverToNode ""
