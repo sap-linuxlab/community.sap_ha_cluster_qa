@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>HA Test Tool</title>
+
+  <script src="<HATestTool><GraphicsLib>"></script>
+  <script src="file://<HATestTool><GraphicsLib>"></script>
+
+	<style>
+
+		body {
+		  font: 14px sans-serif;
+		}
+		
+		.axis path,
+		.axis line {
+		  fill: none;
+		  stroke: #000;
+		  shape-rendering: crispEdges;
+		}
+	
+		.y2.axis {
+		  fill: sienna;
+		}
+	
+		.areaOK {
+		  fill: palegreen;
+		  opacity: 0.5;
+		}
+		
+		.areaDist {
+			fill: salmon;
+			opacity: 0.4;
+		}
+	
+		.areaWhite {
+		  fill: white;
+		}
+		
+		.unavailAll {
+		  fill: firebrick;
+		}
+		
+		.unavailPart {
+			fill: firebrick;
+			opacity: 0.5;
+		}
+	
+		.longRespAll {
+		  fill: blue;
+		}
+		
+		.longRespPart {
+			fill: blue;
+			opacity: 0.5;
+		}
+	
+		.eventsOK {
+			fill: none;
+		  stroke: black;
+		  stroke-width: 5px;
+		}
+		
+		.eventsFail {
+			fill: none;
+		  stroke: red;
+		  stroke-width: 5px;
+		}
+		
+		.respTimeBar {
+			fill: steelblue;
+		}
+		
+		.serverTimeBar {
+			fill: plum;
+		}
+		
+		.respTimeHighBar {
+			fill: steelblue;
+			opacity: 0.5;
+		}
+		
+		.serverTimeHighBar {
+			fill: plum;
+			opacity: 0.5;
+		}
+
+		.stepsPerSecLine {
+		  fill: none;
+		  stroke: sienna;
+		  stroke-width: 3px;
+		}
+		
+		.zoomPointer {
+			cursor: move;
+		}
+		
+		header {
+			text-align: center;
+		}
+
+		.boxVisible {
+			display: block;
+		}
+		
+		.boxHidden {
+			display: none;
+		}
+		
+		#ButtonContainer {
+			display: inline-block;
+			width: 27px;
+		}
+		
+		.buttonVisible button {
+			display: inline-block;
+		}
+		
+		.buttonHidden {
+			display: none;
+		}
+		
+		.expcolButton {
+			width: 25px;
+		}
+		
+		.backOK {
+			display: inline-block;
+		  background: palegreen;
+		  padding: 5px;
+		}
+		
+		.backErr {
+			display: inline-block;
+			background: salmon;
+			padding: 5px;
+		}
+
+		.backWarn {
+			display: inline-block;
+			background: gold;
+			padding: 5px;
+		}
+		
+		.backNeutral {
+			display: inline-block;
+			padding: 5px;
+		}
+		
+		.textContentVisible {
+			display: inner-block;
+			margin-left: 32px;
+			white-space: pre; 
+      font-family: monospace;
+		}
+		
+		.textContentHidden {
+			display: none;
+		}
+  
+	</style>
+</head>
+<body>
+<header>
+	<h2 id="HeadLine">Summary of Test Run with ID: <HATestTool><TestRunID></h2>
+</header>
+<button id="TimeStyle" type="button" onclick="switchTimeScale()">Log. Time Scale</button>
+
+<script  type='text/javascript'>
+
+	var formatDate = d3.time.format("%Y-%m-%d %H:%M:%S.%L");
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                                   data from test run
+// -----------------------------------------------------------------------------------------------------------------
+
+  var exitcode = <HATestTool><Exitcode>;  
+  	
+	var tactDuration = <HATestTool><TactDuration>;  // duration of tact in seconds
+	
+	var highLoadStart = formatDate.parse("<HATestTool><HighloadStart>");
+	var highLoadEnd = formatDate.parse("<HATestTool><HighloadEnd>");
+	
+	var tactData =  [];   // data collected for every tact
+	<HATestTool><TactDataLine>
+	tactData.push({date: formatDate.parse("<HATestTool><StartTime>"), respTime: <HATestTool><ResponseTime>, serverTime: <HATestTool><ServerTime>, stepsPerSec: <HATestTool><StepsPerSec>}); 
+
+	var areas = []; // periods of unavailability and responsiveness (summary)
+	<HATestTool><AreaLine>
+	areas.push({start: formatDate.parse("<HATestTool><StartTime>"), end: formatDate.parse("<HATestTool><EndTime>"), duration: "<HATestTool><Duration>s", state: <HATestTool><SystemState>});
+	
+	var unavail = []; // periods of unavailability
+	<HATestTool><UnavailLine>
+	unavail.push({start: formatDate.parse("<HATestTool><StartTime>"), end: formatDate.parse("<HATestTool><EndTime>"), duration: "<HATestTool><Duration>s", state: "<HATestTool><UnavailState>"});
+	
+	var longResp = []; // periods of long response times
+	<HATestTool><LongResponseLine>
+	longResp.push({start: formatDate.parse("<HATestTool><StartTime>"), end: formatDate.parse("<HATestTool><EndTime>"), duration: "<HATestTool><Duration>s", state: "<HATestTool><LongResponseState>"});
+	
+	var events = []; // event overview
+	<HATestTool><EventLine>
+	events.push({name: "<HATestTool><EventName>", start: formatDate.parse("<HATestTool><StartTime>"), end: formatDate.parse("<HATestTool><EndTime>"), duration: "<HATestTool><Duration>s", state: <HATestTool><EventState>});
+
+	var resultChecks = "<HATestTool><ResultCheck>";  // off, ok, okbut, err
+	var resultEvents = "<HATestTool><ResultEvent>"; // off, err
+	var resultVerification = "<HATestTool><ResultVerification>"; // off, err
+	var resultErrors = "<HATestTool><ResultError>"; // off, err   
+	
+// -----------------------------------------------------------------------------------------------------------------
+//                                                   variables used to draw the chart contents
+// -----------------------------------------------------------------------------------------------------------------
+// v2.12b
+if (tactData.length == 0) {
+	handleHeadLine();
+	d3.select("#TimeStyle").attr("class", "buttonHidden");
+} else {
+	var firstDraw = true;
+
+	// duration of half tacts
+  var halfTact = tactDuration * 1000 / 2;  // half tact duration in milliseconds
+  var halfLastTact = (highLoadEnd.getTime() - tactData[tactData.length-1].date.getTime()) / 2; // half duration of last tact in milliseconds
+  var lastTactDurationMs = highLoadEnd.getTime() - tactData[tactData.length-1].date.getTime();
+  var tactLastTactRatio = tactDuration * 1000 / lastTactDurationMs;
+  
+	// time range for x axis
+	var xDomainMin = new Date(highLoadStart.getTime()); // starting time
+	var xDomainMax = new Date(highLoadEnd.getTime());   // end half of a tact later to have sufficient space for the last bar if the last tact is short
+	
+	// calculate date in the middle of the tacts
+  for (var i = 0; i < tactData.length; i++) {
+		if (i + 1 < tactData.length)
+			// not the last period
+			tactData[i].middleDate = new Date(tactData[i].date.getTime() + halfTact);
+		else
+			tactData[i].middleDate = new Date(tactData[i].date.getTime() + halfLastTact);
+	}
+	
+	// areas below the chart
+	var eventsOrDisturbance = <HATestTool><EventsOrDisturbance>;
+	var heightWhiteArea = 40; // height used for white area below x axis
+	var heightUnavailStart = heightWhiteArea + 25; // height of start of unavailability rectangle
+	var heightUnavail = 25; // height of unavailability rectangle
+	var heightLongRespStart = heightUnavailStart + heightUnavail + 25; // height of start of long response time rectangle
+	var heightLongResp = 25;  // height of long response time rectangle
+	var heightDisturbed = heightLongRespStart + heightLongResp - heightWhiteArea; // height used to display the periods of disturbance
+	var heightEventsStart = heightWhiteArea + heightDisturbed + 25;
+	var heightEvents = 25 * events.length;  // height used to display the events
+	var heightBelowChart = 35 + heightWhiteArea;
+	var heightBelowChart;
+	if (eventsOrDisturbance)
+	   heightBelowChart = 35 + heightWhiteArea + heightDisturbed + heightEvents;
+	else
+	   heightBelowChart = heightWhiteArea;
+	
+	var margin = {top: 30, right: 30, bottom: 30 + heightBelowChart, left: 50, legendHeight: 300, legendWidth: 320},
+	    width = window.innerWidth - margin.left - margin.right - margin.legendWidth,   // width of chart with tact data
+	    height = 800 - margin.top - margin.bottom,                        // height of chart with tact data
+	    legendHeightStart = Math.max(height - margin.legendHeight, 200);
+	    
+	// constants for the bars of response and server time
+  var barShiftSize = 6;    // bars are shifted to the left or right according to this value
+  var barRelMaxSize = 30;  // size up to which the bar width is relational to the tact width
+	var tactBarWidthMaxDiff = 4 * barShiftSize;  // max. difference between tact and bar width
+	var tactBarRatio = (barRelMaxSize + tactBarWidthMaxDiff) / barRelMaxSize;  // for bars smaller than barRelMaxSize:
+  
+	// tact specific data and bar specific data; is changed by zooming
+	var tactNum;        // number of shown tacts
+	var tactWidth;   	  // use 1 additional tact to have sufficient space for the bars
+	var barWidth;       // actual width of a bar
+	var barLeftOffset;  // actual offset used for the response time bar
+	var barRightOffset; // actual offset used for the server time bar
+	var lastBarWidth;       // actual width of last bar
+	var lastBarLeftOffset;  // actual offset used for the last response time bar
+	var lastBarRightOffset; // actual offset used for the last server time bar
+	calcTactAndBarWidth(); // init variables above
+	
+	// variables for drawing rectangles
+	var rectClass;  // style sheet class of the rectangle
+	var rectStart;  // timestamp at which rectangle should start
+	var rectEnd;    // timestamp at which rectangle should end
+	
+	// placement of mouseover output
+	var mouseOverInside = 20;
+	var mouseOverAbove = -5;
+
+	var outsideError = false;  // indicates whether there are errors outside the high load phase
+	
+	var drawChartFcts = [];  // array with functions to draw the chart
+	
+	var legendColl = []; // structure with data for the legend
+	
+	legendColl.push({key: "stepsPerSecLine", text: "Steps per Second", elem: "line", newGrp: 0});
+	legendColl.push({key: "respTimeBar", text: "Avg. Response Time", elem: "rect", newGrp: 0});
+	legendColl.push({key: "serverTimeBar", text: "Avg. Server Time", elem: "rect", newGrp: 0});
+	legendColl.push({key: "areaOK", text: "System OK", elem: "rect", newGrp: 1});
+	legendColl.push({key: "areaDist", text: "System Disturbed", elem: "rect", newGrp: 0});
+	if (eventsOrDisturbance) {
+		legendColl.push({key: "unavailAll", text: "Unavailability (All Calls)", elem: "rect", newGrp: -1});
+		legendColl.push({key: "unavailPart", text: "Unavailability (Partial)", elem: "rect", newGrp: 0});
+		legendColl.push({key: "longRespAll", text: "Long Response Times (All Calls)", elem: "rect", newGrp: 0});
+		legendColl.push({key: "longRespPart", text: "Long Response Times (Partial)", elem: "rect", newGrp: 0});
+		legendColl.push({key: "eventsOK", text: "Event (OK)", elem: "line", newGrp: 1});
+		legendColl.push({key: "eventsFail", text: "Event (Failed)", elem: "line", newGrp: 0});
+	}
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                                           chart variables
+// -----------------------------------------------------------------------------------------------------------------
+
+	var x = d3.time.scale()       // function used to map a timestamp during the test run to an x-value
+	    .range([0, width]);
+
+	var y = d3.scale.linear()    // function used to map response and server time to an y-value
+	    .range([height, 0]);
+		
+	var y2 = d3.scale.linear()   // function used to map steps per second to an y-value 
+	    .range([height, 0]);
+	
+	var xAxis = d3.svg.axis()
+	    .scale(x)
+	    .orient("bottom")
+	    .tickFormat(d3.time.format("%X"));
+	
+	var yAxis = d3.svg.axis()
+	    .scale(y)
+	    .orient("left");
+    	
+	var y2Axis = d3.svg.axis()
+	    .scale(y2)
+	    .orient("right");
+
+	var stepsPerSecLine = d3.svg.line()
+	    .x(function(d) { return x(d.middleDate); })
+	    .y(function(d) { return y2(d.stepsPerSec); });
+	    
+  var zoom = d3.behavior.zoom()  // define zoom
+    .on("zoom", drawChart);
+
+	// specify domains for x- and y-functions
+	x.domain([xDomainMin, xDomainMax]);
+	y.domain([0, Math.max(20, 5 * d3.quantile(tactData.map(function(d) { return d.respTime; }).sort(function(a,b) { return a - b; }), 0.75))]); // use the 75% quantile to calculate the upper limit
+  y2.domain([0, Math.max(2, 1.5 * d3.max(tactData, function(d) { return d.stepsPerSec; }))]);
+  
+  // variables used when toggling between log. and linear time scale
+  var yMaxValue;
+  var ylinearDomainMax;
+  var ylogDomainMax;
+  var ylogTickNum;
+  var ylogTickValues = [];
+  calcSwitchYAxisValues();
+  
+  //if all response time values can be shown with a linear scale, no switch to a log. scale will be offered
+  if (yMaxValue <= ylinearDomainMax) {
+  	d3.select("#TimeStyle").attr("class", "buttonHidden");
+  }
+
+  zoom.x(x);  // apply zoom to x values
+    
+  var yDomainHighStart = y.domain()[1] * 0.95; // y values bigger than the domain are shown in a special style; starting point on y axis
+  var yDomainHighEnd = y.domain()[1] * 1.05;   // y values bigger than the domain are shown in a special style; end point on y axis
+  
+  var yTimeStyle = "linear";    // linear or log possible
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                                         start drawing of chart
+// -----------------------------------------------------------------------------------------------------------------
+	
+	var svg = d3.select("body").append("svg")
+	    .attr("width", width + margin.left + margin.right + margin.legendWidth)
+	    .attr("height", height + margin.top + margin.bottom);
+	var svgGroup = svg.append("g")
+	    						.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	    
+	var clipPath = svgGroup.append("clipPath")
+							    .attr("id", "clip")
+							  	.append("rect")
+							    .attr("x", x(x.domain()[0]))
+							    .attr("y", y(yDomainHighEnd))
+							    .attr("width", width)
+							    .attr("height", height + heightBelowChart + margin.top);
+
+	var chartGroup = svgGroup.append("g")              // includes drawing all test run data except the legend
+										.attr("id","chartGroup")
+										.attr("class", "zoomPointer")
+										.call(zoom);
+	var zoomGroup = chartGroup.append("g")
+									.attr("id", "Zoom")
+									.attr("clip-path", "url(#clip)");
+  var axisGroup = chartGroup.append("g")
+									.attr("id", "Axis")										
+
+// -----------------------------------------------------------------------------------------------------------------
+//                     draw rectangles for periods of unavailability and responsiveness (summary)
+// -----------------------------------------------------------------------------------------------------------------
+
+	function generateAreasFct(){
+		return function(){
+			var areasGroup;
+			var i;
+			
+			areasGroup = getAnchorElem(zoomGroup, "Areas");
+		  for ( i = 0; i < areas.length; i++ ) {
+		  	rectClass = (areas[i].state == 1) ? "areaOK" : "areaDist";
+				rectStart = (areas[i].start < xDomainMin) ? xDomainMin : areas[i].start;
+				rectEnd = (areas[i].end > xDomainMax) ? xDomainMax : areas[i].end;
+				if ((areas[i].state == 0) &&
+					  ((areas[i].start < xDomainMin) || (areas[i].end > xDomainMax)))
+					// period of disturbance starts or ends outside of the high load phase 
+					outsideError = true;
+				if (rectStart <= rectEnd) {
+					// period is not outside of the high load phase
+					var area = areasGroup.append("rect")
+						.attr("x", x(rectStart))
+						.attr("y", y2(y2.domain()[1]))
+						.attr("height", height + heightBelowChart)
+						.attr("width", x(rectEnd) - x(rectStart))
+						.attr("class", rectClass)
+						.data([{elem: areas[i], start: rectStart}]);
+					if (rectClass == "areaDist") {
+						area.on("mouseover", function(d){
+							tooltip.attr("x", x(d.start));
+							tooltip.attr("y", mouseOverInside);
+							tooltip.text(d.elem.duration)
+							return tooltip.style("visibility", "visible");})
+						area.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+					}
+				}
+		  }
+		}
+	}
+	
+	drawChartFcts.push({name: "Areas", fct: generateAreasFct()}); // store function
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                     generate function to draw white area below chart
+// -----------------------------------------------------------------------------------------------------------------
+
+  function generateWhiteAreaFct(){
+ 		return function(){
+ 			var zoomDomain = x.domain();
+ 		  var whiteAreaGroup = getAnchorElem(zoomGroup, "WhiteArea");
+ 		  whiteAreaGroup.append("rect")
+			.attr("x", x(zoomDomain[0]))
+			.attr("y", height + 1)
+			.attr("height", heightWhiteArea)
+			.attr("width", x(xDomainMax))
+			.attr("class", "areaWhite");
+ 		};
+  }
+  
+  drawChartFcts.push({name: "WhiteArea", fct: generateWhiteAreaFct()}); // store function
+
+// -----------------------------------------------------------------------------------------------------------------
+//               generate functions to draw detailed information about unavailablity and long response times
+// -----------------------------------------------------------------------------------------------------------------
+
+	function generateUnavailFct(){
+ 		return function(){
+ 			var unavailGroup;
+ 			var i;
+ 			
+ 			unavailGroup = getAnchorElem(zoomGroup, "Unavail");
+		  for ( i = 0; i < unavail.length; i++ ) {
+		  	rectClass = (unavail[i].state == "a") ? "unavailAll" : "unavailPart";
+				rectStart = (unavail[i].start < xDomainMin) ? xDomainMin : unavail[i].start;
+				rectEnd = (unavail[i].end > xDomainMax) ? xDomainMax : unavail[i].end;
+				if (rectStart <= rectEnd) {
+					// period is not outside of the high load phase
+					unavailGroup.append("rect")
+						.attr("x", x(rectStart))
+						.attr("y", height + heightUnavailStart)
+						.attr("height", heightUnavail)
+						.attr("width", x(rectEnd) - x(rectStart))
+						.attr("class", rectClass)
+						.data([{elem: unavail[i], start: rectStart}])
+						.on("mouseover", function(d){
+							tooltip.attr("x", x(d.start));
+							tooltip.attr("y", height + heightUnavailStart + mouseOverAbove);
+							tooltip.text(d.elem.duration)
+							return tooltip.style("visibility", "visible");})
+						.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+				}
+		  }
+		}
+	}
+	
+	drawChartFcts.push({name: "Unavail", fct: generateUnavailFct()}); // store function
+
+  function generateLongRespFct(){
+ 		return function(){
+ 			var longRespGroup;
+ 			var i;
+ 			
+ 			longRespGroup = getAnchorElem(zoomGroup, "LongResp");
+		  for ( i = 0; i < longResp.length; i++ ) {
+		  	rectClass = (longResp[i].state == "a") ? "longRespAll" : "longRespPart";
+				rectStart = (longResp[i].start < xDomainMin) ? xDomainMin : longResp[i].start;
+				rectEnd = (longResp[i].end > xDomainMax) ? xDomainMax : longResp[i].end;
+				if (rectStart <= rectEnd) {
+					// period is not outside of the high load phase
+					longRespGroup.append("rect")
+					.attr("x", x(rectStart))
+					.attr("y", height + heightLongRespStart)
+					.attr("height", heightLongResp)
+					.attr("width", x(rectEnd) - x(rectStart))
+					.attr("class", rectClass)
+					.data([{elem: longResp[i], start: rectStart}])
+					.on("mouseover", function(d){
+						tooltip.attr("x", x(d.start));
+						tooltip.attr("y", height + heightLongRespStart + mouseOverAbove);
+						tooltip.text(d.elem.duration)
+						return tooltip.style("visibility", "visible");})
+					.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+				}
+		  }
+		}
+	}
+	
+	drawChartFcts.push({name: "LongResp", fct: generateLongRespFct()}); // store function
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                 generate function to draw information about events
+// -----------------------------------------------------------------------------------------------------------------
+ 
+  function generateEventsFct(){
+		return function(){
+			var eventsGroup;
+		  var yCurrent = height + heightEventsStart;
+		  var i;
+		  
+		  eventsGroup = getAnchorElem(zoomGroup, "Events");
+		  for ( i = 0; i < events.length; i++ ) {
+				eventClass = (events[i].state == 1) ? "eventsOK" : "eventsFail";
+				yCurrent += i * 25;
+				eventsGroup.append("line")
+				  .attr("x1", x(events[i].start))
+				  .attr("y1", yCurrent)
+				  .attr("x2", x(events[i].end))
+				  .attr("y2", yCurrent)
+					.attr("class", eventClass)
+					.data([{elem: events[i], yVal: yCurrent}])
+					.on("mouseover", function(d){
+						tooltip.attr("x", x(d.elem.start));
+						tooltip.attr("y", d.yVal + mouseOverAbove);
+						tooltip.text(d.elem.duration)
+						return tooltip.style("visibility", "visible");})
+					.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+				eventsGroup.append("text")
+					.attr("x", x(events[i].end) + 5)
+			    .attr("y", yCurrent + 3)
+				  .attr("style", "fill:#000")
+				  .text("Event " + (i+1) + ": " + events[i].name);
+		  }
+		}
+	}
+	
+	drawChartFcts.push({name: "Events", fct: generateEventsFct()}); // store function
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                           generate functions to draw axis
+// -----------------------------------------------------------------------------------------------------------------
+  
+  function generateXAxisFct(){	 
+		return function(){
+			var xAxisFormat = setXAxisFormat();
+			var xAxisGroup = getAnchorElem(axisGroup, "XAxis");
+			xAxis.tickFormat(xAxisFormat.xFormat);
+  		xAxisGroup.append("g")
+	      .attr("class", "x axis")
+	      .attr("transform", "translate(0," + height + ")")
+	      .call(xAxis)
+				.append("text")
+				.attr("transform", "translate(" + (width-5) + ",0)")
+	      .attr("y", 22)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text(xAxisFormat.xText);   
+	  }
+	}
+	
+	drawChartFcts.push({name: "XAxis", fct: generateXAxisFct()}); // store function 
+
+  function generateYAxisFct(){
+		return function(){
+			var yAxisGroup = getAnchorElem(axisGroup, "YAxis");
+  		yAxisGroup.append("g")
+	      .attr("class", "y axis")
+	      .call(yAxis)
+	    	.append("text")
+	      .attr("transform", "translate(0,5) rotate(-90)")
+	      .attr("y", 8)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Time (ms)");
+	  }
+	}
+	
+	drawChartFcts.push({name: "YAxis", fct: generateYAxisFct()}); // store function
+	  
+  function generateY2AxisFct(){
+		return function(){
+			var y2AxisGroup = getAnchorElem(axisGroup, "Y2Axis");
+  		y2AxisGroup.append("g")
+	      .attr("class", "y2 axis")
+		  	.attr("transform", "translate(" + width + ",0)")
+	      .call(y2Axis)
+	    	.append("text")
+	      .attr("transform", "translate(-24,5) rotate(-90)")
+	      .attr("y", 8)
+	      .attr("dy", ".71em")
+	      .style("text-anchor", "end")
+	      .text("Steps/s");
+	  }
+	}
+	
+	drawChartFcts.push({name: "Y2Axis", fct: generateY2AxisFct()}); // store function
+      
+// -----------------------------------------------------------------------------------------------------------------
+//                                   generate functions to draw bars for response and server time
+// -----------------------------------------------------------------------------------------------------------------
+ 
+  function generateRespTimeFct(){
+		return function(){
+			var respTimeGroup;
+			var xVal, yVal, xValToolTip, yValToolTip; // x- and y-values (in pixels) for the bars and the tooltips
+			var domain = x.domain();
+			var notLastTact;
+			var i;
+			
+			respTimeGroup = getAnchorElem(zoomGroup, "RespTime"); 
+		  for ( i = 0; i < tactData.length; i++ ) {
+		  	if (tactData[i].respTime > 0) {
+		  		// bar is not shown if response time = 0 (would cause error with logarithmic y axis) 
+			  	notLastTact = (i < (tactData.length - 1));
+			  	xVal = x(tactData[i].middleDate) + (notLastTact ? barRightOffset : lastBarRightOffset);
+			  	xValToolTip = xVal;
+			  	if (tactData[i].respTime <= y.domain()[1]) {
+			  		// bar can be completely shown in the chart
+			  		yVal = y(tactData[i].respTime);
+			  		yValToolTip = yVal  + mouseOverAbove;
+			  	} else {
+			  		// height of bar is too big for the chart
+			  		yVal = y(yDomainHighStart);
+						yValToolTip = 10;
+			  	}
+			
+					respTimeGroup.append("rect")
+						.attr("x", xVal)
+						.attr("y", yVal)
+						.attr("height", height - yVal)
+						.attr("width", notLastTact ? barWidth : lastBarWidth)
+						.attr("class", "respTimeBar")
+						.data([{elem: tactData[i], xVal: xValToolTip, yVal: yValToolTip}])
+						.on("mouseover", function(d){
+							tooltip.attr("x", d.xVal);
+							tooltip.attr("y", d.yVal)
+							tooltip.text(d.elem.respTime)
+							return tooltip.style("visibility", "visible");})
+						.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+					
+					if (tactData[i].respTime > y.domain()[1]) {
+						// height of bar is too big for the chart; show upper part of the bar in a special style
+						yVal = y(yDomainHighEnd);
+						respTimeGroup.append("rect")
+							.attr("x", xVal)
+							.attr("y", yVal)
+							.attr("height", height - yVal)
+							.attr("width", notLastTact ? barWidth : lastBarWidth)
+							.attr("class", "respTimeHighBar")
+							.data([{elem: tactData[i], xVal: xValToolTip, yVal: yValToolTip}])
+							.on("mouseover", function(d){
+								tooltip.attr("x", d.xVal);
+								tooltip.attr("y", d.yVal)
+								tooltip.text(d.elem.respTime)
+								return tooltip.style("visibility", "visible");})
+							.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+					}
+				}
+			}
+		}
+	}
+	
+	drawChartFcts.push({name: "RespTime", fct: generateRespTimeFct()}); // store function
+	
+  function generateServerTimeFct(){
+		return function(){
+			var serverTimeGroup;
+			var xVal, yVal, xValToolTip, yValToolTip; // x- and y-values (in pixels) for the bars and the tooltips
+			var notLastTact; 
+			var i;
+			
+			serverTimeGroup = getAnchorElem(zoomGroup, "ServerTime");
+		  for ( i = 0; i < tactData.length; i++ ) {
+		  	if (tactData[i].serverTime > 0) {
+		  		// bar is not shown if server time = 0 (would cause error with logarithmic y axis)
+			  	notLastTact = (i < (tactData.length - 1));
+					xVal = x(tactData[i].middleDate) + (notLastTact ? barLeftOffset : lastBarLeftOffset);
+					if (tactData[i].serverTime <= y.domain()[1]) {
+						// bar can be completely shown in the chart
+						yVal = y(tactData[i].serverTime);
+						xValToolTip = xVal;
+						yValToolTip = yVal + mouseOverInside;
+					} else {
+						// height of bar is too big for the chart
+						yVal = y(yDomainHighStart);
+						xValToolTip = xVal;
+						yValToolTip = 20;
+					}
+			
+					serverTimeGroup.append("rect")
+						.attr("x", xVal)
+						.attr("y", yVal)
+						.attr("height", height - yVal)
+						.attr("width", notLastTact ? barWidth : lastBarWidth)
+						.attr("class", "serverTimeBar")
+						.data([{elem: tactData[i], xVal: xValToolTip, yVal: yValToolTip}])
+						.on("mouseover", function(d){
+							tooltip.attr("x", d.xVal);
+							tooltip.attr("y", d.yVal)
+							tooltip.text(d.elem.serverTime)
+							return tooltip.style("visibility", "visible");})
+						.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+						
+					if (tactData[i].serverTime > y.domain()[1]) {
+						// height of bar is too big for the chart; show upper part of the bar in a special style
+						yVal = y(yDomainHighEnd);
+						serverTimeGroup.append("rect")
+							.attr("x", xVal)
+							.attr("y", yVal)
+							.attr("height", height - yVal)
+							.attr("width", notLastTact ? barWidth : lastBarWidth)
+							.attr("class", "serverTimeHighBar")
+							.data([{elem: tactData[i], xVal: xValToolTip, yVal: yValToolTip}])
+							.on("mouseover", function(d){
+								tooltip.attr("x", d.xVal);
+								tooltip.attr("y", d.yVal)
+								tooltip.text(d.elem.serverTime)
+								return tooltip.style("visibility", "visible");})
+							.on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+					}
+				}
+			}
+		}
+	}
+	
+	drawChartFcts.push({name: "ServerTime", fct: generateServerTimeFct()}); // store function
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                   generate function to draw line for steps per second
+// -----------------------------------------------------------------------------------------------------------------
+	  
+  function generateStepsPerSecFct(){
+		return function(){
+			var stepsPerSecGroup = getAnchorElem(zoomGroup, "StepsPerSec");
+  		stepsPerSecGroup.append("path")
+	      .datum(tactData)
+	      .attr("class", "stepsPerSecLine")
+	      .attr("d", stepsPerSecLine);
+	  }
+	}
+		
+	drawChartFcts.push({name: "StepsPerSec", fct: generateStepsPerSecFct()}); // store function
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                            draw all elements the first time
+// -----------------------------------------------------------------------------------------------------------------
+  handleHeadLine();
+	drawChart();
+	drawLegend();
+	firstDraw = false;
+	
+// -----------------------------------------------------------------------------------------------------------------
+//                                            function to draw the zoomable elements
+// -----------------------------------------------------------------------------------------------------------------
+
+	function drawChart() {
+		var i;
+		
+		calcTactAndBarWidth();
+		for (i = 0; i < drawChartFcts.length; i++) {
+			d3.select("g#" + drawChartFcts[i].name).selectAll("*").remove();	  
+	    drawChartFcts[i].fct();
+	  }
+	}
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                                     draw tooltips
+// -----------------------------------------------------------------------------------------------------------------
+
+	var tooltip = chartGroup.append("text")
+			.attr("id", "Tooltip")
+		  .attr("style", "fill:#000")
+		  .style("visibility", "hidden")
+		  .text("placeholder");
+		        
+// -----------------------------------------------------------------------------------------------------------------
+//                                                   draw legend
+// -----------------------------------------------------------------------------------------------------------------
+  
+	function drawLegend() {
+		
+		var legend;
+		
+		if (firstDraw) {
+			legend = svgGroup.append("g").attr("id","legendGroup");
+		}
+		else {
+			d3.select("g#legendGroup").selectAll("*").remove();
+			legend = d3.select("g#legendGroup");
+		}
+			
+		legend.attr("height", margin.legendheight)
+		  .attr("width", margin.legendWidth)
+		  .attr("transform","translate("+(width + 60)+",200)");
+	 
+	  var yOffset = 0;
+	  for ( var i = 0; i < legendColl.length; i++ ) {
+	 		var styleClass = legendColl[i].key;
+	 		var elem = legendColl[i].elem;
+	 		if (i > 0) {
+	 			if (legendColl[i].newGrp != -1)
+	 				yOffset += 20 + 10*legendColl[i].newGrp + (((legendColl[i].newGrp == 1) && (elem == "line")) ? 5 : 0);
+	 			else {
+	 		  	yOffsetTmp = height + heightWhiteArea - legendHeightStart;
+	 		  	yOffset += 20 + 10 + (((legendColl[i].newGrp == 1) && (elem == "line")) ? 5 : 0);
+	 		  	if (yOffset < yOffsetTmp)
+	 		  		yOffset = yOffsetTmp;
+	 		  }
+	 		}
+	 		var text = legend.append("text")
+			  .attr("x", 30)
+			  .attr("style", "fill:#000")
+			  .text(legendColl[i].text);  
+			var bbox = text.node().getBBox();
+			
+	 		if (elem == "line") {
+	 			text.attr("y",yOffset+(bbox.height/3));
+		 		legend.append("line")
+				  .attr("x1", 0)
+			    .attr("y1", yOffset)
+			    .attr("x2", 20)
+			    .attr("y2", yOffset)
+				  .attr("class",styleClass);
+			} else if (elem == "rect") {
+				text.attr("y",yOffset+(bbox.height-2));
+			  legend.append("rect")
+			    .attr("x", 0)
+					.attr("y", yOffset)
+					.attr("height", bbox.height)
+					.attr("width", 20)
+					.attr("class", styleClass);
+			}
+		}		  
+	}
+
+// -----------------------------------------------------------------------------------------------------------------
+//                                                   react on resize of window
+// -----------------------------------------------------------------------------------------------------------------
+
+	window.onresize = function(){
+		var newWidth = window.innerWidth - margin.left - margin.right - margin.legendWidth;
+		var newRange;
+
+		if (Math.abs(width - newWidth) > 10) {
+			// adapt width
+			width = newWidth;
+			svg.attr("width", width + margin.left + margin.right + margin.legendWidth);
+			clipPath.attr("width", width);
+			newRange = x.range();
+			x.range([newRange[0], width]);
+			
+			zoom.x(x);  // apply zoom to x values
+			
+			// redraw chart and legend
+			drawChart();
+			drawLegend();
+		}
+ };
+
+// -----------------------------------------------------------------------------------------------------------------
+//                               toggle between linear and logarithmic time scale of y axis
+// -----------------------------------------------------------------------------------------------------------------
+
+	function switchTimeScale() {
+		
+		// toggle between linear and log.
+		if (yTimeStyle == "linear") {
+			// chart is shown with a linear y axis and a 'Log. Time Scale' button
+			// change to a log. y axis and a linear time scale button 
+			yTimeStyle = "log";
+    	document.getElementById("TimeStyle").innerHTML = "Linear Time Scale";  // change button
+    	
+    	y = d3.scale.log()
+					.range([height, 0])
+					.domain([0.1,ylogDomainMax]);
+					
+			// change y axis
+			yAxis =	d3.svg.axis()
+	    				.scale(y)
+	    				.orient("left")
+	    				.ticks(ylogTickNum, "s")
+	    				.tickValues(ylogTickValues);
+    }
+    else {
+    	// chart is shown with a logarithmic y axis and a 'Linear Time Scale' button
+			// change to a linear y axis and a log. time scale button
+    	document.getElementById("TimeStyle").innerHTML = "Log. Time Scale";
+    	yTimeStyle = "linear";
+    	
+    	y = d3.scale.linear()
+					.range([height, 0])
+					.domain([0, ylinearDomainMax]);
+			
+			// change y axis
+			yAxis =	d3.svg.axis()
+	    				.scale(y)
+	    				.orient("left");    				
+    }		  
+		drawChart(); // redraw chart
+	}
+	
+	function calcSwitchYAxisValues() {
+		yMaxValue = d3.max(tactData, function(d) { return d.respTime; });
+		ylinearDomainMax = y.domain()[1]; // at first linear axis is used
+    ylogDomainMax = 2 * yMaxValue;
+
+		var minTickNum = 3;
+		var helpLog = Math.log(ylogDomainMax) / Math.log(10);  // not all browsers support Math.log10
+		var helpRound = Math.round(helpLog);
+		
+		ylogTickNum = Math.max(minTickNum, (helpRound > helpLog) ? helpRound : helpRound+1);
+    
+    var tickVal = 1;
+    var i = 0;
+		while (i < ylogTickNum) {
+			ylogTickValues.push(tickVal);
+			tickVal = tickVal * 10;
+			i++;
+		}
+	}
+} // v2.12b		
+// -----------------------------------------------------------------------------------------------------------------
+//                                                 html manipulation
+// -----------------------------------------------------------------------------------------------------------------		
+	
+	function handleHeadLine() {
+		if (exitcode == 0) {
+			d3.select("h2#" + "HeadLine").attr("class", "backOK");
+		} else {
+			d3.select("h2#" + "HeadLine").attr("class", "backErr");
+		}
+	}
+ 
+// -----------------------------------------------------------------------------------------------------------------
+//                                                   helper functions
+// -----------------------------------------------------------------------------------------------------------------
+ 	
+	function getAnchorElem(parentElem, elemName) {
+		if (firstDraw) {
+		  // function is called the first time; generate new group
+			return parentElem.append("g").attr("id", elemName);
+		}
+		else {
+			// group content is recreated; use existing group tag
+			return d3.select("g#" + elemName);
+		}
+	}
+	
+	function calcTactAndBarWidth() {
+		var zoomDomain;
+				
+		if (firstDraw)
+			tactNum = tactData.length;
+		else {
+			zoomDomain = x.domain();
+			tactNum = (zoomDomain[1].getTime() - zoomDomain[0].getTime()) / (1000 * tactDuration);
+		} 
+		tactWidth = width / tactNum + 1;   	//use 1 additional tact to have sufficient space for the bars	
+		if (tactWidth > (barRelMaxSize + tactBarWidthMaxDiff)) {
+			barWidth = tactWidth - tactBarWidthMaxDiff;
+			barLeftOffset = -(barWidth / 2 + barShiftSize);
+			barRightOffset = -(barWidth / 2 - barShiftSize);
+		} else {
+			barWidth = tactWidth / tactBarRatio;
+			barLeftOffset = -(barWidth / 2 + barShiftSize * barWidth / barRelMaxSize);
+			barRightOffset = -(barWidth / 2 - barShiftSize * barWidth / barRelMaxSize);
+		}
+		lastTactWidth = tactWidth / tactLastTactRatio;
+		if (lastTactWidth > (barRelMaxSize + tactBarWidthMaxDiff)) {
+			lastBarWidth = lastTactWidth - tactBarWidthMaxDiff;
+			lastBarLeftOffset = -(lastBarWidth / 2 + barShiftSize);
+			lastBarRightOffset = -(lastBarWidth / 2 - barShiftSize);
+		} else {
+			lastBarWidth = lastTactWidth / tactBarRatio;
+			lastBarLeftOffset = -(lastBarWidth / 2 + barShiftSize * lastBarWidth / barRelMaxSize);
+			lastBarRightOffset = -(lastBarWidth / 2 - barShiftSize * lastBarWidth / barRelMaxSize);
+		}	
+	}
+
+	function setXAxisFormat() {
+		var zoomDomain = x.domain();
+		var zoomDuration = zoomDomain[1].getTime() - zoomDomain[0].getTime();
+		
+		if (zoomDuration >= 10000) {
+			// more than 10 seconds are shown on the x axis
+			return {xText: "Clock (hh:mm:ss)", xFormat: d3.time.format("%X")};
+		} else {
+			return {xText: "Clock (ss:mmm)", xFormat: d3.time.format("%S.%L")};
+		}
+	}
+	
+</script>
+
+<!-- -----------------------------------------------------------------------------------------------------------------
+                                           HTML for results shown at the bottom
+------------------------------------------------------------------------------------------------------------------ -->
+
+<div id="ResultBox">
+	<div id="OutsideErrorBox" class="boxHidden">
+		<h3 id="OutsideErrorText">!!! Attention: Disturbance occured at least partially outside of the high load phase</h3>
+	</div>
+	<div id="ExitcodeBox" class="boxHidden" >
+		<div id="ButtonContainer">
+			<button id="ExitcodeButton" type="button" class="expcolButton buttonHidden" onclick="toggleExitcode()">+</button>
+		</div>
+		<h3 id="ExitcodeShortText">Exitcode</h3>
+		<div id="ExitcodeLongText" class="textContentHidden"><HATestTool><ExitcodeLongtext>
+		</div>
+	</div>
+	<div id="CheckBox" class="boxHidden">
+		<div id="ButtonContainer">
+			<button id="CheckButton" type="button" class="expcolButton buttonVisible" onclick="toggleCheck()">+</button>
+		</div>
+		<h3 id="CheckShortText">Check against expected Result</h3>
+		<div id="CheckLongText" class="textContentHidden"><HATestTool><CheckLongtext>
+		</div>
+	</div>
+	<div id="EventBox" class="boxHidden">
+		<div id="ButtonContainer">
+			<button id="EventButton" type="button" class="expcolButton buttonVisible" onclick="toggleEvent()">+</button>
+		</div>
+		<h3 id="EventShortText">HA Events</h3>
+		<div id="EventLongText" class="textContentHidden"><HATestTool><EventLongtext>
+		</div>
+	</div>
+	<div id="VerificationBox" class="boxHidden">
+		<div id="ButtonContainer">
+			<button id="VerificationButton" type="button" class="expcolButton buttonVisible" onclick="toggleVerification()">+</button>
+		</div>
+		<h3 id="VerificationShortText">Verification</h3>
+		<div id="VerificationLongText" class="textContentHidden"><HATestTool><VerificationLongtext>
+  	</div>
+	</div>
+	<div id="ErrorBox" class="boxHidden">
+		<div id="ButtonContainer">
+			<button id="ErrorButton" type="button" class="expcolButton buttonVisible" onclick="toggleError()">+</button>
+		</div>
+		<h3 id="ErrorShortText">Errors</h3>
+		<div id="ErrorLongText" class="textContentHidden"><HATestTool><ErrorLongtext>
+		</div>
+	</div>
+	<div id="PropertyBox" class="boxHidden">
+		<div id="ButtonContainer">
+			<button id="PropertyButton" type="button" class="expcolButton buttonVisible" onclick="toggleProperty()">+</button>
+		</div>
+		<h3 id="PropertyShortText">Properties</h3>
+		<div id="PropertyLongText" class="textContentHidden"><HATestTool><PropertyLongtext>
+		</div>
+	</div>
+</div>
+
+<!-- -----------------------------------------------------------------------------------------------------------------
+//                                  functions to manipulate HTML for results shown at the bottom
+------------------------------------------------------------------------------------------------------------------ -->
+
+<script>
+	
+	// variable for expand and collapse buttons
+	var expand = "+";
+	var collapse = "-";
+	var exitcodeButtonContent = expand;     // values: + and -
+	var checkButtonContent = expand;        // values: + and -
+	var eventButtonContent = expand;        // values: + and -
+	var verificationButtonContent = expand; // values: + and -
+	var errorButtonContent = expand;        // values: + and -
+	var propertyButtonContent = expand;     // values: + and -
+	
+	function handleBottom() {
+		
+		// outside errors
+		if (outsideError)
+			d3.select("#OutsideErrorBox").attr("class", "boxVisible");
+	
+		// exitcode
+		var exitcodeShort = d3.select("h3#" + "ExitcodeShortText");
+		d3.select("#ExitcodeBox").attr("class", "boxVisible");
+		if (exitcode == 0) {
+			exitcodeShort.attr("class", "backOK");
+		} else {
+			exitcodeShort.attr("class", "backErr");
+			d3.select("button#" + "ExitcodeButton").attr("class", "expcolButton buttonVisible");
+		}
+		exitcodeShort.text("Exitcode: " + exitcode);
+
+		// checks
+		if (resultChecks == "off") {
+			// don't show checks
+			d3.select("#CheckBox").remove();
+		}	else {
+			var checkShort = d3.select("h3#" + "CheckShortText");
+			d3.select("#CheckBox").attr("class", "boxVisible");
+			if (resultChecks == "ok") {
+				checkShort.attr("class", "backOK");
+			} else {
+				if (resultChecks == "okbut") {
+					checkShort.attr("class", "backWarn");
+				} else {
+					checkShort.attr("class", "backErr");
+				}
+			}
+		}
+		
+		// events
+		if (resultEvents == "off") {
+			// don't show checks
+			d3.select("#EventBox").remove();
+		}	else {
+			d3.select("#EventBox").attr("class", "boxVisible");
+			d3.select("h3#" + "EventShortText").attr("class", "backErr");
+		}
+		
+		// verification
+		if (resultVerification == "off") {
+			// don't show checks
+			d3.select("#VerificationBox").remove();
+		}	else {
+			d3.select("#VerificationBox").attr("class", "boxVisible");
+			d3.select("h3#" + "VerificationShortText").attr("class", "backErr");
+		}
+		
+		// errors
+		if (resultErrors == "off") {
+			// don't show checks
+			d3.select("#ErrorBox").remove();
+		}	else {
+			d3.select("#ErrorBox").attr("class", "boxVisible");
+			d3.select("h3#" + "ErrorShortText").attr("class", "backErr");
+		}
+		
+		// properties
+		var propertyShort = d3.select("h3#" + "PropertyShortText");
+		d3.select("#PropertyBox").attr("class", "boxVisible");
+		propertyShort.attr("class", "backNeutral");
+		d3.select("button#" + "PropertyButton").attr("class", "expcolButton buttonVisible");
+	}
+	
+	function toggleExitcode() {
+		// toggle between expand and collapse
+		if (exitcodeButtonContent == expand) {
+			// exitcode info is shown in collapsed form --> expand it
+			d3.select("div#" + "ExitcodeLongText").attr("class", "textContentVisible")
+			                                      .attr("width", width);
+			exitcodeButtonContent = collapse;
+		} else {
+			d3.select("div#" + "ExitcodeLongText").attr("class", "textContentHidden");
+			exitcodeButtonContent = expand;
+		}
+    document.getElementById("ExitcodeButton").innerHTML = exitcodeButtonContent;  // change button
+	}
+	
+	function toggleCheck() {
+		// toggle between expand and collapse
+		if (checkButtonContent == expand) {
+			// check info is shown in collapsed form --> expand it
+			d3.select("div#" + "CheckLongText").attr("class", "textContentVisible")
+			                                   .attr("width", width);
+			checkButtonContent = collapse;
+		} else {
+			d3.select("div#" + "CheckLongText").attr("class", "textContentHidden");
+			checkButtonContent = expand;
+		}
+    document.getElementById("CheckButton").innerHTML = checkButtonContent;  // change button
+	}
+	
+	function toggleEvent() {
+		// toggle between expand and collapse
+		if (eventButtonContent == expand) {
+			// event info is shown in collapsed form --> expand it
+			d3.select("div#" + "EventLongText").attr("class", "textContentVisible")
+			                                   .attr("width", width);
+			eventButtonContent = collapse;
+		} else {
+			d3.select("div#" + "EventLongText").attr("class", "textContentHidden");
+			eventButtonContent = expand;
+		}
+    document.getElementById("EventButton").innerHTML = eventButtonContent;  // change button
+	}
+	
+		function toggleVerification() {
+		// toggle between expand and collapse
+		if (verificationButtonContent == expand) {
+			// verification info is shown in collapsed form --> expand it
+			d3.select("div#" + "VerificationLongText").attr("class", "textContentVisible")
+			                                          .attr("width", width);
+			verificationButtonContent = collapse;
+		} else {
+			d3.select("div#" + "VerificationLongText").attr("class", "textContentHidden");
+			verificationButtonContent = expand;
+		}
+    document.getElementById("VerificationButton").innerHTML = verificationButtonContent;  // change button
+	}
+	
+	function toggleError() {
+		// toggle between expand and collapse
+		if (errorButtonContent == expand) {
+			// error info is shown in collapsed form --> expand it
+			d3.select("div#" + "ErrorLongText").attr("class", "textContentVisible")
+			                                   .attr("width", width);
+			errorButtonContent = collapse;
+		} else {
+			d3.select("div#" + "ErrorLongText").attr("class", "textContentHidden");
+			errorButtonContent = expand;
+		}
+    document.getElementById("ErrorButton").innerHTML = errorButtonContent;  // change button
+	}
+	
+	function toggleProperty() {
+		// toggle between expand and collapse
+		if (propertyButtonContent == expand) {
+			// property info is shown in collapsed form --> expand it
+			d3.select("div#" + "PropertyLongText").attr("class", "textContentVisible")
+			                                      .attr("width", width);
+			propertyButtonContent = collapse;
+		} else {
+			d3.select("div#" + "PropertyLongText").attr("class", "textContentHidden");
+			propertyButtonContent = expand;
+		}
+    document.getElementById("PropertyButton").innerHTML = propertyButtonContent;  // change button
+	}
+
+	handleBottom();
+</script>
+
+</body>

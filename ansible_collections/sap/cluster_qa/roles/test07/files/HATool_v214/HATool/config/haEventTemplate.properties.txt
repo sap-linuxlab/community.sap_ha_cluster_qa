@@ -1,0 +1,21 @@
+####################
+#     HA Event     #
+####################
+
+# name of HA event
+#eventname = SCSFailover
+
+# call of HA event
+# call of a program / script, which starts the HA event
+# program / script has to be located in event subdirectory;
+# there is no directory in the name allowed
+# as of version 2.13, you can specify variable call parameters:
+#   user-defined properties (indicated by <(...)>) or test properties (indicated by <...>);
+#   event properties, file collection properties, and password properties are not allowed;
+#   the values of user-defined properties are specified by the property eventcallparameters;
+#   if a test property is used but not set, its default is used;
+#   if a default does not exist, the program aborts
+#   example: eventcall=script.sh 20 <systemid> <(myparam)>
+#eventcall = <script or program including all parameters>
+
+
