@@ -1,4 +1,5 @@
 ---
-- hosts: all
+- name: Find ERS instance location in the cluster
+  hosts: all
   roles:
     - sap.cluster_qa.pcs_find_ers
