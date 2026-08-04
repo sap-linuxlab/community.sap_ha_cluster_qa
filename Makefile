@@ -28,16 +28,16 @@ venv/bin/activate:  ## Create virtual environment
 .ONESHELL:
 ansible-lint: venv/bin/activate .tox/lint/ansible_collections lint/ansible_collections ## Run ansible-lint
 	. venv/bin/activate
-	$(TOX) exec -e lint -- ansible-lint --offline --config .config/ansible-lint.yml
+	$(TOX) exec -e lint -- ansible-lint --offline
 
 .PHONY: yamllint
 .ONESHELL:
 yamllint: venv/bin/activate  ## Run yamllint
 	. venv/bin/activate
-	$(TOX) exec -e lint -- yamllint . --config-file .config/yamllint.yml
+	$(TOX) exec -e lint -- yamllint . --config-file .yamllint.yml
 
 .PHONY: lint
-lint: cspell collection-dependencies ansible-lint yamllint  ## Run all linting for the project
+lint: cspell ansible-lint yamllint  ## Run all linting for the project
 
 .PHONY: clean-venv
 clean-venv:  ## Clean virtual environment
@@ -59,7 +59,3 @@ clean: clean-venv clean-tox  ## Clean
 collection-list-%: venv/bin/activate ## List ansible installed collections
 	. venv/bin/activate
 	$(TOX) exec -e $* -- ansible-galaxy collection list
-
-.PHONY: collection-dependencies
-collection-dependencies:  ## Check if collection dependencies and project requirements are the same
-	./hack/collection-dependencies.sh

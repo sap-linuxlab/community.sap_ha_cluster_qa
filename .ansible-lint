@@ -1,0 +1,44 @@
+---
+## Collection-wide ansible-lint configuration.
+## Modeled after community.sap_install; run from the repository root or from
+## ansible_collections/sap/cluster_qa (for example: ansible-lint --offline roles/test01).
+##
+## Execution examples:
+# ansible-lint --offline
+# ansible-lint --offline roles/test01
+# make ansible-lint
+
+exclude_paths:
+  - .ansible/
+  - .cache/
+  - .config/
+  - .github/
+  - .tox/
+  - changelogs/
+  - node_modules/
+  - venv/
+  - tests/
+  # Molecule scenarios depend on external collections (e.g. sap.ovirt)
+  # that are not available during offline lint:
+  - roles/*/molecule/
+
+enable_list:
+  - yaml
+
+skip_list:
+  # We don't want to enforce new Ansible versions for Galaxy:
+  - meta-runtime[unsupported-version]
+  # We do not want to use checks which are marked as experimental:
+  - experimental
+  # We use ignore_errors for assert tasks in several roles:
+  - ignore-errors
+  # Allow single digit / flexible schema in role meta files:
+  - schema
+  # Allow templating inside name because it creates more detailed output:
+  - name[template]
+  # Playbooks and roles intentionally use run_once for cluster-wide discovery:
+  - run-once[task]
+  # Cluster status commands often do not need a changed_when:
+  - no-changed-when
+  # Shell pipelines are used for pcs parsing in several roles:
+  - risky-shell-pipe
