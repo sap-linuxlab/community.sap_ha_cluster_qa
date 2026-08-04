@@ -1,23 +1,22 @@
+---
 name: Build collection
 
-"on":
+on:
   workflow_dispatch:
   push:
     branches:
       - main
-  pull_request_target:
-    types:
-      - opened
-      - synchronize
-      - reopened
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
 
 jobs:
   build-sap-cluster_qa:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: actions/checkout@v5
 
       - name: Run collection build command
         run: make build
