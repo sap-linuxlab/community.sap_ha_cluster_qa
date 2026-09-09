@@ -1,4 +1,5 @@
 ---
-- hosts: all
+- name: Prepare hosts using sap.sap_operations.prepare
+  hosts: all
   roles:
     - sap.sap_operations.prepare
